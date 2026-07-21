@@ -19,11 +19,12 @@
     printf("[START] rTest_glBindBuffer_invalid_enum()\n");
 
     glBindBuffer(0xFFFFFFFF, 1);
+
     GLenum err = glGetError();
-
-    if (err != GL_INVALID_ENUM) {printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);}
-
-    assert(err == GL_INVALID_ENUM);
+    if (err != GL_INVALID_ENUM) {
+        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        assert(err == GL_INVALID_ENUM);
+    }
     printf("[PASS] rTest_glBindBuffer_invalid_enum()\n");
 }
 

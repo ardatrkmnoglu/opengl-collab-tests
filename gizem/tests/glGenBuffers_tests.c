@@ -22,8 +22,8 @@ void rTest_glGenBuffers_invalid_value()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
+        assert(err == GL_INVALID_VALUE);
     }
-    assert(err == GL_INVALID_VALUE);
     printf("[PASS] rTest_glGenBuffers_invalid_value()\n");
 }
 

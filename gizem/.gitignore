@@ -1,0 +1,67 @@
+# ==========================
+# CLion / IntelliJ
+# ==========================
+.idea/
+
+# ==========================
+# CMake Build Directories
+# ==========================
+cmake-build-debug/
+cmake-build-release/
+cmake-build*/
+build/
+
+# ==========================
+# CMake Generated Files
+# ==========================
+CMakeCache.txt
+CMakeFiles/
+CTestTestfile.cmake
+cmake_install.cmake
+compile_commands.json
+Makefile
+Testing/
+
+# ==========================
+# Ninja
+# ==========================
+.ninja_deps
+.ninja_log
+build.ninja
+
+# ==========================
+# Executables
+# ==========================
+*.exe
+*.out
+*.app
+
+# ==========================
+# Object Files
+# ==========================
+*.o
+*.obj
+*.lo
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+
+# ==========================
+# Debug Symbols
+# ==========================
+*.pdb
+*.ilk
+
+# ==========================
+# Logs
+# ==========================
+*.log
+
+# ==========================
+# Temporary Files
+# ==========================
+*.tmp
+*.swp
+*.bak

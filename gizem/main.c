@@ -84,6 +84,22 @@ void init(void)
 {
     /* TESTLER */
 
+    // --------------- glBufferSubData ---------------
+    // rTest_glBufferSubData_invalid_enum_target();
+    // rTest_glBufferSubData_invalid_value_negative_offset();
+    // rTest_glBufferSubData_invalid_value_negative_size();
+    // rTest_glBufferSubData_invalid_value_out_of_bounds();
+    // rTest_glBufferSubData_invalid_operation_zero_buffer_bound();
+    // rTest_glBufferSubData_offset_size_overflow_wraparound();
+    // rTest_glBufferSubData_exact_boundary_offset();
+    // rTest_glBufferSubData_negative_offset_compensating_size();
+    // rTest_glBufferSubData_zero_size_null_data();
+    // rTest_glBufferSubData_target_zero_bound();
+    // rTest_glBufferSubData_into_zero_sized_store();
+    // rTest_glBufferSubData_source_smaller_than_size();
+    // rTest_glBufferSubData_dangling_data_pointer();
+    // rTest_glBufferSubData_overlapping_misaligned_thrash();
+
     // --------------- glBufferData ---------------
     // rTest_glBufferData_invalid_enum_target();
     // rTest_glBufferData_invalid_enum_usage();

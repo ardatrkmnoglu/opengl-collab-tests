@@ -84,6 +84,25 @@ void init(void)
 {
     /* TESTLER */
 
+
+    // --------------- glGetBufferParameteriv ---------------
+    // rTest_glGetBufferParameteriv_invalid_enum_target();
+    // rTest_glGetBufferParameteriv_invalid_enum_value();
+    // rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound();
+    // rTest_glGetBufferParameteriv_invalid_target();
+    // rTest_glGetBufferParameteriv_invalid_value();
+    // rTest_glGetBufferParameteriv_reserved_name_zero_bound();
+    // rTest_glGetBufferParameteriv_element_array_zero_bound();
+    // rTest_glGetBufferParameteriv_null_data_pointer();
+    // rTest_glGetBufferParameteriv_dangling_data_pointer();
+    // rTest_glGetBufferParameteriv_size_consistency();
+    // rTest_glGetBufferParameteriv_usage_initial_and_updates();
+    // rTest_glGetBufferParameteriv_both_invalid();
+    // rTest_glGetBufferParameteriv_after_delete_binding_reverts();
+    // rTest_glGetBufferParameteriv_same_buffer_multiple_targets();
+    // rTest_glGetBufferParameteriv_unaligned_data_pointer();
+    // rTest_glGetBufferParameteriv_error_state_stress();
+
     // --------------- glBufferSubData ---------------
     // rTest_glBufferSubData_invalid_enum_target();
     // rTest_glBufferSubData_invalid_value_negative_offset();

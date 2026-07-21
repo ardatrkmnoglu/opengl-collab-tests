@@ -1,6 +1,24 @@
 #ifndef TESTS_H
 #define TESTS_H
 
+/* --------------- glGetBufferParameteriv --------------- */
+void rTest_glGetBufferParameteriv_invalid_enum_target();
+void rTest_glGetBufferParameteriv_invalid_enum_value();
+void rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound();
+void rTest_glGetBufferParameteriv_invalid_target();
+void rTest_glGetBufferParameteriv_invalid_value();
+void rTest_glGetBufferParameteriv_reserved_name_zero_bound();
+void rTest_glGetBufferParameteriv_element_array_zero_bound();
+void rTest_glGetBufferParameteriv_null_data_pointer();
+void rTest_glGetBufferParameteriv_dangling_data_pointer();
+void rTest_glGetBufferParameteriv_size_consistency();
+void rTest_glGetBufferParameteriv_usage_initial_and_updates();
+void rTest_glGetBufferParameteriv_both_invalid();
+void rTest_glGetBufferParameteriv_after_delete_binding_reverts();
+void rTest_glGetBufferParameteriv_same_buffer_multiple_targets();
+void rTest_glGetBufferParameteriv_unaligned_data_pointer();
+void rTest_glGetBufferParameteriv_error_state_stress();
+
 /* --------------- glBufferSubData --------------- */
 void rTest_glBufferSubData_invalid_enum_target();
 void rTest_glBufferSubData_invalid_value_negative_offset();

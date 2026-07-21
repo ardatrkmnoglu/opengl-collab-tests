@@ -33,8 +33,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/glBufferSubData_tests.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/glGetBufferParameteriv_tests.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests.h" afterDir="false" />
@@ -120,7 +119,7 @@
       <workItem from="1784612181830" duration="25000" />
       <workItem from="1784612537374" duration="4404000" />
       <workItem from="1784618082017" duration="242000" />
-      <workItem from="1784618876610" duration="5035000" />
+      <workItem from="1784618876610" duration="10701000" />
     </task>
     <servers />
   </component>

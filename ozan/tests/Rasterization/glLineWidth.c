@@ -225,41 +225,73 @@ void test_lineWidth_errorQueue(void) {
 }
 
 /* ============================================================
- * TEST 5: Implementasyon limitleri ve kirpma
+ * TEST 5: Implementasyon limitleri ve aralik sorgusu
  * ============================================================ */
-
 /*
- * glLineWidth'in implementasyon limitlerini asan degerleri sessizce
- * kirpma davranisini dogrular. GL_LINE_WIDTH_RANGE ile desteklenen
- * aralik sorgulanir; limitin uzerindeki degerler hata uretmeden
- * maksimuma cekilir.
+ * ES 2.0'da line width araligi GL_ALIASED_LINE_WIDTH_RANGE ile
+ * sorgulanir (GL_LINE_WIDTH_RANGE masaustu-GL tokenidir, ES'te
+ * GL_INVALID_ENUM uretir). Bu test:
+ *   - Aralik sorgusunun hatasiz calistigini ve spec garantisini
+ *     (aralik 1.0'i icermeli, min > 0) dogrular
+ *   - Aralik ustu pozitif bir degerin HATA URETMEDIGINI dogrular
+ *     (kirpma raster asamasinda sessizce olur, error degildir)
+ *   - GL_LINE_WIDTH sorgusunun kirpilmis degeri degil, SPECIFIED
+ *     degeri dondurdugunu; yani surucunun state'i erken
+ *     clamp'lemedigini garanti eder
  */
 
-void test_lineWidth_limits(void) {
-    GLfloat widthRange[2];
-    GLfloat width;
+#ifndef GL_ALIASED_LINE_WIDTH_RANGE
+#define GL_ALIASED_LINE_WIDTH_RANGE 0x846E  /* ES2 header yoksa guvence */
+#endif
 
-    printf("TEST: Implementation Limits\n");
+void test_lineWidth_limits(void) {
+    GLfloat range[2];
+    GLfloat width;
+    GLfloat request;
+    GLenum err;
+
+    printf("TEST: Implementation Limits (Aliased Line Width Range)\n");
     resetState();
 
-    glGetFloatv(GL_LINE_WIDTH_RANGE, widthRange);
+    /* ---------- 1) Aralik sorgusu robustlugu ---------- */
+    range[0] = range[1] = -1.0f;             /* sentinel: dolduruldu mu? */
+    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+    err = glGetError();
+    assert(err == GL_NO_ERROR);
 
-    printf("  Line width araligi: [%.2f, %.2f]\n",
-           widthRange[0], widthRange[1]);
+    printf("  ALIASED_LINE_WIDTH_RANGE: [%.2f, %.2f]\n",
+           range[0], range[1]);
 
-    GLfloat maxLimit = widthRange[1];
+    /* Spec garantisi: aralik 1.0'i icermeli, min pozitif olmali */
+    assert(range[0] > 0.0f);
+    assert(range[1] >= range[0]);
+    assert(range[0] <= 1.0f);
+    assert(range[1] >= 1.0f);
 
-    glLineWidth(maxLimit * 10.0f);
-    assert(glGetError() == GL_NO_ERROR);
+    /* ---------- 2) Aralik ustu deger -> hata YOK ---------- */
+    request = range[1] * 10.0f;
+    glLineWidth(request);
+    err = glGetError();
+    assert(err == GL_NO_ERROR);              /* w > 0 her zaman kabul edilir */
 
+    /* ---------- 3) State SPECIFIED degeri korur (erken clamp yok) ---------- */
     glGetFloatv(GL_LINE_WIDTH, &width);
-    printf("  Istek %.1f, gercek %.1f (kirpilmis)\n",
-           maxLimit * 10.0f, width);
+    assert(glGetError() == GL_NO_ERROR);
+    if (fabsf(width - request) > request * 1e-5f) {
+        printf("  [FAIL] state erken clamp'lenmis: istek %.1f, sorgu %.1f\n",
+               request, width);
+        assert(0);
+    }
+    printf("  Istek %.1f -> GL_LINE_WIDTH %.1f (specified korunuyor)\n",
+           request, width);
 
-    assert(width <= maxLimit * 1.01f);
+    /* ---------- 4) Alt sinir da kabul edilmeli ---------- */
+    glLineWidth(range[0]);
+    assert(glGetError() == GL_NO_ERROR);
+    glGetFloatv(GL_LINE_WIDTH, &width);
+    assert(fabsf(width - range[0]) <= range[0] * 1e-5f);
 
     resetState();
     printf("  [PASS]\n\n");
 }
-
 

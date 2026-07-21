@@ -1,323 +1,439 @@
 #include <GL/gl.h>
 #include <assert.h>
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h>
 
 /* ============================================================
- * Test altyapisi
+ * Test altyapısı
  *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine (GL_CCW) getirir ve birikmis
- * hatalari temizler; boylece testler birbirine bagimli olmaz.
- * checkStatePreserved: Reddedilen cagrilarin mevcut durumu
- * bozup bozmadigini dogrular; beklenen degerle gercek deger
- * uyusmazsa program assert ile durur. Bu iki fonksiyon olmadan
- * hata ayiklama zorlasir, cunku hangi testin hangi durumu
- * biraktigi takip edilemez.
+ * resetState:
+ * Her test öncesinde glFrontFace varsayılan değeri olan
+ * GL_CCW olarak ayarlanır ve hata kuyruğu temizlenir.
+ *
+ * checkStatePreserved:
+ * OpenGL durumunun beklenen değerde kaldığını doğrular.
+ * Geçersiz çağrılar sonrasında state değişmemelidir.
  * ============================================================ */
 
-static void resetState(void) {
+static void resetState(void)
+{
     glFrontFace(GL_CCW);
-    while (glGetError() != GL_NO_ERROR);
+    while(glGetError()!=GL_NO_ERROR);
 }
 
-static void checkStatePreserved(GLint expected) {
+static void checkStatePreserved(GLint expected)
+{
     GLint actual;
-    glGetIntegerv(GL_FRONT_FACE, &actual);
-    if (actual != expected) {
-        printf("  [FAIL] Durum bozuldu: beklenen 0x%X, gercek 0x%X\n",
-               expected, actual);
+    glGetIntegerv(GL_FRONT_FACE,&actual);
+    if(actual!=expected)
+    {
+        printf("  [FAIL] State bozuldu!\n");
+        printf("         Beklenen : 0x%X\n",expected);
+        printf("         Gercek   : 0x%X\n",actual);
         assert(0);
     }
 }
 
+
 /* ============================================================
- * TEST 1: Hata kuyrugu butunlugu
+ * TEST 1 : Error Queue Management
+ * ============================================================
  *
- * Ard arda gecersiz enum gonderimi altinda hata kuyrugunun
- * dogru sekilde doldugunu, bosaldigini ve temizlendikten sonra
- * normal islemlerin devam ettigini dogrular.
+ * Amaç
+ * ----
+ * Arka arkaya çok sayıda geçersiz enum gönderildiğinde
+ * hata kuyruğunun bozulmadığını doğrular.
+ *
+ * Daha sonra geçerli bir çağrı yapılarak OpenGL'in
+ * normal çalışmaya döndüğü kontrol edilir.
  * ============================================================ */
 
-void test_frontFace_errorQueue(void) {
-    int i;
+void test_frontFace_errorQueue(void)
+{
     GLenum err;
-    int hataSayisi = 0;
+    int errorCount=0;
+    int i;
+    printf("TEST : Error Queue Management\n");
+    resetState();
+    for(i=0;i<100;i++)
+    {
+        glFrontFace((GLenum)(0x5000+i));
+    }
+    while((err=glGetError())!=GL_NO_ERROR)
+    {
+        assert(err==GL_INVALID_ENUM);
+        errorCount++;
+    }
+    assert(errorCount>0);
+    glFrontFace(GL_CW);
+    assert(glGetError()==GL_NO_ERROR);
+    checkStatePreserved(GL_CW);
+    resetState();
+    printf("  [PASS]\n\n");
+}
 
-    printf("TEST: Error Queue Management\n");
+
+/* ============================================================
+ * TEST 2 : Rapid Toggle
+ * ============================================================
+ *
+ * Amaç
+ * ----
+ * GL_CW ile GL_CCW arasında on binlerce kez geçiş
+ * yaptırılarak state makinesinin bozulmadığı doğrulanır.
+ *
+ * Her çağrı sonrasında GL_FRONT_FACE sorgulanır.
+ * ============================================================ */
+
+void test_frontFace_rapidToggle(void)
+{
+    const int repeat=100000;
+    int i;
+    printf("TEST : Rapid Toggle\n");
+    resetState();
+    for(i=0;i<repeat;i++)
+    {
+        GLenum expected=
+            (i&1)?GL_CCW:GL_CW;
+        GLint current;
+        glFrontFace(expected);
+        assert(glGetError()==GL_NO_ERROR);
+        glGetIntegerv(GL_FRONT_FACE,
+                      &current);
+        assert(current==expected);
+    }
+
+    resetState();
+    printf("  [PASS]\n\n");
+}
+
+
+/* ============================================================
+ * TEST 3 : Mixed Valid / Invalid Calls
+ * ============================================================
+ *
+ * Amaç
+ * ----
+ * Geçerli ve geçersiz çağrılar karıştırılarak
+ * sürücünün hata durumundan doğru şekilde
+ * çıkabildiği doğrulanır.
+ *
+ * Ayrıca geçersiz enum sonrasında state'in
+ * değişmediği de kontrol edilir.
+ * ============================================================ */
+
+void test_frontFace_mixedValidity(void)
+{
+    GLenum sequence[]=
+    {
+        GL_CW,
+        0x1111,
+        GL_CCW,
+        0x2222,
+        GL_CW,
+        0x3333,
+        GL_CCW,
+        0x4444
+    };
+
+    int count=
+        sizeof(sequence)/
+        sizeof(sequence[0]);
+
+    int i;
+
+    printf("TEST : Mixed Validity\n");
     resetState();
 
-    for (i = 0; i < 100; i++) {
-        glFrontFace((GLenum)(0x0BAD + i));
+    for(i=0;i<count;i++)
+    {
+        GLenum value=sequence[i];
+        GLenum expectedError=
+            (value==GL_CW || value==GL_CCW)?
+            GL_NO_ERROR:
+            GL_INVALID_ENUM;
+        glFrontFace(value);
+        assert(glGetError()==expectedError);
+        if(value==GL_CW)
+            checkStatePreserved(GL_CW);
+        if(value==GL_CCW)
+            checkStatePreserved(GL_CCW);
     }
 
-    while ((err = glGetError()) != GL_NO_ERROR) {
-        assert(err == GL_INVALID_ENUM);
-        hataSayisi++;
-    }
+    resetState();
+    printf("  [PASS]\n\n");
+}
 
-    printf("  Kuyruktan okunan hata sayisi: %d\n", hataSayisi);
-    assert(hataSayisi > 0);
+/* ============================================================
+ * TEST 4 : State Preservation
+ * ============================================================
+ *
+ * Amaç
+ * ----
+ * Geçersiz glFrontFace() çağrılarının mevcut OpenGL
+ * durumunu değiştirmediğini doğrular.
+ *
+ * Önce geçerli bir durum oluşturulur.
+ * Daha sonra farklı geçersiz enum değerleri gönderilir.
+ * Her başarısız çağrıdan sonra GL_FRONT_FACE
+ * değerinin değişmediği kontrol edilir.
+ * ============================================================ */
 
+void test_frontFace_statePreservation(void)
+{
+    GLenum err;
+    GLenum invalidEnums[] =
+    {
+        0,
+        1,
+        2,
+        1234,
+        9999,
+        0xFFFF,
+        0xFFFFFFFF
+    };
+
+    int i;
+    printf("TEST : State Preservation\n");
+    resetState();
     glFrontFace(GL_CW);
-    assert(glGetError() == GL_NO_ERROR);
+    assert(glGetError()==GL_NO_ERROR);
     checkStatePreserved(GL_CW);
 
-    resetState();
-    printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 2: Coklu cagri ve durum gecisleri
- *
- * GL_CW ve GL_CCW arasinda hizli gecisler yaparak durum
- * makinesinin tutarliligini dogrular. Her gecisten sonra
- * durum sorgulanir ve beklenen degerle eslestigi kontrol edilir.
- * ============================================================ */
-
-void test_frontFace_rapidToggle(void) {
-    int i;
-    const int tekrar = 10000;
-
-    printf("TEST: Rapid Toggle (CW <-> CCW)\n");
-    resetState();
-
-    for (i = 0; i < tekrar; i++) {
-        GLenum hedef = (i % 2 == 0) ? GL_CW : GL_CCW;
-        GLint face;
-
-        glFrontFace(hedef);
-        assert(glGetError() == GL_NO_ERROR);
-
-        glGetIntegerv(GL_FRONT_FACE, &face);
-        assert(face == hedef);
+    for(i=0;i<sizeof(invalidEnums)/sizeof(invalidEnums[0]);i++)
+    {
+        glFrontFace(invalidEnums[i]);
+        err=glGetError();
+        assert(err==GL_INVALID_ENUM);
+        checkStatePreserved(GL_CW);
     }
 
-    glFrontFace(GL_CCW);
-    checkStatePreserved(GL_CCW);
-    assert(glGetError() == GL_NO_ERROR);
-
-    printf("  Sonuc: %d gecis tamamlandi\n", tekrar);
+    resetState();
     printf("  [PASS]\n\n");
 }
 
+
 /* ============================================================
- * TEST 3: Gecersiz cagrilar arasinda gecerli cagrilar
+ * TEST 5 : Cull Face Combination
+ * ============================================================
  *
- * Gecersiz enum'larin arasina gecerli degerler serpistirerek
- * surucunun hata durumundan kurtulup kurtulamadigini dogrular.
- * Bazi implementasyonlar hata sonrasi "takili" kalabilir.
+ * Amaç
+ * ----
+ * glFrontFace() ve glCullFace() fonksiyonlarının birlikte
+ * çalışırken birbirlerinin durumunu bozmadığını doğrular.
+ *
+ * Tüm geçerli kombinasyonlar denenir ve her çağrı
+ * sonrasında OpenGL state'i kontrol edilir.
  * ============================================================ */
 
-void test_frontFace_mixedValidity(void) {
-    int i;
-    GLenum pattern[] = {
-        GL_CW, (GLenum)0x1234, GL_CCW, (GLenum)0x5678,
-        GL_CW, (GLenum)0x9ABC, GL_CCW, (GLenum)0xDEF0
+void test_frontFace_cullCombinations(void)
+{
+    GLenum frontModes[] =
+    {
+        GL_CCW,
+        GL_CW
     };
-    int n = sizeof(pattern) / sizeof(pattern[0]);
 
-    printf("TEST: Mixed Validity Pattern\n");
+    GLenum cullModes[] =
+    {
+        GL_FRONT,
+        GL_BACK,
+        GL_FRONT_AND_BACK
+    };
+
+    int i;
+    int j;
+
+    printf("TEST : Cull Face Combinations\n");
     resetState();
-
-    for (i = 0; i < n; i++) {
-        GLenum deger = pattern[i];
-        GLenum beklenen = (deger == GL_CW || deger == GL_CCW)
-                          ? GL_NO_ERROR : GL_INVALID_ENUM;
-        GLenum err;
-
-        glFrontFace(deger);
-        err = glGetError();
-        assert(err == beklenen);
-    }
-
-    glFrontFace(GL_CCW);
-    checkStatePreserved(GL_CCW);
-    assert(glGetError() == GL_NO_ERROR);
-
-    printf("  Sonuc: %d karisik cagri tamamlandi\n", n);
-    printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 4: Display list etkilesimi (Eski OpenGL)
- *
- * glFrontFace cagrilarinin display listeye dogru sekilde
- * kaydedilip kaydedilmedigini dogrular. Gecersiz degerler
- * liste derlenirken hata uretmeli, listeye yazilmamalidir.
- * ============================================================ */
-
-void test_frontFace_displayList(void) {
-    GLuint list;
-    GLint face;
-
-    printf("TEST: Display List Interaction\n");
-    resetState();
-
-    list = glGenLists(1);
-    glNewList(list, GL_COMPILE);
-
-    glFrontFace(GL_CW);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glFrontFace((GLenum)0x0BAD);
-    /* Hata aninda uretilebilir veya listeye kaydedilebilir;
-     * davranis implementasyona baglidir. */
-
-    glEndList();
-
-    glFrontFace(GL_CCW);
-    glCallList(list);
-
-    glGetIntegerv(GL_FRONT_FACE, &face);
-    printf("  List sonrasi durum: 0x%X\n", face);
-
-    glDeleteLists(list, 1);
-    resetState();
-    printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 5: Push/PopAttrib etkilesimi
- *
- * glPushAttrib ve glPopAttrib ile GL_TRANSFORM_BIT kullanarak
- * FrontFace durumunun yigina kaydedilip geri yuklendigini
- * dogrular. Durum yonetiminin bu mekanizmayla uyumlu calismasi
- * gerekir.
- * ============================================================ */
-
-void test_frontFace_attribStack(void) {
-    GLint face;
-
-    printf("TEST: Attribute Stack (Push/PopAttrib)\n");
-    resetState();
-
-    glFrontFace(GL_CW);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glPushAttrib(GL_TRANSFORM_BIT);
-
-    glFrontFace(GL_CCW);
-    assert(glGetError() == GL_NO_ERROR);
-    checkStatePreserved(GL_CCW);
-
-    glPopAttrib();
-
-    glGetIntegerv(GL_FRONT_FACE, &face);
-    printf("  Pop sonrasi durum: 0x%X (beklenen GL_CW=0x%X)\n",
-           face, GL_CW);
-
-    resetState();
-    printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 6: Culling kombinasyonlari
- *
- * glFrontFace ile glCullFace'in farkli kombinasyonlarinda
- * tutarli davranis gosterdigini dogrular. Her kombinasyon
- * sonrasi durum sorgulanir.
- * ============================================================ */
-
-void test_frontFace_cullCombinations(void) {
-    GLenum frontModes[] = {GL_CCW, GL_CW};
-    GLenum cullModes[] = {GL_BACK, GL_FRONT, GL_FRONT_AND_BACK};
-    int i, j;
-
-    printf("TEST: Cull Face Combinations\n");
-    resetState();
-
-    for (i = 0; i < 2; i++) {
-        for (j = 0; j < 3; j++) {
-            GLint face, cull;
-
+    glEnable(GL_CULL_FACE);
+    for(i=0;i<2;i++)
+    {
+        for(j=0;j<3;j++)
+        {
+            GLint currentFront;
+            GLint currentCull;
             glFrontFace(frontModes[i]);
+
+            assert(glGetError()==GL_NO_ERROR);
             glCullFace(cullModes[j]);
-            assert(glGetError() == GL_NO_ERROR);
+            assert(glGetError()==GL_NO_ERROR);
 
-            glGetIntegerv(GL_FRONT_FACE, &face);
-            glGetIntegerv(GL_CULL_FACE_MODE, &cull);
+            glGetIntegerv(GL_FRONT_FACE,
+                          &currentFront);
+            glGetIntegerv(GL_CULL_FACE_MODE,
+                          &currentCull);
 
-            assert(face == frontModes[i]);
-            assert(cull == cullModes[j]);
+            assert(currentFront==frontModes[i]);
+            assert(currentCull==cullModes[j]);
         }
     }
 
     glDisable(GL_CULL_FACE);
     resetState();
-    printf("  Sonuc: 6 kombinasyon tamamlandi\n");
     printf("  [PASS]\n\n");
 }
 
+
 /* ============================================================
- * TEST 7: Cok buyuk enum degerleri
+ * TEST 6 : Large Invalid Enum Values
+ * ============================================================
  *
- * 32-bit enum araliginin ust kisimlarini test eder.
- * OpenGL spec 16-bit enum uzayini kullanir ancak 32-bit
- * degerler gonderildiginde implementasyonun davranisi
- * belirsizdir. Cokme veya durum bozulmasi kritik hatadir.
+ * Amaç
+ * ----
+ * Çok büyük GLenum değerleri gönderildiğinde
+ * sürücünün çökmediği ve yalnızca
+ * GL_INVALID_ENUM ürettiği doğrulanır.
+ *
+ * Ayrıca başarısız çağrıların mevcut durumu
+ * değiştirmediği de kontrol edilir.
  * ============================================================ */
 
-void test_frontFace_largeEnum(void) {
-    GLenum largeValues[] = {
+void test_frontFace_largeEnum(void)
+{
+    GLenum values[] =
+    {
         (GLenum)0x10000,
         (GLenum)0x7FFFFFFF,
         (GLenum)0x80000000,
         (GLenum)0xFFFFFFFF
     };
-    int i;
-    int n = sizeof(largeValues) / sizeof(largeValues[0]);
 
-    printf("TEST: Large Enum Values\n");
+    int i;
+
+    printf("TEST : Large Invalid Enum Values\n");
     resetState();
 
-    for (i = 0; i < n; i++) {
+    for(i=0;i<sizeof(values)/sizeof(values[0]);i++)
+    {
         GLenum err;
-
-        glFrontFace(largeValues[i]);
-        err = glGetError();
-
-        printf("  Enum=0x%08X -> 0x%X\n", largeValues[i], err);
+        glFrontFace(values[i]);
+        err=glGetError();
+        assert(err==GL_INVALID_ENUM);
+        checkStatePreserved(GL_CCW);
     }
 
-    checkStatePreserved(GL_CCW);
     resetState();
-    printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 8: Thread benzeri hizli ardisik cagri
- *
- * Tek bir thread icerisinde glFrontFace'e ait cagrilari
- * mimimum gecikmeyle ard arda gondererek durum makinesinin
- * race condition benzeri senaryolarda tutarli kalip
- * kalmadigini gozlemler.
- * ============================================================ */
-
-void test_frontFace_rapidFire(void) {
-    int i;
-    const int tekrar = 50000;
-
-    printf("TEST: Rapid Fire (50K calls)\n");
-    resetState();
-
-    for (i = 0; i < tekrar; i++) {
-        glFrontFace(GL_CW);
-        glFrontFace(GL_CCW);
-    }
-
-    glGetError();
-    glFrontFace(GL_CW);
-    assert(glGetError() == GL_NO_ERROR);
-    checkStatePreserved(GL_CW);
-
-    resetState();
-    printf("  Sonuc: %d cift cagri tamamlandi\n", tekrar);
     printf("  [PASS]\n\n");
 }
 
 /* ============================================================
- * Test calistirma cercevesi
+ * TEST 7 : Rapid Fire
+ * ============================================================
+ *
+ * Amaç
+ * ----
+ * glFrontFace() fonksiyonunu çok kısa aralıklarla
+ * art arda çağırarak sürücünün yoğun kullanım altında
+ * kararlılığını doğrular.
+ *
+ * Test sonunda herhangi bir OpenGL hatası oluşmamalı
+ * ve son durum doğru şekilde korunmalıdır.
  * ============================================================ */
 
+void test_frontFace_rapidFire(void)
+{
+    const unsigned int repeat = 1000000;
+    unsigned int i;
+    printf("TEST : Rapid Fire\n");
+    resetState();
+
+    for(i = 0; i < repeat; i++)
+    {
+        glFrontFace(GL_CW);
+        glFrontFace(GL_CCW);
+    }
+
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(GL_CCW);
+    resetState();
+    printf("  [PASS] %u cift cagri tamamlandi.\n\n", repeat);
+}
+
+
+/* ============================================================
+ * TEST 8 : Random Fuzz Test
+ * ============================================================
+ *
+ * Amaç
+ * ----
+ * Rastgele GLenum değerleri gönderilerek sürücünün
+ * beklenmeyen girdiler karşısındaki dayanıklılığı
+ * test edilir.
+ *
+ * Beklenen sonuçlar:
+ *
+ *      GL_NO_ERROR
+ *      GL_INVALID_ENUM
+ *
+ * Bunların dışındaki herhangi bir hata başarısızlık
+ * olarak değerlendirilir.
+ * ============================================================ */
+
+void test_frontFace_randomFuzz(void)
+{
+    unsigned int i;
+    printf("TEST : Random Fuzz Test\n");
+    resetState();
+    srand(12345);
+
+    for(i = 0; i < 1000000; i++)
+    {
+        GLenum value;
+        GLenum err;
+        switch(rand() % 4)
+        {
+            case 0:
+                value = GL_CW;
+                break;
+            case 1:
+                value = GL_CCW;
+                break;
+            default:
+                value = (GLenum)rand();
+                break;
+        }
+
+        glFrontFace(value);
+        err = glGetError();
+        if(err != GL_NO_ERROR &&
+           err != GL_INVALID_ENUM)
+        {
+            printf("\n[FAIL]\n");
+            printf("Iteration : %u\n", i);
+            printf("Enum      : 0x%X\n", value);
+            printf("Error     : 0x%X\n", err);
+
+            assert(0);
+        }
+    }
+
+    resetState();
+    printf("  [PASS] 1,000,000 rastgele test tamamlandi.\n\n");
+}
+
+
+/* ============================================================
+ * Tum glFrontFace Robustness Testlerini Calistir
+ * ============================================================ */
+
+void Run_glFrontFace_Robustness(void)
+{
+    printf("\n");
+    printf("=============================================\n");
+    printf("      glFrontFace Robustness Test Suite\n");
+    printf("=============================================\n\n");
+
+    test_frontFace_errorQueue();
+    test_frontFace_rapidToggle();
+    test_frontFace_mixedValidity();
+    test_frontFace_statePreservation();
+    test_frontFace_cullCombinations();
+    test_frontFace_largeEnum();
+    test_frontFace_rapidFire();
+    test_frontFace_randomFuzz();
+
+    printf("=============================================\n");
+    printf(" Tum glFrontFace Robustness Testleri Basarili\n");
+    printf("=============================================\n\n");
+}

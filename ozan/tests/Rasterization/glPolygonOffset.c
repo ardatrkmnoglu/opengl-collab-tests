@@ -1,9 +1,3 @@
-/* test_polygonoffset.c
- * glPolygonOffset robustness dogrulama paketi
- *
- * OpenGL 2.1 Bolum 3.5'e gore glPolygonOffset fonksiyonunun
- * nominal ve anormal kosullardaki davranisini dogrular.
- */
 
 #include <GL/gl.h>
 #include <assert.h>
@@ -201,7 +195,3 @@ void test_polygonOffset_specialFloats(void) {
     resetState();
     printf("  [BILGI] Manuel inceleme gerekir\n\n");
 }
-
-/* ============================================================
- * Test calistirma cercevesi
- * ============================================================ */

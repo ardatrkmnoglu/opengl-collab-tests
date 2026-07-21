@@ -229,7 +229,3 @@ void test_cullFaceEnable_capCombinations(void) {
     resetState();
     printf("  [PASS]\n\n");
 }
-
-/* ============================================================
- * Test calistirma cercevesi
- * ============================================================ */

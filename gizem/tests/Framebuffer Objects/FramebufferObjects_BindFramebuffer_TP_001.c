@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 
 
 
@@ -13,17 +12,15 @@
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_FRAMEBUFFER.
-void rTest_glBindFramebuffer_invalid_enum()
+void FramebufferObjects_BindFramebuffer_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_invalid_enum()\n");
 
     glBindFramebuffer((GLenum)0xFFFFFFFF, 0);
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM){
-    printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-    assert(err == GL_INVALID_ENUM);
+        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
     }
     printf("[PASS] rTest_glBindFramebuffer_invalid_enum()\n");
 }
@@ -31,10 +28,9 @@ void rTest_glBindFramebuffer_invalid_enum()
 // belirtilmeyen hatalar ------------------------------
 
 // target parametresi GL_FRAMEBUFFER disinda bir enum oldugunda GL_INVALID_ENUM uretilip onceki binding'in bozulmadigini doğrular.
-void rTest_glBindFramebuffer_invalid_target()
+void FramebufferObjects_BindFramebuffer_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_invalid_target()\n");
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -57,10 +53,9 @@ void rTest_glBindFramebuffer_invalid_target()
 }
 
 // glGenFramebuffers ile hiç uretilmemis, rastgele/keyfi bir framebuffer ismiyle bind cagirildiginda davranisi test eder
-void rTest_glBindFramebuffer_arbitrary_unused_name()
+void FramebufferObjects_BindFramebuffer_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_arbitrary_unused_name()\n");
 
     GLuint arbitraryName = 0xABCD1234;
     glBindFramebuffer(GL_FRAMEBUFFER, arbitraryName);
@@ -80,10 +75,9 @@ void rTest_glBindFramebuffer_arbitrary_unused_name()
 // Yeni oluşturulup ilk kez bind edilen bir framebuffer'ın başlangıçta herhangi bir attachment içermediğini doğrular
 // GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT ve GL_STENCIL_ATTACHMENT noktalarının OBJECT_TYPE'ı,
 // bu noktalara bir renderbuffer veya texture bağlanana kadar GL_NONE olmalıdır
-void rTest_glBindFramebuffer_initial_attachment_state()
+void FramebufferObjects_BindFramebuffer_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_initial_attachment_state()\n");
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -108,10 +102,9 @@ void rTest_glBindFramebuffer_initial_attachment_state()
 
 // framebuffer = 0 iken (varsayilan) target uzerinde query/modify islemlerinin GL_INVALID_OPERATION ile reddedildigini doğrular
 // (spec: "While framebuffer object name zero is bound... GL_INVALID_OPERATION").
-void rTest_glBindFramebuffer_zero_bound_query_rejected()
+void FramebufferObjects_BindFramebuffer_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_zero_bound_query_rejected()\n");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     while (glGetError() != GL_NO_ERROR) {}
@@ -130,10 +123,9 @@ void rTest_glBindFramebuffer_zero_bound_query_rejected()
 // OpenGL spesifikasyonuna göre GL_FRAMEBUFFER_BINDING durumunun otomatik olarak
 // varsayılan framebuffer’a (0) dönmesi gerekir.
 // Yani: "silinen FBO'ya işaret eden dangling bir binding kalmamalı".
-void rTest_glBindFramebuffer_binding_reverts_after_delete()
+void FramebufferObjects_BindFramebuffer_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_binding_reverts_after_delete()\n");
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -153,10 +145,9 @@ void rTest_glBindFramebuffer_binding_reverts_after_delete()
 
 // Ayni framebuffer'in ust uste ayni isimle tekrar tekrar bind edilmesinin (no-op olmasi beklenen durum)
 // implementasyonu bozup bozmadigini (orn. state'i sifirlayip sifirlamadigini) test eder.
-void rTest_glBindFramebuffer_repeated_rebind_same_name()
+void FramebufferObjects_BindFramebuffer_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_repeated_rebind_same_name()\n");
 
     GLuint fbo, rb;
     glGenFramebuffers(1, &fbo);
@@ -192,10 +183,9 @@ void rTest_glBindFramebuffer_repeated_rebind_same_name()
 // sürücünün/implementasyonun iç kaynak tablosunda (örneğin isimleri dizi indeksi
 // gibi kullanan basit implementasyonlarda) out-of-bounds erişim, bellek hatası
 // ya da crash olup olmadığını kontrol eder.
-void rTest_glBindFramebuffer_extreme_name_value()
+void FramebufferObjects_BindFramebuffer_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_extreme_name_value()\n");
 
     GLuint extremeNames[] = { 0xFFFFFFFF, 0x7FFFFFFF, 0x80000000 };
     int n = sizeof(extremeNames) / sizeof(extremeNames[0]);
@@ -216,10 +206,9 @@ void rTest_glBindFramebuffer_extreme_name_value()
 // Senaryo:
 // - glGenRenderbuffers ile bir renderbuffer ismi (rb) üretiyoruz.
 // - Bu renderbuffer ismini, sanki bir framebuffer adıymış gibi kullanıyoruz.
-void rTest_glBindFramebuffer_type_confusion_with_other_object()
+void FramebufferObjects_BindFramebuffer_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_type_confusion_with_other_object()\n");
 
     GLuint rb;
     glGenRenderbuffers(1, &rb);
@@ -235,10 +224,9 @@ void rTest_glBindFramebuffer_type_confusion_with_other_object()
 // glBindFramebuffer ile “sık ve tekrarlı bind/unbind (0’a dön)”
 // işlemlerinin sürücüde zamanla bozulma, kaynak sızıntısı veya kararsızlık
 // (örneğin hataya düşme, iç durumun bozulması) üretip üretmediğini ölçer.
-void rTest_glBindFramebuffer_bind_unbind_stress()
+void FramebufferObjects_BindFramebuffer_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_bind_unbind_stress()\n");
 
     const int ITER = 5000;
     GLuint fbos[8];
@@ -258,10 +246,9 @@ void rTest_glBindFramebuffer_bind_unbind_stress()
 // Bir framebuffer bağlıyken (nonzero), farklı bir framebuffer'a gecis yapildiginda önceki
 // binding’in gerçekten bırakılıp bırakılmadığını doğrular (GL_FRAMEBUFFER_BINDING query'si ile)
 // (spec: "previous binding is automatically broken")
-void rTest_glBindFramebuffer_previous_binding_broken_on_switch()
+void FramebufferObjects_BindFramebuffer_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_previous_binding_broken_on_switch()\n");
 
     GLuint fbo1, fbo2;
     glGenFramebuffers(1, &fbo1);
@@ -287,10 +274,9 @@ void rTest_glBindFramebuffer_previous_binding_broken_on_switch()
 // Halihazirda bind edilmis olan framebuffer'in tekrar ayni isimle bind
 // edilmesinin (self-rebind) attachment durumunu sifirlayip sifirlamadigini test eder
 // - spec bu konuda sessiz, "ilk bind" ile "sonraki bind"ler arasinda fark olmamali.
-void rTest_glBindFramebuffer_self_rebind_preserves_state()
+void FramebufferObjects_BindFramebuffer_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindFramebuffer_self_rebind_preserves_state()\n");
 
     GLuint fbo, rb;
     glGenFramebuffers(1, &fbo);

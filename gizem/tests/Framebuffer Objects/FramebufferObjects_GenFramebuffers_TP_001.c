@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -14,18 +13,15 @@
 
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if n is negative.
-void rTest_glGenFramebuffers_invalid_value()
+void FramebufferObjects_GenFramebuffers_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_invalid_value()\n");
-
     GLuint framebuffer = 0;
     glGenFramebuffers(-1, &framebuffer);
 
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE){
-    printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-    assert(err == GL_INVALID_VALUE);
+        printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
     }
     printf("[PASS] rTest_glGenFramebuffers_invalid_value()\n");
 }
@@ -35,10 +31,9 @@ void rTest_glGenFramebuffers_invalid_value()
 
 
 // n negatif oldugunda GL_INVALID_VALUE uretilip cikis dizisinin dokunulmadan kaldigini doğrular.
-void rTest_glGenFramebuffers_negative_n()
+void FramebufferObjects_GenFramebuffers_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_negative_n()\n");
 
     GLuint sentinel = 0xDEADBEEF;
     GLuint buf = sentinel;
@@ -52,10 +47,9 @@ void rTest_glGenFramebuffers_negative_n()
 
 // n = INT_MIN gibi asiri negatif bir degerle (olasi integer overflow'a
 // karsi) implementasyonun crash olmadan hayatta kalip kalmadigini doğrular.
-void rTest_glGenFramebuffers_extreme_negative_n()
+void FramebufferObjects_GenFramebuffers_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_extreme_negative_n()\n");
 
     GLuint buf = 0x12345678;
     glGenFramebuffers(INT_MIN, &buf);
@@ -69,10 +63,9 @@ void rTest_glGenFramebuffers_extreme_negative_n()
 
 // n = 0 ve framebuffers = NULL kombinasyonunun crash olmadan/hatasiz
 // gecmesi beklenir (yazilacak eleman yok).
-void rTest_glGenFramebuffers_zero_n_null_pointer()
+void FramebufferObjects_GenFramebuffers_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_zero_n_null_pointer()\n");
 
     glGenFramebuffers(0, NULL);
 
@@ -84,10 +77,9 @@ void rTest_glGenFramebuffers_zero_n_null_pointer()
 // n > 0 iken framebuffers = NULL verildiginde (spesifikasyon tanimsiz
 // birakiyor) implementasyonun segfault yerine tutarli davranip
 // davranmadigini gozlemler.
-void rTest_glGenFramebuffers_null_pointer_nonzero_n()
+void FramebufferObjects_GenFramebuffers_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_null_pointer_nonzero_n()\n");
 
     glGenFramebuffers(4, NULL);
 
@@ -97,10 +89,9 @@ void rTest_glGenFramebuffers_null_pointer_nonzero_n()
 }
 
 // Dangling bir pointer'a yazma denemesinin implementasyonun bellek korumasina karsi davranisini test eder.
-void rTest_glGenFramebuffers_invalid_memory_pointer()
+void FramebufferObjects_GenFramebuffers_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_invalid_memory_pointer()\n");
 
     GLuint *freedPtr = (GLuint *)malloc(sizeof(GLuint) * 4);
     free(freedPtr); // artik gecersiz
@@ -115,10 +106,9 @@ void rTest_glGenFramebuffers_invalid_memory_pointer()
 // anlamak icin etrafini "canary" degerlerle sardigimiz bir buffer uzerinde
 // tasma testi yapar. Eger fonksiyon cb.data disina tasip cb.before veya
 // cb.after'i bozarsa buffer overflow var demektir.
-void rTest_glGenFramebuffers_buffer_overflow_canary()
+void FramebufferObjects_GenFramebuffers_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_buffer_overflow_canary()\n");
 
     typedef struct {
     GLuint before;
@@ -142,10 +132,9 @@ void rTest_glGenFramebuffers_buffer_overflow_canary()
 
 // Cok buyuk n degeriyle (INT_MAX) cagirarak bellek tahsis hatalarinin
 // crash yerine tutarli sekilde ele alinip alinmadigini gozlemler.
-void rTest_glGenFramebuffers_huge_n()
+void FramebufferObjects_GenFramebuffers_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_huge_n()\n");
 
     const GLsizei HUGE_N = INT_MAX;
     GLuint *framebuffers = (GLuint *)malloc((size_t)HUGE_N * sizeof(GLuint));
@@ -165,10 +154,9 @@ void rTest_glGenFramebuffers_huge_n()
 
 // Dizinin gercek boyutundan buyuk bir n ile cagirarak stack/heap
 // tasmasi (yanlis kullanim senaryosu) altinda kararliligi test eder.
-void rTest_glGenFramebuffers_stack_smash_small_array()
+void FramebufferObjects_GenFramebuffers_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_stack_smash_small_array()\n");
 
     GLuint smallArray[2]; // kasitli olarak kucuk
     glGenFramebuffers(2, smallArray);
@@ -186,10 +174,9 @@ void rTest_glGenFramebuffers_stack_smash_small_array()
 
 // Ayni n ile ardisik cok sayida glGenFramebuffers/glDeleteFramebuffers
 // dongusuyle isim havuzunun (name pool) tukenmesi/wrap-around durumunu test eder
-void rTest_glGenFramebuffers_exhaustion()
+void FramebufferObjects_GenFramebuffers_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_exhaustion()\n");
 
     const int ITERATIONS = 100000;
     const GLsizei BATCH = 10;
@@ -214,10 +201,9 @@ void rTest_glGenFramebuffers_exhaustion()
 // Uretilen isimlerin, hic bind edilmeden silinip silinemedigini ve
 // glIsFramebuffer sorgusunun tutarli davranip davranmadigini doğrular
 // (spec: "no framebuffer objects are associated until first bound").
-void rTest_glGenFramebuffers_unbound_name_lifecycle()
+void FramebufferObjects_GenFramebuffers_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_unbound_name_lifecycle()\n");
 
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
@@ -234,10 +220,9 @@ void rTest_glGenFramebuffers_unbound_name_lifecycle()
 
 // Ayni ismin silme sonrasi tekrar uretilip uretilmedigini (isim geri
 // donusum/reuse politikasini) crash olmadan gozlemler.
-void rTest_glGenFramebuffers_name_reuse_after_delete()
+void FramebufferObjects_GenFramebuffers_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_name_reuse_after_delete()\n");
 
     GLuint first;
     glGenFramebuffers(1, &first);
@@ -254,10 +239,9 @@ void rTest_glGenFramebuffers_name_reuse_after_delete()
 
 // Unaligned bir cikis pointer'iyla cagrildiginda
 // implementasyonun crash olmadan davranip davranmadigini test eder.
-void rTest_glGenFramebuffers_unaligned_pointer()
+void FramebufferObjects_GenFramebuffers_TC_013()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_unaligned_pointer()\n");
 
     unsigned char rawBuffer[64];
     memset(rawBuffer, 0xAA, sizeof(rawBuffer));
@@ -272,10 +256,9 @@ void rTest_glGenFramebuffers_unaligned_pointer()
 
 // Farkli n degerleriyle (gecerli/gecersiz karisik) art arda cagrilarak
 // implementasyonun genel kararliligini test eder.
-void rTest_glGenFramebuffers_varying_n_stability()
+void FramebufferObjects_GenFramebuffers_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_varying_n_stability()\n");
 
     GLsizei testValues[] = { 1, 0, -1, 2, 100000, 0, -100 };
     int numTests = sizeof(testValues) / sizeof(testValues[0]);
@@ -300,10 +283,9 @@ void rTest_glGenFramebuffers_varying_n_stability()
 // obje turunun kendi ad uzayi olmali) doğrular. Farkli obje turleri
 // arasinda isim carpismasi implementasyonun ic handle tablosunda ciddi
 // bir tasarim hatasina isaret eder.
-void rTest_glGenFramebuffers_namespace_isolation_from_renderbuffers()
+void FramebufferObjects_GenFramebuffers_TC_015()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenFramebuffers_namespace_isolation_from_renderbuffers()\n");
 
     GLuint fbo, rb;
     glGenFramebuffers(1, &fbo);

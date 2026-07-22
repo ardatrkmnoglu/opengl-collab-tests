@@ -33,13 +33,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/glGenFramebuffers_tests.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/glGetBufferParameteriv_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glGetBufferParameteriv_tests.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/tests.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Framebuffer Objects/frameBuffer_tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/frameBuffer_tests.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Framebuffer Objects/glBindFramebuffer_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/glBindFramebuffer_tests.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,6 +118,7 @@
       <workItem from="1784612537374" duration="4404000" />
       <workItem from="1784618082017" duration="242000" />
       <workItem from="1784618876610" duration="23402000" />
+      <workItem from="1784714501159" duration="2238000" />
     </task>
     <servers />
   </component>

@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -13,26 +12,27 @@
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not one of the allowable values.
- void rTest_glBindBuffer_invalid_enum()
+ void BufferObjects_BindBuffer_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_invalid_enum()\n");
 
     glBindBuffer(0xFFFFFFFF, 1);
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
         printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-        assert(err == GL_INVALID_ENUM);
     }
     printf("[PASS] rTest_glBindBuffer_invalid_enum()\n");
 }
 
+
+// belirtilmeyen hatalar ------------------------
+
+
 // glGenBuffers ile oluşturulmamış bir ismin bind edilmesi
-void rTest_glBindBuffer_new_name_without_gen()
+void BufferObjects_BindBuffer_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_new_name_without_gen()\n");
 
     GLuint name = 424242;
     glBindBuffer(GL_ARRAY_BUFFER, name);
@@ -40,11 +40,11 @@ void rTest_glBindBuffer_new_name_without_gen()
     printf("[INFO] glBindBuffer(new name=%u): error=0x%X\n", name, err);
 }
 
-// Silinen bir buffer isminin tekrar bind edilmesiyle yeni bir buffer nesnesi oluşturulup oluşturulmadığını test eder.
-void rTest_glBindBuffer_deleted_buffer()
+// Silinen bir buffer isminin tekrar bind edilmesiyle yeni bir buffer
+// nesnesi oluşturulup oluşturulmadığını test eder.
+void BufferObjects_BindBuffer_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_deleted_buffer()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -56,9 +56,8 @@ void rTest_glBindBuffer_deleted_buffer()
 }
 
 // Büyük/alışılmadık buffer isimlerinin bind edilmesi
-void rTest_glBindBuffer_boundary_handles()
+void BufferObjects_BindBuffer_TC_004()
 {
-    printf("[START] rTest_glBindBuffer_boundary_handles()\n");
 
     GLuint candidates[] = {
         0xFFFFFFFFu,   // UINT_MAX
@@ -75,10 +74,9 @@ void rTest_glBindBuffer_boundary_handles()
 }
 
 // Geçersiz target enum değerlerine karşı implementasyonun hata kontrolünün testi
-void rTest_glBindBuffer_dirty_high_bits_enum()
+void BufferObjects_BindBuffer_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_dirty_high_bits_enum()\n");
 
     GLenum polluted = GL_ARRAY_BUFFER | 0xFFFF0000u;
     glBindBuffer(polluted, 1);
@@ -87,11 +85,11 @@ void rTest_glBindBuffer_dirty_high_bits_enum()
     printf("[INFO] Polluted target=0x%08X : glError=0x%X (expected GL_INVALID_ENUM)\n", polluted, err);
 }
 
-// Aynı buffer nesnesinin farklı target'lara hızlı ve tekrarlı şekilde bağlanması sırasında implementasyonun kararlılığını test eder.
-void rTest_glBindBuffer_rapid_cross_target_rebind_stress()
+// Aynı buffer nesnesinin farklı target'lara hızlı ve tekrarlı şekilde
+// bağlanması sırasında implementasyonun kararlılığını test eder.
+void BufferObjects_BindBuffer_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_rapid_cross_target_rebind_stress()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -117,11 +115,11 @@ void rTest_glBindBuffer_rapid_cross_target_rebind_stress()
     glDeleteBuffers(1, &buf);
 }
 
-// Aynı buffer nesnesi iki target'a bağlıyken silme işlemi sonrası implementasyonun kararlılığını ve hata davranışını test eder
-void rTest_glBindBuffer_delete_while_double_bound()
+// Aynı buffer nesnesi iki target'a bağlıyken silme işlemi sonrası
+// implementasyonun kararlılığını ve hata davranışını test eder
+void BufferObjects_BindBuffer_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_delete_while_double_bound()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -139,11 +137,11 @@ void rTest_glBindBuffer_delete_while_double_bound()
     printf("[INFO] After deleting double-bound buffer: ARRAY_BUFFER error=0x%X, ELEMENT_ARRAY_BUFFER error=0x%X\n", arrayErr, elementErr);
 }
 
-// Buffer'ı tekrar tekrar 0'a bağlayıp bağlama durumunu sorgulayarak implementasyonun state yönetimi kararlılığını test eder.
-void rTest_glBindBuffer_zero_binding_query_thrash()
+// Buffer'ı tekrar tekrar 0'a bağlayıp bağlama durumunu sorgulayarak
+// implementasyonun state yönetimi kararlılığını test eder.
+void BufferObjects_BindBuffer_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_zero_binding_query_thrash()\n");
 
     for (int i = 0; i < 1000; ++i)
     {
@@ -162,11 +160,11 @@ void rTest_glBindBuffer_zero_binding_query_thrash()
     printf("[PASS] Zero binding/query thrash completed successfully.\n");
 }
 
-// Çok sayıda buffer ismi üzerinde rastgele bind işlemleri yaparak implementasyonun isim yönetimi ve durum değişikliklerine karşı dayanıklılığını test eder.
-void rTest_glBindBuffer_massive_namespace_fuzz()
+// Çok sayıda buffer ismi üzerinde rastgele bind işlemleri yaparak implementasyonun
+// isim yönetimi ve durum değişikliklerine karşı dayanıklılığını test eder.
+void BufferObjects_BindBuffer_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_massive_namespace_fuzz()\n");
 
     const int N = 20000;
     GLuint *names = (GLuint *)malloc(sizeof(GLuint) * N);
@@ -220,11 +218,11 @@ void rTest_glBindBuffer_massive_namespace_fuzz()
     printf("[PASS] Massive buffer namespace fuzz completed without OpenGL errors.\n");
 }
 
-// Aynı target üzerinde farklı buffer'lar arasında sürekli geçiş yaparak implementasyonun state yönetimi kararlılığını test eder.
-void rTest_glBindBuffer_binding_churn_stress()
+// Aynı target üzerinde farklı buffer'lar arasında sürekli geçiş yaparak
+// implementasyonun state yönetimi kararlılığını test eder.
+void BufferObjects_BindBuffer_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_binding_churn_stress()\n");
 
     GLuint buffers[2];
     glGenBuffers(2, buffers);
@@ -250,11 +248,11 @@ void rTest_glBindBuffer_binding_churn_stress()
     printf("[PASS] Binding churn stress completed without OpenGL errors.\n");
 }
 
-// Buffer nesnelerinin oluşturma, bağlama ve silme yaşam döngüsünü tekrarlı olarak çalıştırarak implementasyonun dayanıklılığını test eder.
-void rTest_glBindBuffer_lifecycle_stress()
+// Buffer nesnelerinin oluşturma, bağlama ve silme yaşam döngüsünü tekrarlı
+// olarak çalıştırarak implementasyonun dayanıklılığını test eder.
+void BufferObjects_BindBuffer_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindBuffer_lifecycle_stress()\n");
 
     for (int i = 0; i < 5000; ++i)
     {

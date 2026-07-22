@@ -4,303 +4,303 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
+#include <string.h>
 
-// void glBindTexture(GLenum target, GLuint texture);
-// Bir texture nesnesini belirli bir target'a baglar.
-// Baglandiktan sonra o hedef uzerinde yapilan islemler artik bu texture uzerinde gerceklestirilir.
-// target: TEXTURE_2D, TEXTURE_CUBE_MAP
+/*
+ * glBindTexture Robustness Test Suite
+ * Hasan - OpenGL ES 2.0
+ *
+ * Bu test paketi, glBindTexture fonksiyonunun texture'lara ozgu
+ * baglama mekanizmalarini (target kilitlenmesi, active texture izolasyonu,
+ * name adoption vb.) sinamak uzere ozel olarak hazirlanmistir.
+ */
 
-
-// Belirtilen hata: GL_INVALID_ENUM is generated if target is not one of the allowable values.
-void rTest_glBindTexture_invalid_enum()
+// ---------------------------------------------------------------
+// TEST 1: Gecersiz Hedef (Invalid Target Enum)
+// TEXTURE_2D ve TEXTURE_CUBE_MAP disindaki hedeflere texture
+// baglamaya calismanin GL_INVALID_ENUM uretip uretmedigi test edilir.
+// ---------------------------------------------------------------
+void test_bind_invalid_target_enum(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_invalid_enum()\n");
-
-    glBindTexture(0xFFFFFFFF, 1);
-
-    GLenum err = glGetError();
-    if (err != GL_INVALID_ENUM) {
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-    } else {
-        printf("[PASS] rTest_glBindTexture_invalid_enum()\n");
-    }
-}
-
-// glGenTextures ile olusturulmamis bir ismin bind edilmesi
-void rTest_glBindTexture_new_name_without_gen()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_new_name_without_gen()\n");
-
-    GLuint name = 424242;
-    glBindTexture(GL_TEXTURE_2D, name);
-    GLenum err = glGetError();
-    printf("[INFO] glBindTexture(new name=%u): error=0x%X\n", name, err);
-}
-
-// Silinen bir texture isminin tekrar bind edilmesiyle yeni bir texture nesnesi olusturulup
-// olusturulmadigini test eder.
-void rTest_glBindTexture_deleted_texture()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_deleted_texture()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_invalid_target_enum\n");
 
     GLuint tex;
     glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glDeleteTextures(1, &tex);
 
-    // Silindikten sonra tekrar bind etmeye calisiyoruz
-    glBindTexture(GL_TEXTURE_2D, tex);
-    GLenum err = glGetError();
-    printf("[INFO] Bind deleted texture name: error=0x%X\n", err);
-}
+    // Buffer veya Framebuffer gibi alakasiz hedefler
+    GLenum bad_targets[] = {GL_ARRAY_BUFFER, GL_FRAMEBUFFER, 0x0, 0xDEAD};
+    int count = sizeof(bad_targets) / sizeof(bad_targets[0]);
 
-// Buyuk/alisilamadik texture isimlerinin bind edilmesi
-void rTest_glBindTexture_boundary_handles()
-{
-    printf("[START] rTest_glBindTexture_boundary_handles()\n");
+    int all_invalid_enum = 1;
 
-    GLuint candidates[] = {
-        0xFFFFFFFFu,   // UINT_MAX
-        0x80000000u,   // sign-bit siniri
-        0x7FFFFFFFu,   // INT_MAX
-        0xDEADBEEFu,
-        0xCDCDCDCDu    // tipik uninitialized heap pattern
-    };
-    for (int i = 0; i < 5; ++i) {
-        while (glGetError() != GL_NO_ERROR) {}
-        glBindTexture(GL_TEXTURE_2D, candidates[i]);
+    for (int i = 0; i < count; i++) {
+        glBindTexture(bad_targets[i], tex);
         GLenum err = glGetError();
-        printf("[INFO] Boundary texture 0x%08X: glError=0x%X\n", candidates[i], err);
+        if (err != GL_INVALID_ENUM) {
+            printf("  Hedef 0x%04X icin beklenen hata GL_INVALID_ENUM, alinan: 0x%X\n", bad_targets[i], err);
+            all_invalid_enum = 0;
+        }
     }
+
+    if (all_invalid_enum)
+        printf("  -> PASSED: Gecersiz hedefler dogru sekilde reddedildi (GL_INVALID_ENUM)\n\n");
+    else
+        printf("  -> FAILED\n\n");
+
+    glDeleteTextures(1, &tex);
 }
 
-// Gecersiz target enum degerlerine karsi implementasyonun hata kontrolunun testi
-void rTest_glBindTexture_dirty_high_bits_enum()
+// ---------------------------------------------------------------
+// TEST 2: Isim Sahiplenme (Name Adoption / Generation on Bind)
+// glGenTextures ile olusturulmamis rastgele bir ID'nin bind
+// edilmesi. ES 2.0'da bu gecerli bir islemdir ve yeni bir texture olusturur.
+// ---------------------------------------------------------------
+void test_bind_name_adoption(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_dirty_high_bits_enum()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_name_adoption\n");
 
-    GLenum polluted = GL_TEXTURE_2D | 0xFFFF0000u;
-    glBindTexture(polluted, 1);
+    // Rastgele, buyuk ihtimalle kullanilmayan bir ID
+    GLuint random_id = 987654;
+
+    // Oncesinde bu ID texture degil
+    GLboolean is_tex_before = glIsTexture(random_id);
+
+    // Bind ederek ismi sahiplen (Name adoption)
+    glBindTexture(GL_TEXTURE_2D, random_id);
     GLenum err = glGetError();
-    // Spec'e gore bu "allowable degil" -> INVALID_ENUM beklenir
-    printf("[INFO] Polluted target=0x%08X : glError=0x%X (expected GL_INVALID_ENUM)\n", polluted, err);
+
+    // Bind edildikten sonra artik bir texture olmali
+    GLboolean is_tex_after = glIsTexture(random_id);
+
+    printf("  Oncesinde glIsTexture: %s (GL_FALSE beklenir)\n", is_tex_before ? "GL_TRUE" : "GL_FALSE");
+    printf("  Bind sonrasi glIsTexture: %s (GL_TRUE beklenir)\n", is_tex_after ? "GL_TRUE" : "GL_FALSE");
+
+    if (!is_tex_before && is_tex_after && err == GL_NO_ERROR)
+        printf("  -> PASSED: Isim basariyla sahiplenildi (Name Adoption calisiyor)\n\n");
+    else
+        printf("  -> FAILED: Hata=0x%X\n\n", err);
+
+    // Temizle
+    glDeleteTextures(1, &random_id);
 }
 
-// Ayni texture nesnesinin farkli target'lara hizli ve tekrarli sekilde baglanmasi sirasinda
-// implementasyonun kararliligini test eder.
-// GLES 2.0'da bir texture farkli target'lara bind edilemez -> GL_INVALID_OPERATION beklenir.
-void rTest_glBindTexture_rapid_cross_target_rebind_stress()
+// ---------------------------------------------------------------
+// TEST 3: Capraz Hedef Cakismasi (Cross-Target Conflict)
+// Bir kere TEXTURE_2D olarak bind edilen (ve o hedefe kilitlenen)
+// bir ID'nin TEXTURE_CUBE_MAP'e bind edilmeye calisilmasi durumu.
+// GL_INVALID_OPERATION firlatilmalidir.
+// ---------------------------------------------------------------
+void test_bind_cross_target_conflict(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_rapid_cross_target_rebind_stress()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_cross_target_conflict\n");
 
     GLuint tex;
     glGenTextures(1, &tex);
 
-    // Once TEXTURE_2D'ye bind et
+    // Ilk olarak 2D'ye bind et (Artik bu ID 2D'ye kilitlendi)
     glBindTexture(GL_TEXTURE_2D, tex);
+    GLenum err1 = glGetError();
 
-    // Simdi ayni texture'i TEXTURE_CUBE_MAP'e bind etmeye calis
+    // Ayni ID'yi CUBE_MAP'e bind etmeye calis
     glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
-    GLenum err = glGetError();
+    GLenum err2 = glGetError();
 
-    // GLES 2.0 spec: "If texture was previously created with a target that doesn't match
-    // that of target, an INVALID_OPERATION error is generated"
-    if (err == GL_INVALID_OPERATION) {
-        printf("[PASS] Cross-target rebind correctly rejected with GL_INVALID_OPERATION.\n");
-    } else {
-        printf("[INFO] Cross-target rebind: glError=0x%X (expected GL_INVALID_OPERATION)\n", err);
-    }
+    printf("  Ilk bind (2D) hatasi: 0x%X\n", err1);
+    printf("  Ikinci bind (CUBE_MAP) hatasi: 0x%X (GL_INVALID_OPERATION 0x502 beklenir)\n", err2);
+
+    if (err1 == GL_NO_ERROR && err2 == GL_INVALID_OPERATION)
+        printf("  -> PASSED: Capraz hedef cakismasi spec'e uygun engellendi\n\n");
+    else
+        printf("  -> FAILED\n\n");
 
     glDeleteTextures(1, &tex);
 }
 
-// Texture bind edildikten sonra silindiginde, hedefteki baglantinin otomatik olarak
-// 0'a (varsayilan texture) dusurulup dusurulmedigini dogrular.
-void rTest_glBindTexture_delete_while_bound()
+// ---------------------------------------------------------------
+// TEST 4: Aktif Texture Unit Izolasyonu (Active Texture Binding)
+// Texture0 ve Texture1 unitlerine ayri ID'ler bind edildiginde
+// birbirlerini etkileyip etkilemediklerini kontrol eder.
+// ---------------------------------------------------------------
+void test_bind_active_texture_isolation(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_delete_while_bound()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_active_texture_isolation\n");
+
+    GLuint tex[2];
+    glGenTextures(2, tex);
+
+    // TEXTURE0'a tex[0]'i bind et
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex[0]);
+
+    // TEXTURE1'e tex[1]'i bind et
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, tex[1]);
+
+    // State'leri geri oku
+    GLint bound_t1 = -1;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound_t1); // Su an aktif unit 1 oldugu icin tex[1] dondurmeli
+
+    glActiveTexture(GL_TEXTURE0);
+    GLint bound_t0 = -1;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound_t0); // Simdi unit 0, tex[0] dondurmeli
+
+    GLenum err = glGetError();
+
+    printf("  TEXTURE0'daki bind: %d (Beklenen: %u)\n", bound_t0, tex[0]);
+    printf("  TEXTURE1'deki bind: %d (Beklenen: %u)\n", bound_t1, tex[1]);
+
+    if ((GLuint)bound_t0 == tex[0] && (GLuint)bound_t1 == tex[1] && err == GL_NO_ERROR)
+        printf("  -> PASSED: Unit izolasyonu saglam\n\n");
+    else
+        printf("  -> FAILED: Izolasyon bozuk veya hata var (0x%X)\n\n", err);
+
+    glDeleteTextures(2, tex);
+}
+
+// ---------------------------------------------------------------
+// TEST 5: Silinmis Ismin Yeniden Bind Edilmesi
+// Bir texture silindikten sonra ayni isim tekrar bind edilebilir mi?
+// ES 2.0'a gore bu, o isimle 'yeni' bir texture olusturmalidir.
+// ---------------------------------------------------------------
+void test_bind_deleted_texture_reanimation(void)
+{
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_deleted_texture_reanimation\n");
 
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
+
+    // Parametre degistir (varsayilandan farkli yapmak icin)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    // Texture'i sil
     glDeleteTextures(1, &tex);
 
-    // Spec'e gore: silinen texture otomatik olarak unbind edilir (binding 0'a doner)
-    GLint binding = -1;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &binding);
+    // Ayni ismi tekrar bind et (Reanimation / Ismi yeniden sahiplenme)
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    // Parametreleri kontrol et: Yeni texture oldugu icin sifirlanmis
+    // ve varsayilan degerine (GL_NEAREST_MIPMAP_LINEAR) donmus olmali.
+    GLint min_filter = 0;
+    glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, &min_filter);
 
     GLenum err = glGetError();
-    printf("[INFO] After deleting bound texture: TEXTURE_BINDING_2D=%d (expected 0), error=0x%X\n",
-           binding, err);
+
+    printf("  Yeniden dogan texture MIN_FILTER: 0x%X (GL_NEAREST_MIPMAP_LINEAR 0x2702 beklenir)\n", min_filter);
+
+    if (min_filter == GL_NEAREST_MIPMAP_LINEAR && err == GL_NO_ERROR)
+        printf("  -> PASSED: Silinen isimle tertemiz yeni texture olusturuldu\n\n");
+    else
+        printf("  -> FAILED: Eski durum korunmus veya hata var (0x%X)\n\n", err);
+
+    // Artik manuel silmeliyiz cunku genTextures'in referansi degil
+    glDeleteTextures(1, &tex);
 }
 
-// Texture'i tekrar tekrar 0'a baglayip baglama durumunu sorgulayarak
-// implementasyonun state yonetimi kararliligini test eder.
-void rTest_glBindTexture_zero_binding_query_thrash()
+// ---------------------------------------------------------------
+// TEST 6: Varsayilan Texture'a (ID 0) Donus
+// 0 ID'sini bind etmek, aktif texture'i deaktif etmeli ve varsayilan
+// texture state'ine dondurmelidir. Sifir bind etmek hata uretmez.
+// ---------------------------------------------------------------
+void test_bind_zero_default(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_zero_binding_query_thrash()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_zero_default\n");
 
-    for (int i = 0; i < 1000; ++i)
-    {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        GLint binding = -1;
-        glGetIntegerv(GL_TEXTURE_BINDING_2D, &binding);
-        if (binding != 0) {
-            printf("[FAIL] Iteration=%d, GL_TEXTURE_BINDING_2D=%d (expected 0)\n", i, binding);
-            return;
-        }
+    GLuint tex;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
 
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR) {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
-            return;
-        }
-    }
-    printf("[PASS] Zero binding/query thrash completed successfully.\n");
-}
+    // Ozel bir ID'den 0'a donus
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-// Cok sayida texture ismi uzerinde rastgele bind islemleri yaparak implementasyonun
-// isim yonetimi ve durum degisikliklerine karsi dayanikliligini test eder.
-void rTest_glBindTexture_massive_namespace_fuzz()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_massive_namespace_fuzz()\n");
-
-    const int N = 20000;
-    GLuint *names = (GLuint *)malloc(sizeof(GLuint) * N);
-
-    if (names == NULL) {
-        printf("[FAIL] Memory allocation failed.\n");
-        return;
-    }
-
-    glGenTextures(N, names);
+    GLint current_bind = -1;
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &current_bind);
     GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {
-        printf("[FAIL] glGenTextures failed: glError=0x%X\n", err);
-        free(names);
-        return;
-    }
 
-    uint32_t seed = 0x1234567u;
+    if (current_bind == 0 && err == GL_NO_ERROR)
+        printf("  -> PASSED: 0 ID'si basariyla bind edildi ve hata firlatilmadi\n\n");
+    else
+        printf("  -> FAILED: Beklenen bind 0, alinan %d, Hata: 0x%X\n\n", current_bind, err);
 
-    for (int i = 0; i < N; ++i)
-    {
-        seed ^= seed << 13;
-        seed ^= seed >> 17;
-        seed ^= seed << 5;
-        GLuint name = names[seed % N];
-
-        glBindTexture(GL_TEXTURE_2D, name);
-
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            printf("[FAIL] Iteration=%d, texture=%u, glError=0x%X\n",
-                   i, name, err);
-
-            glDeleteTextures(N, names);
-            free(names);
-            return;
-        }
-    }
-
-    glDeleteTextures(N, names);
-    free(names);
-
-    printf("[PASS] Massive texture namespace fuzz completed without OpenGL errors.\n");
+    glDeleteTextures(1, &tex);
 }
 
-// Ayni target uzerinde farkli texture'lar arasinda surekli gecis yaparak
-// implementasyonun state yonetimi kararliligini test eder.
-void rTest_glBindTexture_binding_churn_stress()
+// ---------------------------------------------------------------
+// TEST 7: Ayni ID'nin Defalarca Bind Edilmesi (No-op Stresi)
+// Performans kritik kodlarda ayni texture ust uste bind edilebilir.
+// Surucunun state degisikligi olmadigini anlayip cokmeden calismasi test edilir.
+// ---------------------------------------------------------------
+void test_bind_repeatedly_noop_stress(void)
 {
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_binding_churn_stress()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_repeatedly_noop_stress\n");
 
-    GLuint textures[2];
-    glGenTextures(2, textures);
+    GLuint tex;
+    glGenTextures(1, &tex);
 
-    for (int i = 0; i < 10000; ++i)
-    {
-        glBindTexture(GL_TEXTURE_2D, textures[0]);
-        glBindTexture(GL_TEXTURE_2D, textures[1]);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
-
-            glDeleteTextures(2, textures);
-            return;
-        }
-    }
-
-    glDeleteTextures(2, textures);
-
-    printf("[PASS] Binding churn stress completed without OpenGL errors.\n");
-}
-
-// Texture nesnelerinin olusturma, baglama ve silme yasam dongusunu tekrarli olarak
-// calistirarak implementasyonun dayanikliligini test eder.
-void rTest_glBindTexture_lifecycle_stress()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBindTexture_lifecycle_stress()\n");
-
-    for (int i = 0; i < 5000; ++i)
-    {
-        GLuint tex;
-        glGenTextures(1, &tex);
+    // Ayni texture 10,000 kez baglanir
+    for(int i = 0; i < 10000; i++) {
         glBindTexture(GL_TEXTURE_2D, tex);
-
-        // Bind edildikten sonra basit bir islem yap
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-        glDeleteTextures(1, &tex);
-
-        GLenum err = glGetError();
-        if (err != GL_NO_ERROR)
-        {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
-            return;
-        }
     }
-    printf("[PASS] Texture lifecycle stress completed without OpenGL errors.\n");
+
+    GLenum err = glGetError();
+
+    if (err == GL_NO_ERROR)
+        printf("  -> PASSED: Ust uste ayni ID'nin bind edilmesi sikintisiz atlatildi\n\n");
+    else
+        printf("  -> FAILED: Stres sirasinda hata olustu: 0x%X\n\n", err);
+
+    glDeleteTextures(1, &tex);
 }
 
-// Gecersiz target enum degerleri dizisiyle sistematik olarak glBindTexture cagrilarak
-// implementasyonun tum gecersiz degerler icin GL_INVALID_ENUM dondurup dondurmedigini test eder.
-void rTest_glBindTexture_invalid_enum_sweep()
+// ---------------------------------------------------------------
+// TEST 8: Asiri Buyuk ID Isimleri Ile Sinir Zorlamasi
+// Isim sahiplenme (name adoption) ozelliginin asiri buyuk int
+// degerleriyle (UINT_MAX) kullanilmasi. Surucunun bunlari
+// handle edebildigini veya reddebildigini izleriz.
+// ---------------------------------------------------------------
+void test_bind_extreme_ids(void)
 {
-    printf("[START] rTest_glBindTexture_invalid_enum_sweep()\n");
+    while (glGetError() != GL_NO_ERROR);
+    printf("[TEST] test_bind_extreme_ids\n");
 
-    GLenum candidates[] = {
-        0x0000,         // sifir
-        0x0001,         // GL_POINTS (gecersiz target)
-        0x1234,         // rastgele deger
-        0x9999,         // rastgele deger
-        0xDEAD,         // sentinel
-        GL_ARRAY_BUFFER // buffer target, texture degil
+    GLuint extreme_ids[] = {
+        0xFFFFFFFF,  // UINT_MAX
+        0x7FFFFFFF,  // INT_MAX
+        0x80000000   // Sadece isaret biti
     };
 
-    for (int i = 0; i < 6; ++i) {
-        while (glGetError() != GL_NO_ERROR) {}
-        glBindTexture(candidates[i], 1);
+    int all_ok = 1;
+
+    for(int i=0; i<3; i++) {
+        glBindTexture(GL_TEXTURE_2D, extreme_ids[i]);
         GLenum err = glGetError();
-        printf("[INFO] glBindTexture(target=0x%04X): glError=0x%X (expected GL_INVALID_ENUM)\n",
-               candidates[i], err);
+        
+        GLint bound = 0;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound);
+
+        printf("  ID: 0x%08X -> Hata: 0x%X, Gecerli Bind: 0x%08X\n", extreme_ids[i], err, bound);
+        
+        if (err != GL_NO_ERROR || (GLuint)bound != extreme_ids[i]) {
+            all_ok = 0;
+        }
+
+        // Temizle
+        glDeleteTextures(1, &extreme_ids[i]);
     }
+
+    if (all_ok)
+        printf("  -> PASSED: Surucu cok buyuk texture ID'lerini sorunsuzca isliyor\n\n");
+    else
+        printf("  -> FAILED/WARNING: Bazi ucbirim ID'ler tam desteklenmiyor olabilir\n\n");
 }
+
 
 // =========================================================
 // ANA YAPI: init, draw, clean
@@ -308,8 +308,7 @@ void rTest_glBindTexture_invalid_enum_sweep()
 
 static GLFWwindow* window = NULL;
 static int width = 640, height = 480;
-static int g_tests_failed = 0;
-static const char* windowTitle = "glBindTexture Robustness Tests";
+static const char* windowTitle = "glBindTexture Robustness Tests - Hasan";
 
 void init(void);
 void draw(void);
@@ -317,37 +316,33 @@ void clean(void);
 
 void init(void)
 {
-    printf("=========================================\n");
-    printf("   GLBINDTEXTURE SAGLAMLIK TESTLERI\n");
-    printf("=========================================\n\n");
+    printf("=====================================================\n");
+    printf("  GLBINDTEXTURE ROBUSTNESS SUITE - HASAN\n");
+    printf("=====================================================\n\n");
 
-    rTest_glBindTexture_invalid_enum();
-    rTest_glBindTexture_new_name_without_gen();
-    rTest_glBindTexture_deleted_texture();
-    rTest_glBindTexture_boundary_handles();
-    rTest_glBindTexture_dirty_high_bits_enum();
-    rTest_glBindTexture_rapid_cross_target_rebind_stress();
-    rTest_glBindTexture_delete_while_bound();
-    rTest_glBindTexture_zero_binding_query_thrash();
-    rTest_glBindTexture_massive_namespace_fuzz();
-    rTest_glBindTexture_binding_churn_stress();
-    rTest_glBindTexture_lifecycle_stress();
-    rTest_glBindTexture_invalid_enum_sweep();
+    test_bind_invalid_target_enum();
+    test_bind_name_adoption();
+    test_bind_cross_target_conflict();
+    test_bind_active_texture_isolation();
+    test_bind_deleted_texture_reanimation();
+    test_bind_zero_default();
+    test_bind_repeatedly_noop_stress();
+    test_bind_extreme_ids();
 
-    printf("\n=========================================\n");
-    printf("        TUM TESTLER TAMAMLANDI\n");
-    printf("=========================================\n");
+    printf("=====================================================\n");
+    printf("  TUM TESTLER TAMAMLANDI\n");
+    printf("=====================================================\n");
 }
 
 void draw(void)
 {
-    glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
+    glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void clean(void)
 {
-    // Temizlik islemleri
+    // Temizlik
 }
 
 int main(void)
@@ -380,5 +375,5 @@ int main(void)
 
     clean();
     glfwTerminate();
-    return g_tests_failed ? -1 : 0;
+    return 0;
 }

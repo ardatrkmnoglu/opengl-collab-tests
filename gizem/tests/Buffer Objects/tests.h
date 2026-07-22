@@ -11,7 +11,7 @@ void rTest_glGetBufferParameteriv_invalid_value();
 void rTest_glGetBufferParameteriv_reserved_name_zero_bound();
 void rTest_glGetBufferParameteriv_element_array_zero_bound();
 void rTest_glGetBufferParameteriv_null_data_pointer();
-void rTest_glGetBufferParameteriv_dangling_data_pointer();
+void rTest_glGetBufferParameteriv_dangling_data_pointer(); // test, başta geçmiş görünüyor ancak kısa süre sonra çöküyor. Sorunu bulamadım.
 void rTest_glGetBufferParameteriv_size_consistency();
 void rTest_glGetBufferParameteriv_usage_initial_and_updates();
 void rTest_glGetBufferParameteriv_both_invalid();

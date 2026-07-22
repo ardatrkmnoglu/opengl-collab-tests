@@ -1,4 +1,5 @@
 #include "include/rtests.h"
+#include <GLFW/glfw3.h>
 
 int retcode = 0;
 
@@ -39,23 +40,259 @@ GLuint createDummyProgram() {
 	return prog;
 }
 
-static void runTest(void (*test_func)(), const char *name) {
-	while (glGetError() != GL_NO_ERROR)
-		;
+// create window context
+int createContext(GLFWwindow** window) {
+	if (!glfwInit())
+		return -1;
+	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	*window = glfwCreateWindow(640, 480, "test", NULL, NULL);
+	if (!*window) {
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(*window);
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK)
+		return -1;
+	glGetError();
+	return 0;
+}
+
+// destroy window context
+void destroyContext(GLFWwindow** window) {
+	glfwDestroyWindow(*window);
+	glfwTerminate();
+}
+
+/**************************************/
+/********** Helper Functions **********/
+/**************************************/
+
+static void cleanOpenGLState() {
+	glUseProgram(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+
+	while (glGetError() != GL_NO_ERROR);
+}
+
+static void runTest_old(void (*test_func)(), const char *name) {
+	cleanOpenGLState();
 	printf("[TEST] %s...\n", name);
 	test_func();
 	if (retcode == 0)
 		printf("\x1b[32m[PASS]\x1b[0m %s passed.\n", name);
 	retcode = 0;
 }
+
+static void runTest(void (*test_func)(), const char *name) {
+	printf("[TEST] %s...\n", name);
+	fflush(stdout);
+
+	pid_t pid = fork();
+
+	if (pid < 0) {
+		fprintf(stderr, "\x1b[31m[ERROR]\x1b[0m Fork failed for %s\n", name);
+		return;
+	}
+
+	if (pid == 0) {
+		GLFWwindow* w;
+		createContext(&w);
+
+		cleanOpenGLState();
+		test_func();
+
+		destroyContext(&w);
+		exit(retcode);
+	} else {
+		int status;
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status)) {
+			int exit_code = WEXITSTATUS(status);
+			if (exit_code == 0) {
+				printf("\x1b[32m[PASS]\x1b[0m %s passed.\n", name);
+			}
+		}
+		else if (WIFSIGNALED(status)) {
+			int sig = WTERMSIG(status);
+			fprintf(stderr, "\x1b[31m[CRASH]\x1b[0m %s killed by signal %d! (Driver Vulnerability / Memory Corruption caught)\n", name, sig);
+		}
+	}
+	retcode = 0;
+}
 #define runTest(func) runTest(func, #func)
+
+/******************************************/
+/*** Category-specific Helper Functions ***/
+/******************************************/
+
+/* ---------- glLineWidth ---------- */
+static void resetState_lineWidth(void) {
+	glLineWidth(1.0f);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_lineWidth(GLfloat expected) {
+	GLfloat actual;
+	glGetFloatv(GL_LINE_WIDTH, &actual);
+	if (actual != expected) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen %f, "
+			"gercek %f\n",
+			expected, actual);
+		retcode = 1;
+	}
+}
+
+/* ---------- glCullFace ---------- */
+static void resetState_cullFace(void) {
+	glDisable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_cullFace(GLint expected) {
+	GLint actual;
+	glGetIntegerv(GL_CULL_FACE_MODE, &actual);
+	if (actual != expected) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen 0x%X, "
+			"gercek 0x%X\n",
+			expected, actual);
+		retcode = 1;
+	}
+}
+
+/* ---------- glFrontFace ---------- */
+static void resetState_frontFace(void) {
+	glFrontFace(GL_CCW);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_frontFace(GLint expected) {
+	GLint actual;
+	glGetIntegerv(GL_FRONT_FACE, &actual);
+	if (actual != expected) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen 0x%X, "
+			"gercek 0x%X\n",
+			expected, actual);
+		retcode = 1;
+	}
+}
+
+/* ---------- glEnable/Disable (Cull Face) ---------- */
+static void resetState_cullFaceEnable(void) {
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_SCISSOR_TEST);
+	glFrontFace(GL_CCW);
+	glCullFace(GL_BACK);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+/* ---------- glPolygonOffset ---------- */
+static void resetState_polygonOffset(void) {
+	glDisable(GL_POLYGON_OFFSET_FILL);
+	glDisable(GL_DEPTH_TEST);
+	glPolygonOffset(0.0f, 0.0f);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+/* ---------- glViewport ---------- */
+static void resetState_viewport(void) {
+	glViewport(0, 0, 640, 480);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_viewport(GLint x, GLint y, GLsizei width,
+					 GLsizei height) {
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	if (viewport[0] != x || viewport[1] != y || viewport[2] != width ||
+	    viewport[3] != height) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m Viewport bozuldu: beklenen "
+			"(%d,%d,%d,%d), gercek (%d,%d,%d,%d)\n",
+			x, y, width, height, viewport[0], viewport[1],
+			viewport[2], viewport[3]);
+		retcode = 1;
+	}
+}
+
+/* ---------- glDepthRange ---------- */
+static void resetState_depthRange(void) {
+	glDepthRange(0.0, 1.0);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_depthRange(GLdouble expectedNear,
+					   GLdouble expectedFar) {
+	GLdouble depthRange[2];
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	if (fabs(depthRange[0] - expectedNear) > 0.000001 ||
+	    fabs(depthRange[1] - expectedFar) > 0.000001) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m Depth range bozuldu: beklenen "
+			"(%lf,%lf), gercek (%lf,%lf)\n",
+			expectedNear, expectedFar, depthRange[0],
+			depthRange[1]);
+		retcode = 1;
+	}
+}
+
+/* ---------- glPixelStorei ---------- */
+static void resetState_pixelStore(void) {
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	while (glGetError() != GL_NO_ERROR)
+		;
+}
+
+static void checkStatePreserved_pixelStore(GLenum pname, GLint expectedValue) {
+	GLint value;
+	glGetIntegerv(pname, &value);
+	if (value != expectedValue) {
+		fprintf(stderr,
+			"\x1b[33m[FAIL]\x1b[0m PixelStore bozuldu: beklenen "
+			"%d, gercek %d\n",
+			expectedValue, value);
+		retcode = 1;
+	}
+}
 
 /***************************************/
 /****** Robustness Test Functions ******/
 /***************************************/
 
-/* Shaders and Programs */
-// glCreateProgram
+/****************************************/
+/****** Shaders and Programs ******/
+/****************************************/
+
+/* ============================================================
+ * glCreateProgram
+ * ============================================================
+ *
+ * Program nesnesi olusturma stres testi. 10000 adet program
+ * nesnesi olusturularak sürücünün kaynak yönetiminin
+ * bozulup bozulmadigi kontrol edilir. Normalde sonsuz döngü
+ * olmali ama çalistirmak için 10000 ile sinirlandirilmistir.
+ * ============================================================ */
 void rTest_CreateProgram() {
 	GLuint p_count = 0;
 	//	while (1) {
@@ -67,12 +304,20 @@ void rTest_CreateProgram() {
 		if (prog == 0 || err == GL_OUT_OF_MEMORY)
 			break;
 
-		assert(err == GL_NO_ERROR);
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"rTest_CreateProgram failed.");
 		p_count++;
 	}
 }
 
-// glProgramBinary
+/* ============================================================
+ * glProgramBinary — Hizasiz Pointer
+ * ============================================================
+ *
+ * glProgramBinary fonksiyonuna kasitli olarak hizasi bozulmus
+ * (unaligned) bir bellek adresi verilerek sürücünün geçersiz
+ * bellek erisiminde çökmeden hata üretip üretmedigi dogrulanir.
+ * ============================================================ */
 void rTest_ProgramBinary_unalignedPtr() {
 	GLuint prog = glCreateProgram();
 
@@ -89,6 +334,15 @@ void rTest_ProgramBinary_unalignedPtr() {
 	free(valid_memblock);
 }
 
+/* ============================================================
+ * glProgramBinary — Erisim Hakki Kaldirilmis Bellek
+ * ============================================================
+ *
+ * mmap ile ayrilan bir bellek bölgesinin erisim haklari
+ * mprotect(PROT_NONE) ile kaldirilir ve bu adres
+ * glProgramBinary'ye verilir. Sürücünün bellek koruma
+ * ihlaline karsi dayanikliligini test eder.
+ * ============================================================ */
 void rTest_ProgramBinary_memRevoke() {
 	GLuint prog = glCreateProgram();
 
@@ -107,6 +361,15 @@ void rTest_ProgramBinary_memRevoke() {
 	munmap(mapped_memory, page_size);
 }
 
+/* ============================================================
+ * glProgramBinary — Asiri Yükleme (Overload)
+ * ============================================================
+ *
+ * Çok büyük bir uzunluk degeri (2147483631) ve çöp veri
+ * ile glProgramBinary çagirilarak sürücünün bu geçersiz
+ * binary'yi kabul edip etmedigi dogrulanir. Link durumunun
+ * GL_FALSE olmasi beklenir.
+ * ============================================================ */
 void rTest_ProgramBinary_overload() {
 	GLuint prog = glCreateProgram();
 
@@ -140,7 +403,14 @@ void rTest_ProgramBinary_overload() {
 			"data as a valid Shader Program.");
 }
 
-// glUseProgram
+/* ============================================================
+ * glUseProgram — Geçersiz ID
+ * ============================================================
+ *
+ * Hiç var olmamis bir program ID'si (0xdeadbeef) ile
+ * glUseProgram çagirilarak sürücünün hayalet ID'yi
+ * reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
 void rTest_UseProgram_invalidID() {
 	GLuint ghost_id = 0xdeadbeef;
 	glUseProgram(ghost_id);
@@ -152,18 +422,32 @@ void rTest_UseProgram_invalidID() {
 			"ghost ID (has never existed) as a valid program ID.");
 }
 
+/* ============================================================
+ * glUseProgram — Tip Karmasasi (Type Confusion)
+ * ============================================================
+ *
+ * Bir Shader nesnesi ID'si ile glUseProgram çagirilarak
+ * sürücünün Shader ve Program nesnelerini ayirt edip
+ * edemedigi dogrulanir. GL_INVALID_OPERATION beklenir.
+ * ============================================================ */
 void rTest_UseProgram_typeConfusion() {
 	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
 	glUseProgram(shader);
 
 	GLenum err = glGetError();
 	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
-			"rTest_UseProgram_typeConfusion failed.\n");
+			"rTest_UseProgram_typeConfusion failed.");
 
 	glDeleteShader(shader);
 }
 
-// glGetAttribLocation
+/* ============================================================
+ * glGetAttribLocation — NULL Pointer
+ * ============================================================
+ *
+ * glGetAttribLocation fonksiyonuna NULL pointer verilerek
+ * sürücünün çökmeden -1 dönüp dönmedigi dogrulanir.
+ * ============================================================ */
 void rTest_GetAttribLocation_nullPtr() {
 	GLuint prog = glCreateProgram();
 
@@ -173,6 +457,14 @@ void rTest_GetAttribLocation_nullPtr() {
 			"rTest_GetAttribLocation_nullPtr failed.");
 }
 
+/* ============================================================
+ * glGetAttribLocation — Rezerve Degisken
+ * ============================================================
+ *
+ * OpenGL'e ait rezerve edilmis bir degisken adi ("gl_Position")
+ * ile glGetAttribLocation çagirilarak sürücünün bu ismi
+ * reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
 void rTest_GetAttribLocation_reservedVariable() {
 	GLuint prog = glCreateProgram();
 
@@ -182,8 +474,491 @@ void rTest_GetAttribLocation_reservedVariable() {
 			"rTest_GetAttribLocation_reservedVariable failed.");
 }
 
-/* Vertices */
-// glDrawArrays
+/****************************************/
+/************* Uniforms *************/
+/****************************************/
+
+/* ============================================================
+ * glGetUniformLocation — NULL Pointer
+ * ============================================================
+ *
+ * NULL pointer saldirisi: Akilli bir sürücü çökmeden
+ * -1 dönmelidir.
+ * ============================================================ */
+void rTest_GetUniformLocation_nullPtr(void) {
+	GLuint prog = createDummyProgram();
+
+	// NULL pointer saldırısı: Akıllı bir sürücü çökmeden -1 dönmelidir.
+	GLint loc = glGetUniformLocation(prog, NULL);
+
+	EXPECT_GL_ERROR(loc, (loc == -1),
+			"rTest_GetUniformLocation_nullPtr failed.\n"
+			"Sürücü NULL pointer yediğinde -1 dönmedi.");
+}
+
+/* ============================================================
+ * glGetUniformLocation — Yasakli Ön Ek
+ * ============================================================
+ *
+ * "gl_" ön eki spesifikasyon geregi OpenGL'e aittir.
+ * Sürücünün yasakli ön ekli uniform yerini ifsa edip
+ * etmedigi dogrulanir.
+ * ============================================================ */
+void rTest_GetUniformLocation_reservedPrefix(void) {
+	GLuint prog = createDummyProgram();
+
+	// Yasaklı isim saldırısı: "gl_" ön eki spesifikasyon gereği OpenGL'e
+	// aittir.
+	GLint loc = glGetUniformLocation(prog, "gl_DepthRange");
+
+	EXPECT_GL_ERROR(
+	    loc, (loc == -1),
+	    "rTest_GetUniformLocation_reservedPrefix failed.\n"
+	    "Sürücü yasaklı 'gl_' ön ekine sahip uniform yerini ifşa etti.");
+}
+
+/* ============================================================
+ * glUniform — Tip Karmasasi (Type Confusion)
+ * ============================================================
+ *
+ * Shader'da 'int' olarak tanimlanan bir degiskene 'float'
+ * (glUniform1f) basmaya çalisiriz. Sürücünün tip uyumsuzlugunu
+ * tespit edip GL_INVALID_OPERATION üretmesi beklenir.
+ * ============================================================ */
+void rTest_Uniform_typeConfusion(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	GLint locInt = glGetUniformLocation(prog, "uInt");
+
+	// Tip Karmaşası: Shader'da 'int' olarak tanımlanan bir değişkene
+	// 'float' (glUniform1f) basmaya çalışıyoruz.
+	glUniform1f(locInt, 3.14f);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_Uniform_typeConfusion failed.\n"
+			"Sürücü 'int' değişkene 'float' atanmasını engellemedi "
+			"(Type Confusion).");
+}
+
+/* ============================================================
+ * glUniform — Geçersiz Lokasyon
+ * ============================================================
+ *
+ * location = -1 ise sürücü veriyi sessizce reddetmeli
+ * (GL_NO_ERROR). Geçersiz (fakat -1 olmayan) lokasyon ise
+ * GL_INVALID_OPERATION firlatmalidir.
+ * ============================================================ */
+void rTest_Uniform_invalidLocation(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	// Spesifikasyon Tuzağı:
+	// location = -1 ise sürücü veriyi sessizce reddetmeli (GL_NO_ERROR).
+	glUniform1i(-1, 42);
+	GLenum err1 = glGetError();
+	EXPECT_GL_ERROR(err1, (err1 == GL_NO_ERROR),
+			"rTest_Uniform_invalidLocation failed.\n"
+			"-1 lokasyonu sessizce yutulmalıydı (Spec Kuralı).");
+
+	// Geçersiz (fakat -1 olmayan) lokasyon ise GL_INVALID_OPERATION
+	// fırlatmalıdır.
+	glUniform1i(0x7FFFFFFF, 42);
+	GLenum err2 = glGetError();
+
+	EXPECT_GL_ERROR(err2, (err2 == GL_INVALID_OPERATION),
+			"rTest_Uniform_invalidLocation failed.\n"
+			"Sürücü tamamen geçersiz ve devasa bir lokasyon "
+			"ID'sini reddetmedi.");
+}
+
+/* ============================================================
+ * glUniform4fv — Negatif Count
+ * ============================================================
+ *
+ * Count (eleman sayisi) negatif olamaz. Sürücünün negatif
+ * eleman sayisini (count = -1) reddetmesi beklenir.
+ * ============================================================ */
+void rTest_Uniformv_negativeCount(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	GLint locVec = glGetUniformLocation(prog, "uVec4Array");
+	GLfloat data[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+	// Count (Eleman sayısı) negatif olamaz.
+	glUniform4fv(locVec, -1, data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "rTest_Uniformv_negativeCount failed.\n"
+	    "Sürücü negatif eleman sayısını (count = -1) kabul etti.");
+}
+
+/* ============================================================
+ * glUniform4fv — Array Sinir Ihlali (OOB)
+ * ============================================================
+ *
+ * 3 elemanlik diziye 4 eleman (count = 4) kopyalamaya
+ * çalisilarak sürücünün sinir ihlaline izin verip
+ * vermedigi dogrulanir.
+ * ============================================================ */
+void rTest_Uniformv_arrayOutOfBounds(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	GLint locVec = glGetUniformLocation(
+	    prog, "uVec4Array"); // Shader'da boyutu 3 olarak tanımlı.
+	GLfloat data[16] = {0};
+
+	// Sınır İhlali (Out of Bounds): 3 elemanlık diziye 4 eleman (count = 4)
+	// kopyalamaya çalışıyoruz.
+	glUniform4fv(locVec, 4, data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_Uniformv_arrayOutOfBounds failed.\n"
+			"Sürücü array sınırlarını aşan (OOB) bir uniform "
+			"kopyalamasına izin verdi.");
+}
+
+/* ============================================================
+ * glUniformMatrix4fv — Geçersiz Transpose
+ * ============================================================
+ *
+ * ES 2.0 ve SC 2.0 kurali: Transpose parametresi her zaman
+ * GL_FALSE olmak ZORUNDADIR. GL_TRUE verilerek sürücünün
+ * bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_UniformMatrix_invalidTranspose(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	GLint locMat4 = glGetUniformLocation(prog, "uMat4");
+	GLfloat mat[16] = {0};
+
+	// ES 2.0 ve SC 2.0 kuralı: Transpose parametresi her zaman GL_FALSE
+	// olmak ZORUNDADIR.
+	glUniformMatrix4fv(locMat4, 1, GL_TRUE, mat);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_UniformMatrix_invalidTranspose failed.\n"
+			"Sürücü GL_TRUE transpose bayrağını kabul etti "
+			"(Spesifikasyon ihlali).");
+}
+
+/* ============================================================
+ * glUniformMatrix — Tip Uyumsuzlugu
+ * ============================================================
+ *
+ * Lokasyonu Mat3 (3x3 Matris) olarak çekip, veriyi Mat4
+ * fonksiyonuyla basmaya çalisarak sürücünün tip kontrolü
+ * yapip yapmadigini test eder.
+ * ============================================================ */
+void rTest_UniformMatrix_typeMismatch(void) {
+	GLuint prog = createDummyProgram();
+	glUseProgram(prog);
+
+	// Lokasyonu bir Mat3 (3x3 Matris) olarak çekiyoruz.
+	GLint locMat3 = glGetUniformLocation(prog, "uMat3");
+	GLfloat mat[16] = {0};
+
+	// SABOTAJ: Lokasyon Mat3 iken, biz veriyi Mat4 fonskiyonuyla basmaya
+	// çalışıyoruz.
+	glUniformMatrix4fv(locMat3, 1, GL_FALSE, mat);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_OPERATION),
+	    "rTest_UniformMatrix_typeMismatch failed.\n"
+	    "Sürücü Mat3 lokasyonuna Mat4 verisi kopyalamaya çalıştı.");
+}
+
+/****************************************/
+/******** Vertex Attributes ********/
+/****************************************/
+
+/* ============================================================
+ * glGetVertexAttribfv — Geçersiz Enum
+ * ============================================================
+ *
+ * 0xDEADBEEF adinda bir parametre (pname) yoktur. Sürücünün
+ * geçersiz bir parametre sorgusuna GL_INVALID_ENUM ile
+ * yanit vermesi beklenir.
+ * ============================================================ */
+void rTest_GetVertexAttrib_invalidEnum(void) {
+	GLfloat params[4];
+	// 0xDEADBEEF adında bir parametre (pname) yoktur.
+	glGetVertexAttribfv(0, 0xDEADBEEF, params);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_ENUM),
+	    "rTest_GetVertexAttrib_invalidEnum failed.\n"
+	    "Geçersiz bir parametre (pname) sorgusuna hata dönülmedi.");
+}
+
+/* ============================================================
+ * glGetVertexAttribiv — Indeks Sinir Ihlali
+ * ============================================================
+ *
+ * Donanim sinirina (GL_MAX_VERTEX_ATTRIBS) esit bir indeks
+ * ile sorgu yapilarak sürücünün sinir kontrolü dogrulanir.
+ * ============================================================ */
+void rTest_GetVertexAttrib_indexOutOfBounds(void) {
+	GLint max_attribs = 0;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
+
+	GLint params[4];
+	// Sınır İhlali: İndeksler 0 ile (max_attribs - 1) arasında olmalıdır.
+	glGetVertexAttribiv(max_attribs, GL_VERTEX_ATTRIB_ARRAY_ENABLED,
+			    params);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_GetVertexAttrib_indexOutOfBounds failed.\n"
+			"Sürücü donanım sınırının dışındaki bir Attribute "
+			"indeksini sorgulattı.");
+}
+
+/* ============================================================
+ * glGetVertexAttribPointerv — Geçersiz Enum
+ * ============================================================
+ *
+ * Bu fonksiyon yalnizca GL_VERTEX_ATTRIB_ARRAY_POINTER
+ * Enum'ini kabul eder. GL_FLOAT gibi geçersiz bir Enum
+ * verilerek sürücünün bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_GetVertexAttribPointer_invalidEnum(void) {
+	void *ptr = NULL;
+	// Bu fonksiyon yalnızca ve yalnızca GL_VERTEX_ATTRIB_ARRAY_POINTER
+	// Enum'ını kabul eder.
+	glGetVertexAttribPointerv(0, GL_FLOAT, &ptr);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_GetVertexAttribPointer_invalidEnum failed.\n"
+			"GL_VERTEX_ATTRIB_ARRAY_POINTER harici bir Enum olarak "
+			"kabul edildi.");
+}
+
+/* ============================================================
+ * glGetnUniformfv — Negatif Buffer Boyutu
+ * ============================================================
+ *
+ * BufSize negatif olamaz. Bu, KHR_robustness eklentisinin
+ * temel kuralidir. Sürücünün negatif bir buffer boyutunu
+ * reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_GetnUniform_negativeBufSize(void) {
+	GLuint prog = createDummyProgram();
+	GLint locFloat = glGetUniformLocation(prog, "uFloat");
+
+	GLfloat data[4];
+	// BufSize negatif olamaz. Bu, KHR_robustness eklentisinin temel
+	// kuralıdır.
+	glGetnUniformfv(prog, locFloat, -1, data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "rTest_GetnUniform_negativeBufSize failed.\n"
+	    "Sürücü negatif bir buffer boyutu (bufSize) kabul etti.");
+}
+
+/* ============================================================
+ * glGetnUniformfv — Geçersiz Program
+ * ============================================================
+ *
+ * 0, hiçbir zaman geçerli bir program nesnesi degildir.
+ * Sürücünün geçersiz bir Program ID'si üzerinden Uniform
+ * sorgulatip sorgulatmadigi dogrulanir.
+ * ============================================================ */
+void rTest_GetnUniform_invalidProgram(void) {
+	// 0, hiçbir zaman geçerli bir program nesnesi değildir.
+	GLfloat data[4];
+	glGetnUniformfv(0, 0, sizeof(data), data);
+	GLenum err = glGetError();
+
+	// Geçersiz (hiç üretilmemiş) bir obje olduğu için GL_INVALID_VALUE
+	// dönmelidir. Eğer obje var ama Program değilse (örn Shader ise)
+	// GL_INVALID_OPERATION döner.
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION),
+	    "rTest_GetnUniform_invalidProgram failed.\n"
+	    "Sürücü geçersiz bir Program ID'si üzerinden Uniform sorgulattı.");
+}
+
+/* ============================================================
+ * glGetProgramiv — Geçersiz Enum
+ * ============================================================
+ *
+ * Geçersiz bir parametre (pname = 0xDEADBEEF) ile
+ * glGetProgramiv çagirilarak sürücünün bunu GL_INVALID_ENUM
+ * ile reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_GetProgramiv_invalidEnum(void) {
+	GLuint prog = glCreateProgram();
+	GLint params = 0;
+
+	glGetProgramiv(prog, 0xDEADBEEF, &params);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_GetProgramiv_invalidEnum failed.\n"
+			"Geçersiz bir parametre (pname) kabul edildi.");
+}
+
+/* ============================================================
+ * glGetProgramiv — Tip Karmasasi (Type Confusion)
+ * ============================================================
+ *
+ * Sürücünün Shader nesnesini Program gibi okumaya çalisip
+ * çalismayacagini siniyoruz. GL_INVALID_OPERATION beklenir.
+ * ============================================================ */
+void rTest_GetProgramiv_typeConfusion(void) {
+	GLuint shader = glCreateShader(GL_VERTEX_SHADER);
+	GLint params = 0;
+
+	// Tip Karmaşası: Sürücünün Shader nesnesini Program gibi okumaya
+	// çalışıp çalışmayacağını sınıyoruz.
+	glGetProgramiv(shader, GL_LINK_STATUS, &params);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_GetProgramiv_typeConfusion failed.\n"
+			"Sürücü bir Shader nesnesine Program muamelesi yaptı.");
+
+	glDeleteShader(shader);
+}
+
+/* ============================================================
+ * glVertexAttrib1f — Indeks Sinir Ihlali
+ * ============================================================
+ *
+ * Donanimin limitine (max_attribs) veri yazmaya çalisarak
+ * sürücünün sinir disindaki bir Attribute indeksini reddetmesi
+ * beklenir.
+ * ============================================================ */
+void rTest_VertexAttrib_indexOutOfBounds(void) {
+	GLint max_attribs = 0;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
+
+	// Sınır İhlali: İndeksler 0 ile (max_attribs - 1) arasında olmalıdır.
+	// Donanımın limitine (max_attribs) veri yazmaya çalışıyoruz.
+	glVertexAttrib1f(max_attribs, 1.0f);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_VertexAttrib_indexOutOfBounds failed.\n"
+			"Sürücü sınır dışı bir Attribute indeksini "
+			"(max_attribs) reddetmedi.");
+}
+
+/* ============================================================
+ * glVertexAttrib4fv — Özel Float Degerleri
+ * ============================================================
+ *
+ * Kasitli olarak zehirli kayan nokta (float) degerleri
+ * (NaN, Infinity) gönderilerek sürücünün bu degerleri
+ * yediginde çökmek yerine güvenlice kabul etmesi
+ * veya tanimli bir hata üretmesi beklenir.
+ * ============================================================ */
+void rTest_VertexAttribv_specialFloats(void) {
+	// Kasıtlı olarak zehirli kayan nokta (float) değerleri gönderiyoruz.
+	GLfloat data[4] = {NAN, INFINITY, -INFINITY, 0.0f};
+
+	// Sürücü bu değerleri yediğinde çökmek yerine güvenlice kabul etmeli
+	// veya kendi iç mimarisine göre bir hata üretmelidir.
+	glVertexAttrib4fv(0, data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_NO_ERROR || err == GL_INVALID_VALUE),
+	    "rTest_VertexAttribv_specialFloats failed.\n"
+	    "Sürücü NaN/Inf değerlerinde tanımsız bir hata üretti.");
+}
+
+/* ============================================================
+ * glVertexAttribPointer — Geçersiz Type
+ * ============================================================
+ *
+ * Type parametresi GL_FLOAT, GL_BYTE vb. olmalidir.
+ * Alakasiz bir Enum (GL_TEXTURE_2D) verilerek sürücünün
+ * bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_VertexAttribPointer_invalidType(void) {
+	// Type parametresi GL_FLOAT, GL_BYTE vb. olmalıdır.
+	// Biz gidip alakasız bir Enum (GL_TEXTURE_2D) veriyoruz.
+	glVertexAttribPointer(0, 3, GL_TEXTURE_2D, GL_FALSE, 0, NULL);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_VertexAttribPointer_invalidType failed.\n"
+			"Geçersiz bir veri tipi (GL_TEXTURE_2D) kabul edildi.");
+}
+
+/* ============================================================
+ * glVertexAttribPointer — Geçersiz Size
+ * ============================================================
+ *
+ * Size parametresi yalnizca 1, 2, 3 veya 4 olabilir.
+ * 5 elemanlı bir vektör geçersizdir.
+ * ============================================================ */
+void rTest_VertexAttribPointer_invalidSize(void) {
+	// Size parametresi BİR TEK 1, 2, 3 veya 4 olabilir!
+	// 5 elemanlı bir vektör olamaz.
+	glVertexAttribPointer(0, 5, GL_FLOAT, GL_FALSE, 0, NULL);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "rTest_VertexAttribPointer_invalidSize failed.\n"
+	    "Sürücü 'size = 5' olan geçersiz bir boyutu kabul etti.");
+}
+
+/* ============================================================
+ * glEnable/DisableVertexAttribArray — Sinir Ihlali
+ * ============================================================
+ *
+ * Üst sinir ihlali ve çok büyük/negatif indeks (0xFFFFFFFF)
+ * ile sürücünün sinir kontrolü dogrulanir.
+ * ============================================================ */
+void rTest_EnableDisableVertexAttrib_bounds(void) {
+	GLint max_attribs = 0;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
+
+	// Üst sınır ihlali (GL_INVALID_VALUE bekliyoruz)
+	glEnableVertexAttribArray(max_attribs);
+	GLenum err1 = glGetError();
+	EXPECT_GL_ERROR(
+	    err1, (err1 == GL_INVALID_VALUE),
+	    "rTest_EnableDisableVertexAttrib_bounds failed.\n"
+	    "glEnableVertexAttribArray: Sınır dışı indeks reddedilmedi.");
+
+	// Negatif veya çok büyük sınır ihlali (0xFFFFFFFF -> UINT_MAX)
+	glDisableVertexAttribArray(0xFFFFFFFF);
+	GLenum err2 = glGetError();
+	EXPECT_GL_ERROR(err2, (err2 == GL_INVALID_VALUE),
+			"rTest_EnableDisableVertexAttrib_bounds failed.\n"
+			"glDisableVertexAttribArray: Çok büyük/negatif indeks "
+			"(0xFFFFFFFF) reddedilmedi.");
+}
+
+/****************************************/
+/*********** Draw Calls ***********/
+/****************************************/
+
+/* ============================================================
+ * glDrawArrays — Sinir Disi Çizim (OOB)
+ * ============================================================
+ *
+ * 3 vertex'lik bir veri ile 1.000.000 vertex çizmeye
+ * çalisilarak sürücünün sinir kontrolü dogrulanir.
+ * ============================================================ */
 void rTest_DrawArrays_outOfBounds() {
 	GLfloat vertices[] = {-0.5, -0.5, 0.0, 0.5, -0.5, 0.0, 0.0, 0.5, 0.0};
 
@@ -200,6 +975,16 @@ void rTest_DrawArrays_outOfBounds() {
 	glDisableVertexAttribArray(0);
 }
 
+/* ============================================================
+ * glDrawArrays — Guard Page Saldirisi
+ * ============================================================
+ *
+ * mmap ile iki sayfa bellek ayrilir, ikinci sayfa PROT_NONE
+ * yapilir (guard page). Vertex verisi guard page sinirinda
+ * konumlandirilir ve 300.000.000 vertex çizmeye çalisilarak
+ * sürücünün bellek koruma ihlaline karsi dayanikliligi
+ * dogrulanir.
+ * ============================================================ */
 void rTest_DrawArrays_guardPageAttack(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
@@ -244,33 +1029,464 @@ void rTest_DrawArrays_guardPageAttack(void) {
 	munmap(memory, page_size * 2);
 }
 
-// void glBindBuffer(GLenum target, GLuint buffer);
-// Bir buffer nesnesini belirli bir target'a bağlar
-// Bağlandıktan sonra o hedef üzerinde yapılan işlemler artık bu buffer üzerinde
-// gerçekleştirilir
+/* ============================================================
+ * glDrawElements — Geçersiz Indeks Tipi
+ * ============================================================
+ *
+ * 'type' parametresi yalnizca GL_UNSIGNED_BYTE,
+ * GL_UNSIGNED_SHORT veya GL_UNSIGNED_INT olabilir.
+ * GL_FLOAT türünde indeks okumasini isteyerek sürücünün
+ * bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_DrawElements_invalidType(void) {
+	// 'type' parametresi indeks dizisinin tipidir.
+	// Yalnızca GL_UNSIGNED_BYTE, GL_UNSIGNED_SHORT veya GL_UNSIGNED_INT
+	// olabilir. Biz float türünde bir indeks okumasını istiyoruz.
+	glDrawElements(GL_TRIANGLES, 3, GL_FLOAT, NULL);
+	GLenum err = glGetError();
 
-// Belirtilen hata: GL_INVALID_ENUM is generated if target is not one of the
-// allowable values.
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_DrawElements_invalidType failed.\n"
+			"İndeks verisi olarak GL_FLOAT kabul edildi.");
+}
+
+/* ============================================================
+ * glDrawRangeElements — Geçersiz Aralik
+ * ============================================================
+ *
+ * 'end' degeri kesinlikle 'start' degerinden küçük olamaz.
+ * start = 10, end = 5 göndererek mantiksal bir imkansizlik
+ * yaratilir.
+ * ============================================================ */
+void rTest_DrawRangeElements_invalidRange(void) {
+	// glDrawRangeElements(mode, start, end, count, type, indices)
+	// KURAL: 'end' değeri kesinlikle 'start' değerinden KÜÇÜK OLAMAZ!
+	// start = 10, end = 5 göndererek mantıksal bir imkansızlık yaratıyoruz.
+	glDrawRangeElements(GL_TRIANGLES, 10, 5, 3, GL_UNSIGNED_SHORT, NULL);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "rTest_DrawRangeElements_invalidRange failed.\n"
+	    "Sürücü 'end < start' olan mantıksız bir aralığı kabul etti.");
+}
+
+/****************************************/
+/****** Framebuffer Operations ******/
+/****************************************/
+
+/* ============================================================
+ * glColorMask — Boolean Dönüsüm
+ * ============================================================
+ *
+ * Kasitli olarak 1 ve 0 yerine 'tuhaf' sayilar (0xFF, 0x02,
+ * 0x80) gönderilerek OpenGL kuralina göre 0 disindaki her
+ * seyin GL_TRUE kabul edilmesi dogrulanir.
+ * ============================================================ */
+void rTest_ColorMask_booleanConversion(void) {
+	// Kasıtlı olarak 1 ve 0 yerine 'tuhaf' sayılar (0xFF, 0x02, 0x80)
+	// gönderiyoruz. OpenGL kurallarına göre 0 dışındaki her şey GL_TRUE
+	// kabul edilmelidir.
+	glColorMask(0xFF, 0x02, 0x00, 0x80);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"rTest_ColorMask_booleanConversion failed.\n"
+			"Standart dışı değerler girildiğinde hata üretildi "
+			"(Spesifikasyona aykırı).");
+
+	// Sürücü gerçekten bu değerleri GL_TRUE ve GL_FALSE olarak kırptı mı?
+	GLboolean mask[4];
+	glGetBooleanv(GL_COLOR_WRITEMASK, mask);
+
+	EXPECT_GL_ERROR(mask[0],
+			(mask[0] == GL_TRUE && mask[1] == GL_TRUE &&
+			 mask[2] == GL_FALSE && mask[3] == GL_TRUE),
+			"rTest_ColorMask_booleanConversion failed.\n"
+			"Sürücü '!= 0' kuralını ihlal etti veya değerleri "
+			"doğru cast etmedi.");
+}
+
+/* ============================================================
+ * glStencilMaskSeparate — Geçersiz Enum
+ * ============================================================
+ *
+ * 'face' parametresi yalnizca GL_FRONT, GL_BACK veya
+ * GL_FRONT_AND_BACK olabilir. GL_TEXTURE_2D verilerek
+ * sürücünün bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_StencilMaskSeparate_invalidEnum(void) {
+	// 'face' parametresi YALNIZCA GL_FRONT, GL_BACK veya GL_FRONT_AND_BACK
+	// olabilir.
+	glStencilMaskSeparate(GL_TEXTURE_2D, 0xFFFFFFFF);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_ENUM),
+	    "rTest_StencilMaskSeparate_invalidEnum failed.\n"
+	    "Geçersiz face parametresi (GL_TEXTURE_2D) reddedilmedi.");
+}
+
+/* ============================================================
+ * glClear — Geçersiz Bit Maskesi
+ * ============================================================
+ *
+ * glClear yalnizca COLOR, DEPTH ve STENCIL bitlerinin
+ * mantiksal OR kombinasyonunu kabul eder. Tüm bitleri '1'
+ * yaparak (0xFFFFFFFF) ve kirletilmis bir maske göndererek
+ * sürücünün bunu reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_Clear_invalidBitmask(void) {
+	// glClear yalnızca COLOR, DEPTH ve STENCIL bitlerinin mantıksal OR
+	// (Veya) kombinasyonunu kabul eder. Tüm bitleri '1' yaparak
+	// (0xFFFFFFFF) sürücüye yasaklı bitler yolluyoruz.
+	glClear(0xFFFFFFFF);
+	GLenum err1 = glGetError();
+
+	EXPECT_GL_ERROR(err1, (err1 == GL_INVALID_VALUE),
+			"rTest_Clear_invalidBitmask failed.\n"
+			"glClear, tanımsız olan geçersiz maske bitlerini yuttu "
+			"(0xFFFFFFFF).");
+
+	// İnce Suikast: Sadece bir tane geçersiz bit (örneğin 0x04) ekleyerek
+	// kirletiyoruz.
+	glClear(GL_COLOR_BUFFER_BIT | 0x00000004);
+	GLenum err2 = glGetError();
+
+	EXPECT_GL_ERROR(
+	    err2, (err2 == GL_INVALID_VALUE),
+	    "rTest_Clear_invalidBitmask failed.\n"
+	    "Kirletilmiş mantıksal maske kombinasyonu reddedilmedi.");
+}
+
+/* ============================================================
+ * glClearColor — Özel Float Degerleri (NaN, Infinity)
+ * ============================================================
+ *
+ * Kayan nokta zehirlemesi (NaN ve Infinity). Spec bu konuda
+ * çok net olmasa da kaliteli bir SC 2.0 sürücüsü bunu
+ * sessizce yutmali veya güvenli hale getirmelidir.
+ * Kesinlikle ÇÖKMEMELIDIR.
+ * ============================================================ */
+void rTest_ClearColor_specialFloats(void) {
+	// Kayan nokta zehirlemesi (NaN ve Infinity)
+	// Spec bu konuda çok net olmasa da kaliteli bir SC 2.0 sürücüsü bunu
+	// sessizce yutmalı veya kendi içinde güvenli bir hale getirmelidir
+	// (Kesinlikle ÇÖKMEMELİDİR).
+	glClearColor(NAN, INFINITY, -INFINITY, 1.5f);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR || err == GL_INVALID_VALUE),
+			"rTest_ClearColor_specialFloats failed.\n"
+			"NaN/Inf değerleri atanırken beklenmeyen bir hata kodu "
+			"döndü veya sürücü kilitlendi.");
+}
+
+/* ============================================================
+ * glClearDepthf — Clamping Dogrulamasi
+ * ============================================================
+ *
+ * Depth degeri matematiksel olarak [0.0, 1.0] araliginda
+ * olmalidir. Sinir disina çikilarak sürücünün sessizce
+ * kırpma (clamp) yapip yapamadigi dogrulanir.
+ * ============================================================ */
+void rTest_ClearDepthf_clamping(void) {
+	// Depth değeri matematikte sadece [0.0, 1.0] aralığında olabilir.
+	// Biz sınırların çok dışına taşıyoruz.
+	glClearDepthf(5000.0f);
+	GLenum err = glGetError();
+
+	// Spesifikasyon: "Değerler hata fırlatmadan sessizce [0,1] aralığına
+	// kırpılır."
+	EXPECT_GL_ERROR(
+	    err, (err == GL_NO_ERROR),
+	    "rTest_ClearDepthf_clamping failed.\n"
+	    "Sınır dışı depth atamasında beklenmeyen bir hata fırlatıldı.");
+
+	// Sürücü gerçekten değeri 1.0'a kilitledi (clamp) mi?
+	GLfloat depth = -1.0f;
+	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
+
+	EXPECT_GL_ERROR(
+	    depth, (depth == 1.0f),
+	    "rTest_ClearDepthf_clamping failed.\n"
+	    "Sürücü aşırı depth değerini [0,1] aralığına kırpmayı başaramadı.");
+}
+
+/* ============================================================
+ * glClearStencil — Sinir Degerleri
+ * ============================================================
+ *
+ * Stencil degeri integer'dir, ancak mevcut Stencil Buffer bit
+ * sayisina göre maskelenir. Asiri büyük ve negatif sayilar
+ * vererek state okumasinin bozulup bozulmadigini test eder.
+ * ============================================================ */
+void rTest_ClearStencil_bounds(void) {
+	// Stencil değeri integer'dır, ancak mevcut Stencil Buffer bit sayısına
+	// göre maskelenir. Aşırı büyük ve negatif sayılar vererek state
+	// okumasının bozulup bozulmadığını sınıyoruz.
+	glClearStencil(-1); // Genelde tüm bitleri 1 yapan maske görevi görür
+			    // (Two's complement)
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"rTest_ClearStencil_bounds failed.\n"
+			"Negatif değer atamasında hata fırlatıldı.");
+}
+
+/****************************************/
+/******** Buffer Objects ********/
+/****************************************/
+
+/* ============================================================
+ * glGenBuffers — Negatif n Degeri
+ * ============================================================
+ *
+ * Belirtilen hata: GL_INVALID_VALUE is generated if n is
+ * negative. Negatif n degeri ile çagrilarak sürücünün bunu
+ * GL_INVALID_VALUE ile reddedip reddetmedigi dogrulanir.
+ * ============================================================ */
+void rTest_glGenBuffers_invalid_value() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buffer = 0;
+	glGenBuffers(-1, &buffer);
+	GLenum err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_glGenBuffers_invalid_value failed. Expected "
+			"GL_INVALID_VALUE.");
+}
+
+/* ============================================================
+ * glGenBuffers — Sifir Count
+ * ============================================================
+ *
+ * n = 0 ile çagri yapildiginda sürücünün tanimli davranip
+ * davranmadigi gözlemlenir.
+ * ============================================================ */
+void rTest_glGenBuffers_zero_count() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf = 0xCDCDCDCD; // sentinel değer
+	glGenBuffers(0, &buf);
+	GLenum err = glGetError();
+	printf("[INFO] glGenBuffers(n=0): error=0x%X, buffer=0x%08X\n", err,
+	       buf);
+}
+
+/* ============================================================
+ * glGenBuffers — NULL Buffers Pointer
+ * ============================================================
+ *
+ * buffers = NULL, n > 0 (negative robustness): sürücünün
+ * NULL pointer ile çökmeden davranip davranmadigi gözlemlenir.
+ * ============================================================ */
+void rTest_glGenBuffers_null_buffers() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	glGenBuffers(5, NULL);
+	GLenum err = glGetError();
+	printf("[INFO] glGenBuffers(buffers=nullptr, n=5): error=0x%X\n", err);
+}
+
+/* ============================================================
+ * glGenBuffers — Asiri Büyük n
+ * ============================================================
+ *
+ * 100.000 adet buffer ismi üreterek sürücünün büyük tahsis
+ * isteklerini kararli bir sekilde ele alip almadigi dogrulanir.
+ * ============================================================ */
+void rTest_glGenBuffers_large_n() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	const GLsizei largeCount = 100000;
+	GLuint *buffers = (GLuint *)malloc(sizeof(GLuint) * largeCount);
+	if (buffers == NULL) {
+		printf("[INFO] Memory allocation failed.\n");
+		return;
+	}
+	glGenBuffers(largeCount, buffers);
+	GLenum err = glGetError();
+	printf("[INFO] glGenBuffers(n=%d): error=0x%X\n", largeCount, err);
+	free(buffers);
+}
+
+/* ============================================================
+ * glGenBuffers — Tekrarli Üretim
+ * ============================================================
+ *
+ * Ayni array'i art arda 1000 kez çagirarak isim tekilligini
+ * bozmaya çalisir. Sürücünün tekrarli üretimde hata verip
+ * vermediği gözlemlenir.
+ * ============================================================ */
+void rTest_glGenBuffers_repeated_generation() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buffers[10];
+	for (int i = 0; i < 1000; ++i) {
+		glGenBuffers(10, buffers);
+		GLenum err = glGetError();
+		if (err != GL_NO_ERROR) {
+			printf("[INFO] glGenBuffers failed at iteration %d: "
+			       "error=0x%X\n",
+			       i, err);
+			return;
+		}
+	}
+	printf(
+	    "[INFO] Repeated glGenBuffers(10) x1000 completed successfully.\n");
+}
+
+/* ============================================================
+ * glGenBuffers — Benzersiz Isimler
+ * ============================================================
+ *
+ * 1000 adet buffer adi üreterek döndürülen isimlerin
+ * benzersiz oldugunu ve reserved 0 isminin üretilmedigini
+ * dogrular.
+ * ============================================================ */
+void rTest_glGenBuffers_unique_names() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	const GLsizei COUNT = 1000;
+	GLuint buffers[COUNT];
+	glGenBuffers(COUNT, buffers);
+
+	// 0 ismi üretilmemeli
+	for (int i = 0; i < COUNT; i++) {
+		if (buffers[i] == 0) {
+			EXPECT_GL_ERROR(
+			    0, 0,
+			    "rTest_glGenBuffers_unique_names failed. Reserved "
+			    "name 0 was generated.");
+			glDeleteBuffers(COUNT, buffers);
+			return;
+		}
+	}
+
+	// Aynı isim iki kez üretilmemeli
+	for (int i = 0; i < COUNT; i++) {
+		for (int j = i + 1; j < COUNT; j++) {
+			if (buffers[i] == buffers[j]) {
+				EXPECT_GL_ERROR(
+				    buffers[i], 0,
+				    "rTest_glGenBuffers_unique_names failed. "
+				    "Duplicate buffer name found.");
+				glDeleteBuffers(COUNT, buffers);
+				return;
+			}
+		}
+	}
+
+	GLenum err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"rTest_glGenBuffers_unique_names failed.");
+
+	glDeleteBuffers(COUNT, buffers);
+}
+
+/* ============================================================
+ * glGenBuffers — Bind Edilmemis Isim Yasam Döngüsü
+ * ============================================================
+ *
+ * Bind edilmemis buffer isimleri üzerinde glIsBuffer ve
+ * glDeleteBuffers çagrilarinin spesifikasyona uygun
+ * davranip davranmadigini dogrular.
+ * ============================================================ */
+void rTest_glGenBuffers_unbound_names_lifecycle() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	GLboolean isBuffer = glIsBuffer(buf);
+
+	glDeleteBuffers(1, &buf);
+
+	GLenum err = glGetError();
+	printf("[INFO] Unbound buffer name: glIsBuffer=%s, glDeleteBuffers "
+	       "error=0x%X\n",
+	       isBuffer ? "GL_TRUE" : "GL_FALSE", err);
+}
+
+/* ============================================================
+ * glGenBuffers — Çift Silme
+ * ============================================================
+ *
+ * Ayni buffer isminin birden fazla kez silinmesi durumunda
+ * implementasyonun kararlilığını test eder.
+ * ============================================================ */
+void rTest_glGenBuffers_double_delete() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glDeleteBuffers(1, &buf);
+	GLenum firstErr = glGetError();
+	glDeleteBuffers(1, &buf);
+	GLenum secondErr = glGetError();
+	printf("[INFO] Double delete: firstErr=0x%X, secondErr=0x%X\n",
+	       firstErr, secondErr);
+}
+
+/* ============================================================
+ * glGenBuffers — Devasa Count, Küçük Buffer
+ * ============================================================
+ *
+ * Büyük 'n' degeri (INT_MAX) ve kasitli olarak yetersiz
+ * output buffer kullanilarak implementasyonun geçersiz
+ * istemci bellegi karsisindaki davranisi test edilir.
+ * ============================================================ */
+void rTest_glGenBuffers_huge_count_small_buffer() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLsizei huge_n = INT_MAX;
+	GLuint buffers[1];
+
+	glGenBuffers(huge_n, buffers);
+
+	GLenum err = glGetError();
+	printf("[INFO] n=INT_MAX -> glError=0x%x\n", err);
+}
+
+/* ============================================================
+ * glBindBuffer — Geçersiz Enum
+ * ============================================================
+ *
+ * Belirtilen hata: GL_INVALID_ENUM is generated if target
+ * is not one of the allowable values. 0xFFFFFFFF ile
+ * çagrilarak sürücünün bunu reddetmesi beklenir.
+ * ============================================================ */
 void rTest_glBindBuffer_invalid_enum() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_invalid_enum()\n");
 
 	glBindBuffer(0xFFFFFFFF, 1);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_ENUM) {
-		printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-		assert(err == GL_INVALID_ENUM);
-	}
-	printf("[PASS] rTest_glBindBuffer_invalid_enum()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glBindBuffer_invalid_enum failed. Expected "
+			"GL_INVALID_ENUM.");
 }
 
-// glGenBuffers ile oluşturulmamış bir ismin bind edilmesi
+/* ============================================================
+ * glBindBuffer — Gen Olmadan Yeni Isim
+ * ============================================================
+ *
+ * glGenBuffers ile olusturulmamis bir ismin bind edilmesi
+ * durumunda sürücünün davranisi gözlemlenir.
+ * ============================================================ */
 void rTest_glBindBuffer_new_name_without_gen() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_new_name_without_gen()\n");
 
 	GLuint name = 424242;
 	glBindBuffer(GL_ARRAY_BUFFER, name);
@@ -278,12 +1494,16 @@ void rTest_glBindBuffer_new_name_without_gen() {
 	printf("[INFO] glBindBuffer(new name=%u): error=0x%X\n", name, err);
 }
 
-// Silinen bir buffer isminin tekrar bind edilmesiyle yeni bir buffer nesnesi
-// oluşturulup oluşturulmadığını test eder.
+/* ============================================================
+ * glBindBuffer — Silinmis Buffer
+ * ============================================================
+ *
+ * Silinen bir buffer isminin tekrar bind edilmesiyle yeni
+ * bir buffer nesnesi olusturulup olusturulmadigini test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_deleted_buffer() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_deleted_buffer()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -294,17 +1514,17 @@ void rTest_glBindBuffer_deleted_buffer() {
 	printf("[INFO] Bind deleted name: error=0x%X\n", err);
 }
 
-// Büyük/alışılmadık buffer isimlerinin bind edilmesi
+/* ============================================================
+ * glBindBuffer — Sinir Buffer Isimleri
+ * ============================================================
+ *
+ * Büyük/alisılmadik buffer isimlerinin (UINT_MAX, INT_MAX,
+ * 0xDEADBEEF, vb.) bind edilmesi durumunda sürücünün
+ * davranisi gözlemlenir.
+ * ============================================================ */
 void rTest_glBindBuffer_boundary_handles() {
-	printf("[START] rTest_glBindBuffer_boundary_handles()\n");
-
-	GLuint candidates[] = {
-	    0xFFFFFFFFu, // UINT_MAX
-	    0x80000000u, // sign-bit sınırı
-	    0x7FFFFFFFu, // INT_MAX
-	    0xDEADBEEFu,
-	    0xCDCDCDCDu // tipik uninitialized heap pattern
-	};
+	GLuint candidates[] = {0xFFFFFFFFu, 0x80000000u, 0x7FFFFFFFu,
+			       0xDEADBEEFu, 0xCDCDCDCDu};
 	for (int i = 0; i < 5; ++i) {
 		while (glGetError() != GL_NO_ERROR) {
 		}
@@ -315,29 +1535,37 @@ void rTest_glBindBuffer_boundary_handles() {
 	}
 }
 
-// Geçersiz target enum değerlerine karşı implementasyonun hata kontrolünün
-// testi
+/* ============================================================
+ * glBindBuffer — Kirli Yüksek Bitler
+ * ============================================================
+ *
+ * Geçersiz target enum degerlerine karsi implementasyonun
+ * hata kontrolünün testi. GL_ARRAY_BUFFER | 0xFFFF0000u
+ * gibi kirletilmis bir enum kullanilir.
+ * ============================================================ */
 void rTest_glBindBuffer_dirty_high_bits_enum() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_dirty_high_bits_enum()\n");
 
 	GLenum polluted = GL_ARRAY_BUFFER | 0xFFFF0000u;
 	glBindBuffer(polluted, 1);
 	GLenum err = glGetError();
-	// Spec'e göre bu "allowable değil" -> INVALID_ENUM beklenir
 	printf("[INFO] Polluted target=0x%08X : glError=0x%X (expected "
 	       "GL_INVALID_ENUM)\n",
 	       polluted, err);
 }
 
-// Aynı buffer nesnesinin farklı target'lara hızlı ve tekrarlı şekilde
-// bağlanması sırasında implementasyonun kararlılığını test eder.
+/* ============================================================
+ * glBindBuffer — Hizli Çapraz Hedef Rebind Stres Testi
+ * ============================================================
+ *
+ * Ayni buffer nesnesinin farkli target'lara hizli ve
+ * tekrarli sekilde baglanmasi sirasinda implementasyonun
+ * kararlilığını test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_rapid_cross_target_rebind_stress() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf(
-	    "[START] rTest_glBindBuffer_rapid_cross_target_rebind_stress()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -350,7 +1578,7 @@ void rTest_glBindBuffer_rapid_cross_target_rebind_stress() {
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			printf("[FAIL] Iteration=%d, target=%s, glError=0x%X\n",
+			printf("[INFO] Iteration=%d, target=%s, glError=0x%X\n",
 			       i,
 			       target == GL_ARRAY_BUFFER
 				   ? "GL_ARRAY_BUFFER"
@@ -360,24 +1588,28 @@ void rTest_glBindBuffer_rapid_cross_target_rebind_stress() {
 			return;
 		}
 	}
-	printf("[PASS] Rapid cross-target rebind stress completed without "
+	printf("[INFO] Rapid cross-target rebind stress completed without "
 	       "OpenGL errors.\n");
 	glDeleteBuffers(1, &buf);
 }
 
-// Aynı buffer nesnesi iki target'a bağlıyken silme işlemi sonrası
-// implementasyonun kararlılığını ve hata davranışını test eder
+/* ============================================================
+ * glBindBuffer — Çift Bind Sirasinda Silme
+ * ============================================================
+ *
+ * Ayni buffer nesnesi iki target'a bagliyken silme islemi
+ * sonrasi implementasyonun kararlilığını ve hata davranisini
+ * test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_delete_while_double_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_delete_while_double_bound()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 	glBufferData(GL_ARRAY_BUFFER, 256, NULL, GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,
-		     buf); // aynı obje şimdi iki target'ta aktif
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
 	glDeleteBuffers(1, &buf);
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 64, NULL);
@@ -391,53 +1623,65 @@ void rTest_glBindBuffer_delete_while_double_bound() {
 	       arrayErr, elementErr);
 }
 
-// Buffer'ı tekrar tekrar 0'a bağlayıp bağlama durumunu sorgulayarak
-// implementasyonun state yönetimi kararlılığını test eder.
+/* ============================================================
+ * glBindBuffer — Sifir Baglama Sorgu Stresi
+ * ============================================================
+ *
+ * Buffer'i tekrar tekrar 0'a baglayip baglama durumunu
+ * sorgulayarak implementasyonun state yönetimi kararlilığını
+ * test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_zero_binding_query_thrash() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_zero_binding_query_thrash()\n");
 
 	for (int i = 0; i < 1000; ++i) {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		GLint binding = -1;
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &binding);
 		if (binding != 0) {
-			printf("[FAIL] Iteration=%d, "
-			       "GL_ARRAY_BUFFER_BINDING=%d (expected 0)\n",
-			       i, binding);
+			EXPECT_GL_ERROR(
+			    binding, 0,
+			    "rTest_glBindBuffer_zero_binding_query_thrash "
+			    "failed. GL_ARRAY_BUFFER_BINDING != 0.");
 			return;
 		}
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
+			EXPECT_GL_ERROR(err, 0,
+					"rTest_glBindBuffer_zero_binding_query_"
+					"thrash failed.");
 			return;
 		}
 	}
-	printf("[PASS] Zero binding/query thrash completed successfully.\n");
+	printf("[INFO] Zero binding/query thrash completed successfully.\n");
 }
 
-// Çok sayıda buffer ismi üzerinde rastgele bind işlemleri yaparak
-// implementasyonun isim yönetimi ve durum değişikliklerine karşı
-// dayanıklılığını test eder.
+/* ============================================================
+ * glBindBuffer — Devasa Isim Alani Fuzz
+ * ============================================================
+ *
+ * Çok sayida buffer ismi üzerinde rastgele bind islemleri
+ * yaparak implementasyonun isim yönetimi ve durum
+ * degisikliklerine karsi dayanikliligini test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_massive_namespace_fuzz() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_massive_namespace_fuzz()\n");
 
 	const int N = 20000;
 	GLuint *names = (GLuint *)malloc(sizeof(GLuint) * N);
 
 	if (names == NULL) {
-		printf("[FAIL] Memory allocation failed.\n");
+		printf("[INFO] Memory allocation failed.\n");
 		return;
 	}
 
 	glGenBuffers(N, names);
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR) {
-		printf("[FAIL] glGenBuffers failed: glError=0x%X\n", err);
+		printf("[INFO] glGenBuffers failed: glError=0x%X\n", err);
 		free(names);
 		return;
 	}
@@ -460,7 +1704,7 @@ void rTest_glBindBuffer_massive_namespace_fuzz() {
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			printf("[FAIL] Iteration=%d, buffer=%u, target=%s, "
+			printf("[INFO] Iteration=%d, buffer=%u, target=%s, "
 			       "glError=0x%X\n",
 			       i, name,
 			       target == GL_ARRAY_BUFFER
@@ -477,16 +1721,21 @@ void rTest_glBindBuffer_massive_namespace_fuzz() {
 	glDeleteBuffers(N, names);
 	free(names);
 
-	printf("[PASS] Massive buffer namespace fuzz completed without OpenGL "
+	printf("[INFO] Massive buffer namespace fuzz completed without OpenGL "
 	       "errors.\n");
 }
 
-// Aynı target üzerinde farklı buffer'lar arasında sürekli geçiş yaparak
-// implementasyonun state yönetimi kararlılığını test eder.
+/* ============================================================
+ * glBindBuffer — Baglama Degisim Stresi
+ * ============================================================
+ *
+ * Ayni target üzerinde farkli buffer'lar arasinda sürekli
+ * geçis yaparak implementasyonun state yönetimi kararlilığını
+ * test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_binding_churn_stress() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_binding_churn_stress()\n");
 
 	GLuint buffers[2];
 	glGenBuffers(2, buffers);
@@ -498,25 +1747,30 @@ void rTest_glBindBuffer_binding_churn_stress() {
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
-
+			EXPECT_GL_ERROR(
+			    err, 0,
+			    "rTest_glBindBuffer_binding_churn_stress failed.");
 			glDeleteBuffers(2, buffers);
 			return;
 		}
 	}
 
 	glDeleteBuffers(2, buffers);
-
 	printf(
-	    "[PASS] Binding churn stress completed without OpenGL errors.\n");
+	    "[INFO] Binding churn stress completed without OpenGL errors.\n");
 }
 
-// Buffer nesnelerinin oluşturma, bağlama ve silme yaşam döngüsünü tekrarlı
-// olarak çalıştırarak implementasyonun dayanıklılığını test eder.
+/* ============================================================
+ * glBindBuffer — Yasam Döngüsü Stresi
+ * ============================================================
+ *
+ * Buffer nesnelerinin olusturma, baglama ve silme yasam
+ * döngüsünü tekrarli olarak çalistirarak implementasyonun
+ * dayanikliligini test eder.
+ * ============================================================ */
 void rTest_glBindBuffer_lifecycle_stress() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBindBuffer_lifecycle_stress()\n");
 
 	for (int i = 0; i < 5000; ++i) {
 		GLuint buf;
@@ -527,44 +1781,45 @@ void rTest_glBindBuffer_lifecycle_stress() {
 
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
+			EXPECT_GL_ERROR(
+			    err, 0,
+			    "rTest_glBindBuffer_lifecycle_stress failed.");
 			return;
 		}
 	}
-	printf("[PASS] Buffer lifecycle stress completed without OpenGL "
+	printf("[INFO] Buffer lifecycle stress completed without OpenGL "
 	       "errors.\n");
 }
 
-// void glBufferData(GLenum target, GLsizeiptr size, const GLvoid * data, GLenum
-// usage); Target parametresiyle bind ettiğin buffer object için ekran kartı
-// (GPU) üzerinde yeni bir data store oluşturur Eski veriyi tamamen siler
-// İstersen verdiğin data pointer’ındaki veriyi bu yeni belleğe kopyalayarak
-// başlatır usage parametresiyle de bu veriyi nasıl kullanacağını sürücüye ipucu
-// olarak bildirirsin (performans optimizasyonu için)
-
-// Belirtilen hata: GL_INVALID_ENUM is generated if target is not
-// GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+/* ============================================================
+ * glBufferData — Geçersiz Target Enum
+ * ============================================================
+ *
+ * GL_INVALID_ENUM is generated if target is not
+ * GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+ * ============================================================ */
 void rTest_glBufferData_invalid_enum_target() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_invalid_enum_target()\n");
 
 	glBufferData(0xFFFFFFFF, 16, NULL, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_ENUM) {
-		printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-		assert(err == GL_INVALID_ENUM);
-	}
-	printf("[PASS] rTest_glBufferData_invalid_enum_target()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glBufferData_invalid_enum_target failed. "
+			"Expected GL_INVALID_ENUM.");
 }
 
-// Belirtilen hata: GL_INVALID_ENUM is generated if usage is not GL_STREAM_DRAW,
-// GL_STATIC_DRAW, or GL_DYNAMIC_DRAW.
+/* ============================================================
+ * glBufferData — Geçersiz Usage Enum
+ * ============================================================
+ *
+ * GL_INVALID_ENUM is generated if usage is not
+ * GL_STREAM_DRAW, GL_STATIC_DRAW, or GL_DYNAMIC_DRAW.
+ * ============================================================ */
 void rTest_glBufferData_invalid_enum_usage() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_invalid_enum_usage()\n");
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -572,20 +1827,22 @@ void rTest_glBufferData_invalid_enum_usage() {
 	glBufferData(GL_ARRAY_BUFFER, 16, NULL, 0xFFFFFFFF);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_ENUM) {
-		printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-		assert(err == GL_INVALID_ENUM);
-	}
-	printf("[PASS] rTest_glBufferData_invalid_enum_usage()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glBufferData_invalid_enum_usage failed. "
+			"Expected GL_INVALID_ENUM.");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
+/* ============================================================
+ * glBufferData — Negatif Boyut
+ * ============================================================
+ *
+ * GL_INVALID_VALUE is generated if size is negative.
+ * ============================================================ */
 void rTest_glBufferData_invalid_value_negative_size() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_invalid_value_negative_size()\n");
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -593,42 +1850,43 @@ void rTest_glBufferData_invalid_value_negative_size() {
 	glBufferData(GL_ARRAY_BUFFER, -1, NULL, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_VALUE) {
-		printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-		assert(err == GL_INVALID_VALUE);
-	}
-	printf("[PASS] rTest_glBufferData_invalid_value_negative_size()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_glBufferData_invalid_value_negative_size "
+			"failed. Expected GL_INVALID_VALUE.");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer
-// object name 0 is bound to target.
+/* ============================================================
+ * glBufferData — Sifir Buffer Bagli
+ * ============================================================
+ *
+ * GL_INVALID_OPERATION is generated if the reserved buffer
+ * object name 0 is bound to target.
+ * ============================================================ */
 void rTest_glBufferData_invalid_operation_zero_buffer_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] "
-	       "rTest_glBufferData_invalid_operation_zero_buffer_bound()\n");
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBufferData(GL_ARRAY_BUFFER, 16, NULL, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_OPERATION) {
-		printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n",
-		       err);
-		assert(err == GL_INVALID_OPERATION);
-	}
-	printf("[PASS] "
-	       "rTest_glBufferData_invalid_operation_zero_buffer_bound()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_glBufferData_invalid_operation_zero_buffer_"
+			"bound failed. Expected GL_INVALID_OPERATION.");
 }
 
-// Belirtilen hata: GL_OUT_OF_MEMORY is generated if the GL is unable to create
-// a data store with the specified size.
+/* ============================================================
+ * glBufferData — Bellek Yetersizligi
+ * ============================================================
+ *
+ * GL_OUT_OF_MEMORY is generated if the GL is unable to
+ * create a data store with the specified size.
+ * ============================================================ */
 void rTest_glBufferData_out_of_memory() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_out_of_memory()\n");
 
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
@@ -637,56 +1895,56 @@ void rTest_glBufferData_out_of_memory() {
 		     GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
-	if (err == GL_OUT_OF_MEMORY) {
-		printf("[PASS] GL_OUT_OF_MEMORY was generated.\n");
-	} else if (err == GL_NO_ERROR) {
-		printf("[INFO] GL_OUT_OF_MEMORY was not generated. This "
-		       "behavior is implementation-dependent.\n");
-	} else {
-		printf("[FAIL] Expected GL_OUT_OF_MEMORY or GL_NO_ERROR, but "
-		       "got 0x%X\n",
-		       err);
-		assert(0);
-	}
+	EXPECT_GL_ERROR(err, (err == GL_OUT_OF_MEMORY || err == GL_NO_ERROR),
+			"rTest_glBufferData_out_of_memory failed. Expected "
+			"GL_OUT_OF_MEMORY or GL_NO_ERROR.");
+	if (err == GL_OUT_OF_MEMORY)
+		printf("[INFO] GL_OUT_OF_MEMORY was generated.\n");
+	else if (err == GL_NO_ERROR)
+		printf("[INFO] GL_OUT_OF_MEMORY was not generated "
+		       "(implementation-dependent).\n");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilmeyen hatalar --------------------------------------------------
-
-// Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API
-// kullanımına karşı implementasyonun dayanıklılığını gözlemler.
+/* ============================================================
+ * glBufferData — Kaynak Boyutu Yetersiz
+ * ============================================================
+ *
+ * Kaynak veri boyutunun belirtilen 'size' degerinden küçük
+ * oldugu hatali API kullanimina karsi implementasyonun
+ * dayanikliligini gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_source_buffer_too_small() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_source_buffer_too_small()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 
-	char smallSource[16] = {0}; // Sadece 16 byte'lık kaynak veri.
-
-	// Kasıtlı yanlış kullanım: OpenGL'den 4096 byte okuması isteniyor ancak
-	// kaynak yalnızca 16 byte.
+	char smallSource[16] = {0};
 	glBufferData(GL_ARRAY_BUFFER, 4096, smallSource, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
 	printf("[INFO] Misuse robustness (source buffer too small): "
-	       "glError=0x%X \n",
+	       "glError=0x%X\n",
 	       err);
 
 	glDeleteBuffers(1, &buf);
 }
 
-// size = 0 ama data != NULL
-// Sıfır boyutlu data store oluşturulurken geçerli bir data pointer'ı
-// verilmesinin implementasyon tarafından güvenli şekilde ele alınıp
-// alınmadığını doğrular.
+/* ============================================================
+ * glBufferData — Sifir Boyut, Non-NULL Data
+ * ============================================================
+ *
+ * Sifir boyutlu data store olusturulurken geçerli bir data
+ * pointer'i verilmesinin implementasyon tarafindan güvenli
+ * sekilde ele alinip alinmadigini dogrular.
+ * ============================================================ */
 void rTest_glBufferData_zero_size_nonnull_data() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_zero_size_nonnull_data()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -696,20 +1954,19 @@ void rTest_glBufferData_zero_size_nonnull_data() {
 	glBufferData(GL_ARRAY_BUFFER, 0, &dummy, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
-	if (err == GL_NO_ERROR)
-		printf("[PASS] size=0, data!=NULL accepted.\n");
-	else
-		printf("[INFO] size=0, data!=NULL returned glError=0x%X\n",
-		       err);
+	printf("[INFO] size=0, data!=NULL: glError=0x%X\n", err);
 
 	glDeleteBuffers(1, &buf);
 }
 
-// Sınır ve aşırı boyut size değerleri karşısında implementasyonun kararlılığını
-// gözlemler.
+/* ============================================================
+ * glBufferData — Boyut Tasmasi Sinir Testi
+ * ============================================================
+ *
+ * Sinir ve asiri boyut size degerleri karsisinda
+ * implementasyonun kararlilığını gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_size_overflow_boundary() {
-	printf("[START] rTest_glBufferData_size_overflow_boundary()\n");
-
 	GLsizeiptr candidates[] = {-1, INT_MIN, (GLsizeiptr)INT_MAX + 1,
 				   LLONG_MAX};
 
@@ -731,14 +1988,19 @@ void rTest_glBufferData_size_overflow_boundary() {
 	}
 }
 
-// Geçersiz ve kirlenmiş usage enum değerleri karşısında implementasyonun
-// kararlılığını gözlemler.
+/* ============================================================
+ * glBufferData — Kirli Usage Enum
+ * ============================================================
+ *
+ * Geçersiz ve kirletilmis usage enum degerleri karsisinda
+ * implementasyonun kararlilığını gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_dirty_usage_enum() {
-	printf("[START] rTest_glBufferData_dirty_usage_enum()\n");
 	GLenum candidates[] = {GL_STATIC_DRAW, 0xFFFF0000u, 0xFFFFFFFFu,
 			       0x12345678u, 0xDEADBEEFu};
 
-	for (int i = 0; i < sizeof(candidates) / sizeof(candidates[0]); i++) {
+	for (int i = 0; i < (int)(sizeof(candidates) / sizeof(candidates[0]));
+	     i++) {
 		while (glGetError() != GL_NO_ERROR) {
 		}
 
@@ -757,26 +2019,36 @@ void rTest_glBufferData_dirty_usage_enum() {
 	}
 }
 
-// Hedefe herhangi bir buffer bağlı değilken glBufferData çağrısının
-// implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
+/* ============================================================
+ * glBufferData — Sifir Buffer Bagli (Target)
+ * ============================================================
+ *
+ * Hedefe herhangi bir buffer bagli degilken glBufferData
+ * çagrisinin güvenli sekilde ele alinip alinmadigini
+ * gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_target_zero_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_target_zero_bound()\n");
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // hiçbir buffer bound değil
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
 	printf("[INFO] glBufferData(buffer=0) completed, glError=0x%X\n", err);
 }
 
-// Aynı buffer üzerinde farklı boyutlarda data store'ları art arda oluşturarak
-// implementasyonun reallocation işlemlerindeki kararlılığını gözlemler.
+/* ============================================================
+ * glBufferData — Tekrarli Boyut Degisim Stresi
+ * ============================================================
+ *
+ * Ayni buffer üzerinde farkli boyutlarda data store'lari
+ * art arda olusturarak implementasyonun reallocation
+ * islemlerindeki kararlilığını gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_repeated_resize_thrash() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_repeated_resize_thrash()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -799,19 +2071,24 @@ void rTest_glBufferData_repeated_resize_thrash() {
 	glDeleteBuffers(1, &buf);
 }
 
-// Hizasız bir kaynak data pointer'ı kullanılarak implementasyonun hatalı
-// istemci girdisi karşısındaki kararlılığı gözlemlenir.
+/* ============================================================
+ * glBufferData — Hizasiz Data Pointer
+ * ============================================================
+ *
+ * Hizasi bozulmus bir kaynak data pointer'i kullanilarak
+ * implementasyonun hatali istemci girdisi karsisindaki
+ * kararlilığı gözlemlenir.
+ * ============================================================ */
 void rTest_glBufferData_misaligned_data_pointer() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_misaligned_data_pointer()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 
 	char raw[128] = {0};
-	void *misaligned = raw + 1; // Kasıtlı olarak hizasız pointer
+	void *misaligned = raw + 1;
 	glBufferData(GL_ARRAY_BUFFER, 64, misaligned, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
@@ -822,10 +2099,15 @@ void rTest_glBufferData_misaligned_data_pointer() {
 	glDeleteBuffers(1, &buf);
 }
 
-// Serbest bırakılmış (dangling) bir kaynak pointer kullanılarak
-// implementasyonun hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
+/* ============================================================
+ * glBufferData — Dangling Data Pointer
+ * ============================================================
+ *
+ * Serbest birakilmis (dangling) bir kaynak pointer
+ * kullanilarak implementasyonun hatali istemci girdisi
+ * karsisindaki kararlilığı gözlemlenir.
+ * ============================================================ */
 void rTest_glBufferData_dangling_data_pointer() {
-	printf("[START] rTest_glBufferData_dangling_data_pointer()\n");
 	while (glGetError() != GL_NO_ERROR) {
 	}
 
@@ -835,13 +2117,13 @@ void rTest_glBufferData_dangling_data_pointer() {
 
 	char *heapData = (char *)malloc(256);
 	if (heapData == NULL) {
-		printf("[ERROR] Memory allocation failed.\n");
+		printf("[INFO] Memory allocation failed.\n");
 		glDeleteBuffers(1, &buf);
 		return;
 	}
 
 	memset(heapData, 0xAB, 256);
-	free(heapData); // Pointer artık dangling
+	free(heapData);
 	glBufferData(GL_ARRAY_BUFFER, 256, heapData, GL_STATIC_DRAW);
 
 	GLenum err = glGetError();
@@ -852,21 +2134,23 @@ void rTest_glBufferData_dangling_data_pointer() {
 	glDeleteBuffers(1, &buf);
 }
 
-// Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin durumunun
-// korunup korunmadığını gözlemler.
+/* ============================================================
+ * glBufferData — OOM Sonrasi State
+ * ============================================================
+ *
+ * Büyük bir data store tahsis denemesi sonrasinda buffer
+ * nesnesinin durumunun korunup korunmadigini gözlemler.
+ * ============================================================ */
 void rTest_glBufferData_state_after_out_of_memory() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferData_state_after_out_of_memory()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 
-	// Başlangıçta küçük bir veri deposu oluştur.
 	glBufferData(GL_ARRAY_BUFFER, 1024, NULL, GL_STATIC_DRAW);
 
-	// Gerçekçi olmayan büyük bir tahsis denemesi.
 	glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)1 << 40, NULL,
 		     GL_STATIC_DRAW);
 
@@ -881,37 +2165,35 @@ void rTest_glBufferData_state_after_out_of_memory() {
 	glDeleteBuffers(1, &buf);
 }
 
-// void glBufferSubData (GLenum target, GLintptr offset, GLsizeiptr size, const
-// GLvoid * data); Daha önceden oluşturulmuş bir buffer’ın içindeki belirli bir
-// kısmı günceller Yeni bellek ayırmaz, var olan glBufferData ile oluşturulmuş
-// data store’un içini kısmen değiştirir target ile belirtilen ve şu an
-// glBindBuffer ile bağlanmış buffer’ı kullanır Buffer’ın offset byte’tan
-// başlayan kısmına, size byte uzunluğunda data pointer’ındaki veriyi kopyalar.
-
-// Belirtilen hata: GL_INVALID_ENUM is generated if target is not
-// GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+/* ============================================================
+ * glBufferSubData — Geçersiz Target Enum
+ * ============================================================
+ *
+ * GL_INVALID_ENUM is generated if target is not
+ * GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+ * ============================================================ */
 void rTest_glBufferSubData_invalid_enum_target() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_invalid_enum_target()\n");
 
 	int data = 123;
 	glBufferSubData(0xFFFFFFFF, 0, sizeof(data), &data);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_ENUM) {
-		printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-		assert(err == GL_INVALID_ENUM);
-	}
-	printf("[PASS] rTest_glBufferSubData_invalid_enum_target()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glBufferSubData_invalid_enum_target failed. "
+			"Expected GL_INVALID_ENUM.");
 }
 
-// Belirtilen hata: GL_INVALID_VALUE is generated if offset is negative.
+/* ============================================================
+ * glBufferSubData — Negatif Offset
+ * ============================================================
+ *
+ * GL_INVALID_VALUE is generated if offset is negative.
+ * ============================================================ */
 void rTest_glBufferSubData_invalid_value_negative_offset() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf(
-	    "[START] rTest_glBufferSubData_invalid_value_negative_offset()\n");
 
 	GLuint buffer;
 	int data = 123;
@@ -921,21 +2203,22 @@ void rTest_glBufferSubData_invalid_value_negative_offset() {
 	glBufferSubData(GL_ARRAY_BUFFER, -1, sizeof(data), &data);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_VALUE) {
-		printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-		assert(err == GL_INVALID_VALUE);
-	}
-	printf(
-	    "[PASS] rTest_glBufferSubData_invalid_value_negative_offset()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_glBufferSubData_invalid_value_negative_offset "
+			"failed. Expected GL_INVALID_VALUE.");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
+/* ============================================================
+ * glBufferSubData — Negatif Boyut
+ * ============================================================
+ *
+ * GL_INVALID_VALUE is generated if size is negative.
+ * ============================================================ */
 void rTest_glBufferSubData_invalid_value_negative_size() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_invalid_value_negative_size()\n");
 
 	GLuint buffer;
 	int data = 123;
@@ -945,21 +2228,23 @@ void rTest_glBufferSubData_invalid_value_negative_size() {
 	glBufferSubData(GL_ARRAY_BUFFER, 0, -1, &data);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_VALUE) {
-		printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-		assert(err == GL_INVALID_VALUE);
-	}
-	printf("[PASS] rTest_glBufferSubData_invalid_value_negative_size()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_glBufferSubData_invalid_value_negative_size "
+			"failed. Expected GL_INVALID_VALUE.");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilen hata: GL_INVALID_VALUE is generated if offset and size together
-// define a region beyond the allocated data store.
+/* ============================================================
+ * glBufferSubData — Sinir Disi (Out of Bounds)
+ * ============================================================
+ *
+ * GL_INVALID_VALUE is generated if offset and size together
+ * define a region beyond the allocated data store.
+ * ============================================================ */
 void rTest_glBufferSubData_invalid_value_out_of_bounds() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_invalid_value_out_of_bounds()\n");
 
 	GLuint buffer;
 	int data = 123;
@@ -969,60 +2254,53 @@ void rTest_glBufferSubData_invalid_value_out_of_bounds() {
 	glBufferSubData(GL_ARRAY_BUFFER, 60, 8, &data); // 60 + 8 = 68 > 64
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_VALUE) {
-		printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-		assert(err == GL_INVALID_VALUE);
-	}
-	printf("[PASS] rTest_glBufferSubData_invalid_value_out_of_bounds()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_glBufferSubData_invalid_value_out_of_bounds "
+			"failed. Expected GL_INVALID_VALUE.");
 
 	glDeleteBuffers(1, &buffer);
 }
 
-// Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer
-// object name 0 is bound to target.
+/* ============================================================
+ * glBufferSubData — Sifir Buffer Bagli
+ * ============================================================
+ *
+ * GL_INVALID_OPERATION is generated if the reserved buffer
+ * object name 0 is bound to target.
+ * ============================================================ */
 void rTest_glBufferSubData_invalid_operation_zero_buffer_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] "
-	       "rTest_glBufferSubData_invalid_operation_zero_buffer_bound()\n");
 
 	int data = 123;
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(data), &data);
 
 	GLenum err = glGetError();
-	if (err != GL_INVALID_OPERATION) {
-		printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n",
-		       err);
-		assert(err == GL_INVALID_OPERATION);
-	}
-	printf("[PASS] "
-	       "rTest_glBufferSubData_invalid_operation_zero_buffer_bound()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_glBufferSubData_invalid_operation_zero_buffer_"
+			"bound failed. Expected GL_INVALID_OPERATION.");
 }
 
-// belirtilmeyen hatalar ------------------------
-
-// Offset ve size değerlerinin toplamında oluşabilecek integer overflow
-// durumunda implementasyonun sınır kontrollerini güvenli şekilde yapıp
-// yapmadığını gözlemler. GLsizeptr 32 bit ise LLONG_MAX yerine INT_MAX
-// kullanmak gerekebilir
+/* ============================================================
+ * glBufferSubData — Offset+Size Overflow (Wraparound)
+ * ============================================================
+ *
+ * Offset ve size degerlerinin toplaminda olusabilecek
+ * integer overflow durumunda implementasyonun sinir
+ * kontrollerini güvenli sekilde yapip yapmadigini gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_offset_size_overflow_wraparound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] "
-	       "rTest_glBufferSubData_offset_size_overflow_wraparound()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 	glBufferData(GL_ARRAY_BUFFER, 1024, NULL, GL_STATIC_DRAW);
 
-	// Eğer implementasyon "offset + size <= buffer_size" kontrolünü
-	// wraparound'a karşı korumasız yapıyorsa, negatif/küçük bir toplam elde
-	// edip sınır kontrolünü atlatabilir -> OOB write
 	GLintptr offset = 100;
-	GLsizeiptr size =
-	    (GLsizeiptr)LLONG_MAX - 50; // offset + size overflow eder
+	GLsizeiptr size = (GLsizeiptr)LLONG_MAX - 50;
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, NULL);
 
 	GLenum err = glGetError();
@@ -1031,12 +2309,17 @@ void rTest_glBufferSubData_offset_size_overflow_wraparound() {
 	       (long long)offset, (long long)size, err);
 }
 
-// Buffer sınırının tam bitiş noktası ve bir byte ötesi kullanılarak
-// implementasyonun sınır kontrollerindeki kararlılığı gözlemlenir.
+/* ============================================================
+ * glBufferSubData — Tam Sinir Offset
+ * ============================================================
+ *
+ * Buffer sinirinin tam bitis noktasi ve bir byte ötesi
+ * kullanilarak implementasyonun sinir kontrollerindeki
+ * kararlilığı gözlemlenir.
+ * ============================================================ */
 void rTest_glBufferSubData_exact_boundary_offset() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_exact_boundary_offset()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -1044,44 +2327,39 @@ void rTest_glBufferSubData_exact_boundary_offset() {
 	glBufferData(GL_ARRAY_BUFFER, 256, NULL, GL_STATIC_DRAW);
 
 	char data[16] = {0};
-	glBufferSubData(GL_ARRAY_BUFFER, 240, 16,
-			data); // offset + size == 256, tam sınırda; spec'e göre
-			       // GEÇERLİ olmalı
+	glBufferSubData(GL_ARRAY_BUFFER, 240, 16, data);
 
 	GLenum err = glGetError();
 	printf("[INFO] Exact boundary update completed (expected: NO_ERROR), "
 	       "glError=0x%X\n",
 	       err);
 
-	// Bir fazlasını dene: sınırı 1 byte aşan durum
-	glBufferSubData(GL_ARRAY_BUFFER, 241, 16, data); // 241+16=257 > 256
+	glBufferSubData(GL_ARRAY_BUFFER, 241, 16, data);
 	err = glGetError();
 	printf("[INFO] One-byte-beyond boundary update completed (expected: "
-	       "INVALID_VALUE ), glError=0x%X\n",
+	       "INVALID_VALUE), glError=0x%X\n",
 	       err);
 }
 
-// Negatif offset değerinin büyük bir size ile "telafi edildiği" durumda
-// implementasyonun offset doğrulamasını bağımsız olarak yapıp yapmadığını ve
-// sınır kontrollerindeki kararlılığını gözlemler
+/* ============================================================
+ * glBufferSubData — Negatif Offset Telafisi
+ * ============================================================
+ *
+ * Negatif offset degerinin büyük bir size ile "telafi
+ * edildigi" durumda implementasyonun offset dogrulamasini
+ * bagimsiz olarak yapip yapmadigini gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_negative_offset_compensating_size() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] "
-	       "rTest_glBufferSubData_negative_offset_compensating_size()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
 	glBufferData(GL_ARRAY_BUFFER, 1024, NULL, GL_STATIC_DRAW);
 
-	// negatif offset tek başına INVALID_VALUE üretmeli.
-	// Ama size'ı öyle seçtik ki offset+size matematiksel olarak buffer
-	// içinde "makul" görünüyor
-	// -- implementasyon offset'i ayrı ayrı kontrol etmiyorsa bu sinsi bir
-	// OOB write'a yol açabilir.
 	GLintptr offset = -512;
-	GLsizeiptr size = 600; // offset+size = 88, buffer içinde gibi görünüyor
+	GLsizeiptr size = 600;
 
 	char data[600] = {0};
 	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
@@ -1092,12 +2370,17 @@ void rTest_glBufferSubData_negative_offset_compensating_size() {
 	       (long long)offset, (long long)size, err);
 }
 
-// Sıfır byte güncelleme isteğinde implementasyonun gereksiz bellek erişimi
-// yapmadan çağrıyı güvenli şekilde tamamlayıp tamamlamadığını gözlemler.
+/* ============================================================
+ * glBufferSubData — Sifir Boyut, NULL Data
+ * ============================================================
+ *
+ * Sifir byte güncelleme isteginde implementasyonun gereksiz
+ * bellek erisimi yapmadan çagriyi güvenli sekilde
+ * tamamlayip tamamlamadigi gözlemlenir.
+ * ============================================================ */
 void rTest_glBufferSubData_zero_size_null_data() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_zero_size_null_data()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -1112,12 +2395,17 @@ void rTest_glBufferSubData_zero_size_null_data() {
 	       err);
 }
 
-// Hedefe herhangi bir buffer bağlı değilken glBufferSubData çağrısının
-// implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
+/* ============================================================
+ * glBufferSubData — Sifir Buffer Bagli (Target)
+ * ============================================================
+ *
+ * Hedefe herhangi bir buffer bagli degilken glBufferSubData
+ * çagrisinin güvenli sekilde ele alinip alinmadigini
+ * gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_target_zero_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_target_zero_bound()\n");
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -1130,19 +2418,21 @@ void rTest_glBufferSubData_target_zero_bound() {
 	       err);
 }
 
-// Data store'u henüz oluşturulmamış (0 byte) bir buffer nesnesine yazma
-// isteğinin implementasyon tarafından güvenli şekilde ele alınıp alınmadığını
-// gözlemler
+/* ============================================================
+ * glBufferSubData — Sifir Boyutlu Store'a Yazma
+ * ============================================================
+ *
+ * Data store'u henüz olusturulmamis (0 byte) bir buffer
+ * nesnesine yazma isteginin güvenli sekilde ele alinip
+ * alinmadigini gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_into_zero_sized_store() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_into_zero_sized_store()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
 	glBindBuffer(GL_ARRAY_BUFFER, buf);
-	// glBufferData hiç çağrılmadı -- spec: "immediately after first bound,
-	// zero-sized memory buffer" durumu geçerli
 
 	char data[16] = {0};
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 16, data);
@@ -1153,12 +2443,17 @@ void rTest_glBufferSubData_into_zero_sized_store() {
 	       err);
 }
 
-// Kaynak veri tamponunun belirtilen size değerinden küçük olduğu hatalı API
-// kullanımına karşı implementasyonun dayanıklılığını gözlemler.
+/* ============================================================
+ * glBufferSubData — Kaynak Boyutu Yetersiz
+ * ============================================================
+ *
+ * Kaynak veri tamponunun belirtilen size degerinden küçük
+ * oldugu hatali API kullanimina karsi implementasyonun
+ * dayanikliligini gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_source_smaller_than_size() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_source_smaller_than_size()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -1166,8 +2461,6 @@ void rTest_glBufferSubData_source_smaller_than_size() {
 	glBufferData(GL_ARRAY_BUFFER, 4096, NULL, GL_STATIC_DRAW);
 
 	char small_source[8] = {0};
-	// size=4096 beyan ediliyor ama kaynak sadece 8 byte -- GL bunu
-	// doğrulayamaz, implementasyonun kendi belleğinden OOB okumasını dener
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 4096, small_source);
 
 	GLenum err = glGetError();
@@ -1176,12 +2469,17 @@ void rTest_glBufferSubData_source_smaller_than_size() {
 	       err);
 }
 
-// Serbest bırakılmış bir istemci bellek işaretçisi kullanılarak
-// implementasyonun geçersiz veri kaynağı karşısındaki davranışı gözlemlenir.
+/* ============================================================
+ * glBufferSubData — Dangling Data Pointer
+ * ============================================================
+ *
+ * Serbest birakilmis bir istemci bellek isareçisi
+ * kullanilarak implementasyonun geçersiz veri kaynagi
+ * karsisindaki davranisi gözlemlenir.
+ * ============================================================ */
 void rTest_glBufferSubData_dangling_data_pointer(void) {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glBufferSubData_dangling_data_pointer()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -1189,7 +2487,7 @@ void rTest_glBufferSubData_dangling_data_pointer(void) {
 	glBufferData(GL_ARRAY_BUFFER, 256, NULL, GL_STATIC_DRAW);
 
 	char *heap_data = (char *)malloc(256);
-	free(heap_data); /* serbest bırakıldı */
+	free(heap_data);
 
 	glBufferSubData(GL_ARRAY_BUFFER, 0, 256, heap_data);
 
@@ -1199,14 +2497,17 @@ void rTest_glBufferSubData_dangling_data_pointer(void) {
 	       err);
 }
 
-// Aynı buffer bölgesine çakışan ve hizasız güncellemeleri art arda
-// gerçekleştirerek implementasyonun yoğun bellek kopyalama yükü altındaki
-// kararlılığını gözlemler.
+/* ============================================================
+ * glBufferSubData — Çakisan/Hizasiz Güncelleme Stresi
+ * ============================================================
+ *
+ * Ayni buffer bölgesine çakisan ve hizasiz güncellemeleri
+ * art arda gerçeklestirerek implementasyonun yogun bellek
+ * kopyalama yükü altindaki kararlilığını gözlemler.
+ * ============================================================ */
 void rTest_glBufferSubData_overlapping_misaligned_thrash() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf(
-	    "[START] rTest_glBufferSubData_overlapping_misaligned_thrash()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
@@ -1215,14 +2516,12 @@ void rTest_glBufferSubData_overlapping_misaligned_thrash() {
 
 	char raw[64];
 	for (int i = 0; i < 5000; ++i) {
-		GLintptr offset =
-		    (i * 3) % 4090; // sürekli çakışan, hizasız offsetler
-		GLsizeiptr size =
-		    1 + (i % 63); // rastgele, çoğunlukla hizasız boyutlar
+		GLintptr offset = (i * 3) % 4090;
+		GLsizeiptr size = 1 + (i % 63);
 		if (offset + size > 4096)
-			continue; // sınır ihlalini bu testte istemiyoruz
+			continue;
 
-		void *misaligned = raw + (i % 3); // hizasız kaynak pointer
+		void *misaligned = raw + (i % 3);
 		glBufferSubData(GL_ARRAY_BUFFER, offset, size, misaligned);
 	}
 
@@ -1230,1163 +2529,564 @@ void rTest_glBufferSubData_overlapping_misaligned_thrash() {
 	printf("[INFO] glBufferSubData(overlapping/misaligned thrash) "
 	       "completed, glError=0x%X\n",
 	       err);
-	// Spec alignment gereksinimini not olarak belirtiyor ama ihlali için
-	// hata tanımlamıyor; burada amaç implementasyonun iç kopyalama
-	// rutininin (örn. SIMD/vektörize memcpy) hizasız erişimde çökmesi
 }
 
-// glGenBuffers: yeni buffer nesneleri için ID üretir
-// n: Kaç tane buffer ismi üretileceği.
-// buffers: Üretilen buffer ID’lerinin yazılacağı dizi.
-
-// Belirtilen hata: GL_INVALID_VALUE is generated if n is negative
-void rTest_glGenBuffers_invalid_value() {
+/* ============================================================
+ * glGetBufferParameteriv — Geçersiz Target Enum
+ * ============================================================
+ *
+ * GL_INVALID_ENUM is generated if target is not
+ * GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_invalid_enum_target() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_invalid_value()\n");
 
-	GLuint buffer = 0;
-	glGenBuffers(-1, &buffer);
+	GLint data = -1;
+	glGetBufferParameteriv((GLenum)0xFFFFFFFF, GL_BUFFER_SIZE, &data);
+
 	GLenum err = glGetError();
-	if (err != GL_INVALID_VALUE) {
-		printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-		assert(err == GL_INVALID_VALUE);
-	}
-	printf("[PASS] rTest_glGenBuffers_invalid_value()\n");
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glGetBufferParameteriv_invalid_enum_target "
+			"failed. Expected GL_INVALID_ENUM.");
 }
 
-// n = 0 ile çağrı
-void rTest_glGenBuffers_zero_count() {
+/* ============================================================
+ * glGetBufferParameteriv — Geçersiz Value Enum
+ * ============================================================
+ *
+ * GL_INVALID_ENUM is generated if value is not
+ * GL_BUFFER_SIZE or GL_BUFFER_USAGE.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_invalid_enum_value() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_zero_count()\n");
 
-	GLuint buf = 0xCDCDCDCD; // sentinel değer
-	glGenBuffers(0, &buf);
+	GLuint buffer;
+	GLint data = -1;
+
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, (GLenum)0xFFFFFFFF, &data);
+
 	GLenum err = glGetError();
-	printf("[INFO] glGenBuffers(n=0): error=0x%X, buffer=0x%08X\n", err,
-	       buf);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glGetBufferParameteriv_invalid_enum_value "
+			"failed. Expected GL_INVALID_ENUM.");
+
+	glDeleteBuffers(1, &buffer);
 }
 
-// buffers = NULL, n > 0 (negative robustness)
-void rTest_glGenBuffers_null_buffers() {
+/* ============================================================
+ * glGetBufferParameteriv — Sifir Buffer Bagli
+ * ============================================================
+ *
+ * GL_INVALID_OPERATION is generated if the reserved buffer
+ * object name 0 is bound to target.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_null_buffers()\n");
 
-	glGenBuffers(5, NULL);
+	GLint data = -1;
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
+
 	GLenum err = glGetError();
-	printf("[INFO] glGenBuffers(buffers=nullptr, n=5): error=0x%X\n", err);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_glGetBufferParameteriv_invalid_operation_zero_"
+			"buffer_bound failed. Expected GL_INVALID_OPERATION.");
 }
 
-// Aşırı büyük n
-void rTest_glGenBuffers_large_n() {
+/* ============================================================
+ * glGetBufferParameteriv — Geçersiz Target
+ * ============================================================
+ *
+ * target GL_ARRAY_BUFFER/GL_ELEMENT_ARRAY_BUFFER disinda bir
+ * enum oldugunda GL_INVALID_ENUM üretilip data'nin
+ * degismedigini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_invalid_target() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_large_n()\n");
 
-	const GLsizei largeCount = 100000;
-	GLuint *buffers = (GLuint *)malloc(sizeof(GLuint) * largeCount);
-	if (buffers == NULL) {
-		printf("[ERROR] Memory allocation failed.\n");
-		return;
-	}
-	glGenBuffers(largeCount, buffers);
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
+
+	GLint sentinel = 0x7EADBEEF;
+	GLint data = sentinel;
+	glGetBufferParameteriv(GL_TEXTURE_2D, GL_BUFFER_SIZE, &data);
+
 	GLenum err = glGetError();
-	printf("[INFO] glGenBuffers(n=%d): error=0x%X\n", largeCount, err);
-	free(buffers);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_glGetBufferParameteriv_invalid_target failed. "
+			"Expected GL_INVALID_ENUM for invalid target.");
+	EXPECT_GL_ERROR(data, (data == sentinel),
+			"rTest_glGetBufferParameteriv_invalid_target failed. "
+			"Data was modified despite GL_INVALID_ENUM.");
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
 }
 
-// Aynı array'i art arda, isim tekilliğini bozmaya çalışarak çağırma (fonksiyon
-// 1000 kez art arda çağrıldığında hata veriyor mu)
-void rTest_glGenBuffers_repeated_generation() {
+/* ============================================================
+ * glGetBufferParameteriv — Geçersiz Value
+ * ============================================================
+ *
+ * value GL_BUFFER_SIZE/GL_BUFFER_USAGE disinda bir enum
+ * oldugunda GL_INVALID_ENUM üretilip data'nin degismedigini
+ * dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_invalid_value() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_repeated_generation()\n");
 
-	GLuint buffers[10];
-	for (int i = 0; i < 1000; ++i) {
-		glGenBuffers(10, buffers);
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
+
+	GLenum bogusValues[] = {GL_BUFFER_ACCESS, 0, 0xFFFFFFFF,
+				GL_ARRAY_BUFFER, 0xDEADBEEF};
+	int n = sizeof(bogusValues) / sizeof(bogusValues[0]);
+
+	for (int i = 0; i < n; i++) {
+		while (glGetError() != GL_NO_ERROR) {
+		}
+		GLint sentinel = 0x7EADBEEF;
+		GLint data = sentinel;
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, bogusValues[i], &data);
 		GLenum err = glGetError();
-		if (err != GL_NO_ERROR) {
-			printf("[INFO] glGenBuffers failed at iteration %d: "
-			       "error=0x%X\n",
-			       i, err);
-			return;
-		}
+		printf("[INFO] value=0x%X => err=0x%X, data-modified=%s\n",
+		       bogusValues[i], err, (data != sentinel) ? "yes" : "no");
 	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Reserved 0 Bagli (ARRAY_BUFFER)
+ * ============================================================
+ *
+ * Reserved isim 0 target'a bind edilmisken GL_INVALID_OPERATION
+ * üretilip üretilmedigini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_reserved_name_zero_bound() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLint sentinel = 0x7EADBEEF;
+	GLint data = sentinel;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_glGetBufferParameteriv_reserved_name_zero_bound "
+			"failed. Expected GL_INVALID_OPERATION.");
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Reserved 0 Bagli (ELEMENT_ARRAY)
+ * ============================================================
+ *
+ * GL_ELEMENT_ARRAY_BUFFER hedefi için de ayni reserved-0
+ * davranisini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_element_array_zero_bound() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLint data = -1;
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_USAGE, &data);
+	GLenum err = glGetError();
+
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_OPERATION),
+			"rTest_glGetBufferParameteriv_element_array_zero_bound "
+			"failed. Expected GL_INVALID_OPERATION.");
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — NULL Data Pointer
+ * ============================================================
+ *
+ * data parametresi NULL iken çagirildiginda implementasyonun
+ * segfault yerine tanimli/tutarli davranip davranmadigini
+ * gözlemler.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_null_data_pointer() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 128, NULL, GL_STATIC_DRAW);
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, NULL);
+
+	GLenum err = glGetError();
+	printf("[INFO] NULL data pointer => err=0x%X\n", err);
+	printf("[INFO] Implementation did not crash on NULL output pointer.\n");
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Dangling Data Pointer
+ * ============================================================
+ *
+ * data, geçersiz/erisilemez (dangling) bir bellek adresi
+ * oldugunda implementasyonun bellek koruma ihlaline karsi
+ * davranisini test eder.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_dangling_data_pointer() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 32, NULL, GL_STATIC_DRAW);
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLint *freedPtr = (GLint *)malloc(sizeof(GLint));
+	free(freedPtr);
+
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, freedPtr);
+
+	GLenum err = glGetError();
+	printf("[INFO] Dangling data pointer call completed. err=0x%X\n", err);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Boyut Tutarliligi
+ * ============================================================
+ *
+ * GL_BUFFER_SIZE sorgusunun, glBufferData ile ayrilan gerçek
+ * boyutla tutarli olup olmadigini ve sifir boyutlu bir
+ * bufferda dogru sekilde 0 döndürüp döndürmedigini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_size_consistency() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+
+	GLint initialSize = -1;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &initialSize);
+	GLenum errInitial = glGetError();
+	printf("[INFO] Initial (pre-BufferData) size=%d, err=0x%X\n",
+	       initialSize, errInitial);
+
+	const GLsizeiptr allocSize = 256;
+	glBufferData(GL_ARRAY_BUFFER, allocSize, NULL, GL_STATIC_DRAW);
+
+	GLint size = -1;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+
+	GLenum err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"rTest_glGetBufferParameteriv_size_consistency failed. "
+			"Unexpected error querying size.");
+	EXPECT_GL_ERROR(size, (size == (GLint)allocSize),
+			"rTest_glGetBufferParameteriv_size_consistency failed. "
+			"Size mismatch.");
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Usage Tutarliligi
+ * ============================================================
+ *
+ * GL_BUFFER_USAGE'in initial degerinin GL_STATIC_DRAW
+ * oldugunu ve glBufferData sonrasi degisen usage degerlerinin
+ * dogru yansitilip yansitilmadigini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_usage_initial_and_updates() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+
+	GLint initialUsage = -1;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &initialUsage);
+	printf("[INFO] Initial usage (pre-BufferData) = 0x%X (expected "
+	       "GL_STATIC_DRAW=0x%X)\n",
+	       initialUsage, GL_STATIC_DRAW);
+
+	GLenum usages[] = {GL_STATIC_DRAW, GL_DYNAMIC_DRAW, GL_STREAM_DRAW};
+	int n = sizeof(usages) / sizeof(usages[0]);
+
+	for (int i = 0; i < n; i++) {
+		glBufferData(GL_ARRAY_BUFFER, 16, NULL, usages[i]);
+		GLint got = -1;
+		glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &got);
+		printf("[INFO] Set usage=0x%X => queried=0x%X\n", usages[i],
+		       got);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Her Ikisi de Geçersiz
+ * ============================================================
+ *
+ * target ve value her ikisi de geçersiz oldugunda hangi
+ * hatanin üretildigini gözlemler. Implementasyon tutarli
+ * bir siraya sahip olmali (crash olmamali).
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_both_invalid() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLint data = 0x1234;
+	glGetBufferParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, &data);
+	GLenum err = glGetError();
+
+	printf("[INFO] Both target and value invalid => err=0x%X (data=%d)\n",
+	       err, data);
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_ENUM),
+	    "rTest_glGetBufferParameteriv_both_invalid failed. Expected "
+	    "GL_INVALID_ENUM for combined invalid params.");
+}
+
+/* ============================================================
+ * glGetBufferParameteriv — Silme Sonrasi Binding Reversal
+ * ============================================================
+ *
+ * Silinmis bir buffer'in binding'inin 0'a döndügü spec
+ * davranisini dogrular. Silme sonrasi sorgu
+ * GL_INVALID_OPERATION beklenir.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_after_delete_binding_reverts() {
+	while (glGetError() != GL_NO_ERROR) {
+	}
+
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 32, NULL, GL_STATIC_DRAW);
+	glDeleteBuffers(1, &buf);
+
+	GLenum errDelete = glGetError();
+
+	GLint data = -1;
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
+
+	GLenum errQuery = glGetError();
 	printf(
-	    "[PASS] Repeated glGenBuffers(10) x1000 completed successfully.\n");
+	    "[INFO] errDelete=0x%X, post-delete query errQuery=0x%X, data=%d\n",
+	    errDelete, errQuery, data);
+
+	EXPECT_GL_ERROR(
+	    errQuery, (errQuery == GL_INVALID_OPERATION),
+	    "rTest_glGetBufferParameteriv_after_delete_binding_reverts failed. "
+	    "Expected GL_INVALID_OPERATION after delete.");
 }
 
-// Çok sayıda buffer adı üreterek döndürülen isimlerin benzersiz olduğunu ve
-// reserved 0 isminin üretilmediğini doğrular.
-void rTest_glGenBuffers_unique_names() {
+/* ============================================================
+ * glGetBufferParameteriv — Ayni Buffer Çoklu Target
+ * ============================================================
+ *
+ * Ayni buffer nesnesi hem GL_ARRAY_BUFFER hem
+ * GL_ELEMENT_ARRAY_BUFFER hedeflerine ayni anda bind
+ * edildiginde her iki target üzerinden sorgunun tutarli
+ * sonuç verip vermedigini dogrular.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_same_buffer_multiple_targets() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_unique_names()\n");
-
-	const GLsizei COUNT = 1000;
-	GLuint buffers[COUNT];
-	glGenBuffers(COUNT, buffers);
-
-	// 0 ismi üretilmemeli
-	for (int i = 0; i < COUNT; i++) {
-		if (buffers[i] == 0) {
-			printf(
-			    "[FAIL] glGenBuffers returned reserved name 0.\n");
-			return;
-		}
-	}
-
-	// Aynı isim iki kez üretilmemeli
-	for (int i = 0; i < COUNT; i++) {
-		for (int j = i + 1; j < COUNT; j++) {
-			if (buffers[i] == buffers[j]) {
-				printf(
-				    "[FAIL] Duplicate buffer name %u found.\n",
-				    buffers[i]);
-				return;
-			}
-		}
-	}
-
-	GLenum err = glGetError();
-	if (err == GL_NO_ERROR)
-		printf("[PASS] All generated buffer names are unique and "
-		       "non-zero.\n");
-	else
-		printf("[FAIL] glGetError() = 0x%X\n", err);
-
-	glDeleteBuffers(COUNT, buffers);
-}
-
-// Bind edilmemiş buffer isimleri üzerinde glIsBuffer ve glDeleteBuffers
-// çağrılarının spesifikasyona uygun davranıp davranmadığını doğrular.
-void rTest_glGenBuffers_unbound_names_lifecycle() {
-	while (glGetError() != GL_NO_ERROR) {
-	}
-	printf("[START] rTest_glGenBuffers_unbound_names_lifecycle()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
-	GLboolean isBuffer = glIsBuffer(buf);
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 100, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
+	GLint sizeViaArray = -1, sizeViaElement = -1;
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &sizeViaArray);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
+	glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE,
+			       &sizeViaElement);
 
+	printf("[INFO] sizeViaArray=%d, sizeViaElement=%d\n", sizeViaArray,
+	       sizeViaElement);
+
+	EXPECT_GL_ERROR(
+	    sizeViaArray,
+	    (sizeViaArray == sizeViaElement && sizeViaArray == 100),
+	    "rTest_glGetBufferParameteriv_same_buffer_multiple_targets failed. "
+	    "Inconsistent buffer state across targets.");
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glDeleteBuffers(1, &buf);
-
-	GLenum err = glGetError();
-	printf("[INFO] Unbound buffer name: glIsBuffer=%s, glDeleteBuffers "
-	       "error=0x%X\n",
-	       isBuffer ? "GL_TRUE" : "GL_FALSE", err);
 }
 
-// Aynı buffer isminin birden fazla kez silinmesi durumunda implementasyonun
-// kararlılığını test eder.
-void rTest_glGenBuffers_double_delete() {
+/* ============================================================
+ * glGetBufferParameteriv — Hizasiz Data Pointer
+ * ============================================================
+ *
+ * data çikis parametresi unaligned bir adres oldugunda
+ * implementasyonun crash olmadan davranip davranmadigini
+ * test eder.
+ * ============================================================ */
+void rTest_glGetBufferParameteriv_unaligned_data_pointer() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
-	printf("[START] rTest_glGenBuffers_double_delete()\n");
 
 	GLuint buf;
 	glGenBuffers(1, &buf);
-	glDeleteBuffers(1, &buf);
-	GLenum firstErr = glGetError();
-	glDeleteBuffers(1, &buf);
-	GLenum secondErr = glGetError();
-	printf("[INFO] Double delete: firstErr=0x%X, secondErr=0x%X\n",
-	       firstErr, secondErr);
-}
+	glBindBuffer(GL_ARRAY_BUFFER, buf);
+	glBufferData(GL_ARRAY_BUFFER, 16, NULL, GL_STATIC_DRAW);
 
-// Büyük 'n' değeri ve kasıtlı olarak yetersiz output buffer kullanılarak
-// implementasyonun geçersiz istemci belleği karşısındaki davranışı test edilir
-// (negative robustness)
-void rTest_glGenBuffers_huge_count_small_buffer() {
 	while (glGetError() != GL_NO_ERROR) {
 	}
 
-	printf("[START] rTest_glGenBuffers_huge_count_small_buffer()\n");
+	unsigned char raw[64];
+	memset(raw, 0xAA, sizeof(raw));
+	GLint *unaligned = (GLint *)(raw + 1);
 
-	GLsizei huge_n =
-	    INT_MAX; // n * sizeof(GLuint) iç hesapta overflow edebilir
-
-	GLuint buffers[1]; // kasıtlı olarak yetersiz boyutlu tampon
-
-	// NOT: gerçek n kadar büyük array vermiyoruz -- implementasyonun n'i
-	// gerçekten kullanıp kullanmadığını, yoksa iç limitle mi kısıtladığını
-	// görmek için. Bu, çağıranın hatası olsa da spec bir üst sınır
-	// tanımlamıyor, bu yüzden implementasyonun nasıl davrandığını
-	// izliyoruz.
-	glGenBuffers(huge_n, buffers);
+	glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, unaligned);
 
 	GLenum err = glGetError();
-	printf("n=INT_MAX -> glError=0x%x\n", err);
+	printf("[INFO] Unaligned data pointer => err=0x%X\n", err);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &buf);
 }
 
 /* ============================================================
- * Test altyapisi
+ * glGetBufferParameteriv — Hata Durumu Stresi
+ * ============================================================
  *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine getirir ve birikmis hatalari
- * temizler; boylece testler birbirine bagimli olmaz.
- * checkStatePreserved: Reddedilen cagrilarin mevcut durumu
- * bozup bozmadigini dogrular; beklenen degerle gercek deger
- * uyusmazsa program assert ile durur.
+ * Çok sayida ardisik geçersiz çagriyla error state'inin
+ * (glGetError kuyrugu) tasip tasmadigini kontrol eder.
  * ============================================================ */
-
-static void resetState(void) {
-	glDisable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
-
-static void checkStatePreserved(GLint expected) {
-	GLint actual;
-	glGetIntegerv(GL_CULL_FACE_MODE, &actual);
-	if (actual != expected) {
-		printf("  [FAIL] Durum bozuldu: beklenen 0x%X, gercek 0x%X\n",
-		       expected, actual);
-		assert(0);
-	}
-}
-
-/* ============================================================
- * TEST 1: Sozlesme dogrulama
- *
- * glCullFace'in temel sozlesmesini dogrular: gecerli degerler
- * (GL_BACK, GL_FRONT, GL_FRONT_AND_BACK) kabul edilmeli,
- * gecersiz enum'lar GL_INVALID_ENUM ile reddedilmelidir.
- * Reddedilen cagrilar durumu bozmamalidir.
- * ============================================================ */
-
-void test_cullFace_basicRobustness(void) {
-	GLint mode = 0;
-	GLenum err;
-
-	printf("TEST: Basic Robustness\n");
-	resetState();
-
-	glCullFace(GL_FRONT);
-	err = glGetError();
-	assert(err == GL_NO_ERROR);
-
-	glGetIntegerv(GL_CULL_FACE_MODE, &mode);
-	assert(mode == GL_FRONT);
-
-	glCullFace(GL_FRONT_AND_BACK);
-	err = glGetError();
-	assert(err == GL_NO_ERROR);
-
-	glGetIntegerv(GL_CULL_FACE_MODE, &mode);
-	assert(mode == GL_FRONT_AND_BACK);
-
-	glCullFace((GLenum)0x0BAD);
-	assert(glGetError() == GL_INVALID_ENUM);
-
-	glCullFace(GL_CCW);
-	assert(glGetError() == GL_INVALID_ENUM);
-
-	checkStatePreserved(GL_FRONT_AND_BACK);
-
-	assert(glGetError() == GL_NO_ERROR);
-
-	resetState();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 2: Enum uzayi taramasi
- *
- * 16-bit enum uzayinin tamamini (0x0000 - 0xFFFF, 65536 deger)
- * sistematik olarak tarar. Yalnizca GL_BACK, GL_FRONT ve
- * GL_FRONT_AND_BACK kabul edilmeli, kalan 65533 deger
- * GL_INVALID_ENUM ile reddedilmelidir.
- * ============================================================ */
-
-void test_cullFace_stressSweep(void) {
-	long i;
-	int passCount = 0;
-	int failCount = 0;
-
-	printf("TEST: Stress Sweep (0x0000 .. 0xFFFF)\n");
-	resetState();
-
-	for (i = 0x0000; i <= 0xFFFF; i++) {
-		GLenum deger = (GLenum)i;
-		GLenum beklenen = (deger == GL_BACK || deger == GL_FRONT ||
-				   deger == GL_FRONT_AND_BACK)
-				      ? GL_NO_ERROR
-				      : GL_INVALID_ENUM;
-		GLenum err;
-
-		glCullFace(deger);
-		err = glGetError();
-
-		if (err != beklenen) {
-			printf(
-			    "  [FAIL] Enum=0x%04lX Beklenen=0x%X Gelen=0x%X\n",
-			    i, beklenen, err);
-			failCount++;
-		} else {
-			passCount++;
-		}
+void rTest_glGetBufferParameteriv_error_state_stress() {
+	while (glGetError() != GL_NO_ERROR) {
 	}
 
-	{
-		GLint mode = 0;
-		glCullFace(GL_BACK);
-		glGetIntegerv(GL_CULL_FACE_MODE, &mode);
-		assert(mode == GL_BACK);
-		assert(glGetError() == GL_NO_ERROR);
+	GLint data;
+	const int ITER = 10000;
+	for (int i = 0; i < ITER; i++) {
+		glGetBufferParameteriv(GL_TEXTURE_2D, GL_BUFFER_SIZE, &data);
 	}
 
-	printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
-	assert(failCount == 0);
-	printf("  [PASS]\n\n");
+	GLenum err1 = glGetError();
+	GLenum err2 = glGetError();
+	printf("[INFO] After %d invalid calls: err1=0x%X, err2=0x%X\n", ITER,
+	       err1, err2);
+
+	EXPECT_GL_ERROR(err1, (err1 == GL_INVALID_ENUM),
+			"rTest_glGetBufferParameteriv_error_state_stress "
+			"failed. Expected GL_INVALID_ENUM.");
+	EXPECT_GL_ERROR(
+	    err2, (err2 == GL_NO_ERROR),
+	    "rTest_glGetBufferParameteriv_error_state_stress failed. Error "
+	    "flag should be sticky single-flag per spec.");
 }
+
+/****************************************/
+/********** Rasterization **********/
+/****************************************/
+
+#ifndef GL_ALIASED_LINE_WIDTH_RANGE
+#define GL_ALIASED_LINE_WIDTH_RANGE 0x846E
+#endif
 
 /* ============================================================
- * TEST 3: Hata kuyrugu butunlugu
+ * glLineWidth — Temel Robustness
+ * ============================================================
  *
- * Ard arda gecersiz enum gonderimi altinda hata kuyrugunun
- * dogru sekilde doldugunu, bosaldigini ve temizlendikten sonra
- * normal islemlerin devam ettigini dogrular.
+ * glLineWidth'in temel sözlesmesini dogrular: pozitif degerler
+ * hatasiz kabul edilmeli, pozitif olmayan degerler
+ * GL_INVALID_VALUE ile reddedilmelidir. Reddedilen çagrilar
+ * mevcut GL_LINE_WIDTH durumunu degistirmemelidir.
  * ============================================================ */
-
-void test_cullFace_errorQueue(void) {
-	int i;
-	GLenum err;
-	int hataSayisi = 0;
-
-	printf("TEST: Error Queue Management\n");
-	resetState();
-
-	for (i = 0; i < 100; i++) {
-		glCullFace((GLenum)(0x0BAD + i));
-	}
-
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		assert(err == GL_INVALID_ENUM);
-		hataSayisi++;
-	}
-
-	printf("  Kuyruktan okunan hata sayisi: %d\n", hataSayisi);
-	assert(hataSayisi > 0);
-
-	glCullFace(GL_FRONT);
-	assert(glGetError() == GL_NO_ERROR);
-	checkStatePreserved(GL_FRONT);
-
-	resetState();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 4: Coklu cagri ve durum gecisleri
- *
- * Gecerli cull modlari arasinda hizli gecisler yaparak durum
- * makinesinin tutarliligini dogrular. Her gecisten sonra durum
- * sorgulanir ve beklenen degerle eslestigi kontrol edilir.
- * ============================================================ */
-
-void test_cullFace_rapidToggle(void) {
-	int i;
-	const int tekrar = 10000;
-
-	printf("TEST: Rapid Toggle (BACK <-> FRONT <-> F&B)\n");
-	resetState();
-
-	for (i = 0; i < tekrar; i++) {
-		GLenum hedef;
-		GLint mode;
-
-		switch (i % 3) {
-		case 0:
-			hedef = GL_BACK;
-			break;
-		case 1:
-			hedef = GL_FRONT;
-			break;
-		case 2:
-			hedef = GL_FRONT_AND_BACK;
-			break;
-		}
-
-		glCullFace(hedef);
-		assert(glGetError() == GL_NO_ERROR);
-
-		glGetIntegerv(GL_CULL_FACE_MODE, &mode);
-		assert(mode == hedef);
-	}
-
-	glCullFace(GL_BACK);
-	checkStatePreserved(GL_BACK);
-	assert(glGetError() == GL_NO_ERROR);
-
-	printf("  Sonuc: %d gecis tamamlandi\n", tekrar);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 5: Gecersiz cagrilar arasinda gecerli cagrilar
- *
- * Gecersiz enum'larin arasina gecerli degerler serpistirerek
- * surucunun hata durumundan kurtulup kurtulamadigini dogrular.
- * Bazi implementasyonlar hata sonrasi "takili" kalabilir.
- * ============================================================ */
-
-void test_cullFace_mixedValidity(void) {
-	int i;
-	GLenum pattern[] = {GL_BACK,	    (GLenum)0x1234,    GL_FRONT,
-			    (GLenum)0x5678, GL_FRONT_AND_BACK, (GLenum)0x9ABC,
-			    GL_BACK,	    (GLenum)0xDEF0};
-	int n = sizeof(pattern) / sizeof(pattern[0]);
-
-	printf("TEST: Mixed Validity Pattern\n");
-	resetState();
-
-	for (i = 0; i < n; i++) {
-		GLenum deger = pattern[i];
-		GLenum beklenen = (deger == GL_BACK || deger == GL_FRONT ||
-				   deger == GL_FRONT_AND_BACK)
-				      ? GL_NO_ERROR
-				      : GL_INVALID_ENUM;
-		GLenum err;
-
-		glCullFace(deger);
-		err = glGetError();
-		assert(err == beklenen);
-	}
-
-	glCullFace(GL_BACK);
-	checkStatePreserved(GL_BACK);
-	assert(glGetError() == GL_NO_ERROR);
-
-	printf("  Sonuc: %d karisik cagri tamamlandi\n", n);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 6: Culling etkinlestirme/kapatma etkilesimi
- *
- * glCullFace'in glEnable/glDisable(GL_CULL_FACE) ile olan
- * etkilesimini dogrular. Culling kapaliyken cull mode'un
- * etkisiz olmasi, acikken etkili olmasi gerekir.
- * ============================================================ */
-
-void test_cullFace_enableDisable(void) {
-	printf("TEST: Enable/Disable Interaction\n");
-	resetState();
-
-	glCullFace(GL_FRONT_AND_BACK);
-	glGetError();
-
-	glDisable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	glEnable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	glDisable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	checkStatePreserved(GL_BACK);
-
-	resetState();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 7: FrontFace etkilesimi
- *
- * glCullFace ile glFrontFace'in birlikte calistigini dogrular.
- * Farkli kombinasyonlarda durumlarin tutarli oldugunu kontrol eder.
- * ============================================================ */
-
-void test_cullFace_frontFaceCombo(void) {
-	GLenum frontModes[] = {GL_CCW, GL_CW};
-	GLenum cullModes[] = {GL_BACK, GL_FRONT, GL_FRONT_AND_BACK};
-	int i, j;
-
-	printf("TEST: FrontFace Combinations\n");
-	resetState();
-
-	for (i = 0; i < 2; i++) {
-		for (j = 0; j < 3; j++) {
-			GLint face, mode;
-
-			glFrontFace(frontModes[i]);
-			glCullFace(cullModes[j]);
-			assert(glGetError() == GL_NO_ERROR);
-
-			glGetIntegerv(GL_FRONT_FACE, &face);
-			glGetIntegerv(GL_CULL_FACE_MODE, &mode);
-
-			assert(face == frontModes[i]);
-			assert(mode == cullModes[j]);
-		}
-	}
-
-	resetState();
-	printf("  Sonuc: 6 kombinasyon tamamlandi\n");
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 8: Cok buyuk enum degerleri
- *
- * 32-bit enum araliginin ust kisimlarini test eder.
- * OpenGL spec 16-bit enum uzayini kullanir ancak 32-bit
- * degerler gonderildiginde implementasyonun davranisi
- * belirsizdir. Cokme veya durum bozulmasi kritik hatadir.
- * ============================================================ */
-
-void test_cullFace_largeEnum(void) {
-	GLenum largeValues[] = {(GLenum)0x10000, (GLenum)0x7FFFFFFF,
-				(GLenum)0x80000000, (GLenum)0xFFFFFFFF};
-	int i;
-	int n = sizeof(largeValues) / sizeof(largeValues[0]);
-
-	printf("TEST: Large Enum Values\n");
-	resetState();
-
-	for (i = 0; i < n; i++) {
-		GLenum err;
-
-		glCullFace(largeValues[i]);
-		err = glGetError();
-
-		printf("  Enum=0x%08X -> 0x%X\n", largeValues[i], err);
-	}
-
-	checkStatePreserved(GL_BACK);
-	resetState();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine getirir ve birikmis hatalari
- * temizler; boylece testler birbirine bagimli olmaz.
- * ============================================================ */
-
-static void resetState2(void) {
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_SCISSOR_TEST);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
-
-/* ============================================================
- * TEST 1: Sozlesme, davranis ve izolasyon dogrulama
- *
- * glEnable/glDisable(GL_CULL_FACE)'in temel sozlesmesini,
- * gercek culling davranisini ve cap izolasyonunu uc asamada
- * dogrular:
- *
- * A) SOZLESME: Toggle islemleri idempotent olmali; zaten acik
- *    olan bir cap'i tekrar acmak veya kapali olani tekrar kapatmak
- *    hata uretmemeli ve durumu degistirmemelidir. glIsEnabled
- *    sorgusu tutarli sonuc donmelidir.
- *
- * B) DAVRANIS: GL_CULL_FACE anahtari gercekten culling
- *    pipeline'ini gecitlemelidir. Ayni geometri icin acik ve
- *    kapali durumlar farkli sonuclar vermelidir; ayni sonuc
- *    cikarsa anahtar etkisiz demektir.
- *
- * C) ROBUSTNESS: Gecersiz cap degerleri reddedilmeli, hata
- *    kuyrugu kirlenmemeli ve baska cap'lerin durumu etkilenmemelidir.
- *    Bu, surucunun ic durum yonetiminin dogru calistigini gosterir.
- * ============================================================ */
-
-void test_cullFaceEnable_basicRobustness(void) {
-	printf("TEST: Enable/Disable Basic Robustness\n");
-	resetState2();
-
-	/* ---------- A) SOZLESME ---------- */
-
-	/* A1: Enable sonrasi IsEnabled TRUE */
-	glEnable(GL_CULL_FACE);
-	assert(glGetError() == GL_NO_ERROR);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	/* A2: Disable sonrasi IsEnabled FALSE */
-	glDisable(GL_CULL_FACE);
-	assert(glGetError() == GL_NO_ERROR);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	/* A3: Idempotent - zaten kapaliyken tekrar Disable */
-	glDisable(GL_CULL_FACE);
-	assert(glGetError() == GL_NO_ERROR);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	/* A4: Idempotent - iki kez Enable */
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_CULL_FACE);
-	assert(glGetError() == GL_NO_ERROR);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	/* ---------- B) DAVRANIS ---------- */
-
-	/* B1: Acik durumda state sorgusu */
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	/* B2: Kapali durumda state sorgusu */
-	glDisable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	/* B3: Toggle sonrasi tekrar ac */
-	glEnable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	/* ---------- C) ROBUSTNESS ---------- */
-
-	/* C1: Gecersiz cap ile Enable */
-	glDisable(GL_CULL_FACE);
-	glEnable((GLenum)0x0BAD);
-	assert(glGetError() == GL_INVALID_ENUM);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	/* C2: Gecersiz cap ile Disable */
-	glDisable((GLenum)0x0BAD);
-	assert(glGetError() == GL_INVALID_ENUM);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	/* C3: Cap izolasyonu - baska cap toggle edilince CULL_FACE
-	 * etkilenmemeli */
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_SCISSOR_TEST);
-	assert(glGetError() == GL_NO_ERROR);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_TRUE);
-
-	glDisable(GL_SCISSOR_TEST);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-
-	/* ---------- temizlik ---------- */
-	resetState2();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 2: Hizli toggle ve durum tutarliligi
- *
- * glEnable/glDisable arasinda hizli gecisler yaparak durum
- * makinesinin tutarliligini dogrular. Her gecisten sonra
- * glIsEnabled sorgusu beklenen degeri vermelidir.
- * ============================================================ */
-
-void test_cullFaceEnable_rapidToggle(void) {
-	int i;
-	const int tekrar = 10000;
-
-	printf("TEST: Rapid Toggle (Enable <-> Disable)\n");
-	resetState2();
-
-	for (i = 0; i < tekrar; i++) {
-		GLboolean beklenen = (i % 2 == 0) ? GL_TRUE : GL_FALSE;
-
-		if (beklenen) {
-			glEnable(GL_CULL_FACE);
-		} else {
-			glDisable(GL_CULL_FACE);
-		}
-
-		assert(glGetError() == GL_NO_ERROR);
-		assert(glIsEnabled(GL_CULL_FACE) == beklenen);
-	}
-
-	resetState2();
-	printf("  Sonuc: %d toggle tamamlandi\n", tekrar);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 3: Gecersiz cap taramasi
- *
- * glEnable ve glDisable'e farkli gecersiz cap degerleri
- * gondererek implementasyonun hata ayiklama mantigini test eder.
- * Tum gecersiz degerler GL_INVALID_ENUM ile reddedilmelidir.
- * ============================================================ */
-
-void test_cullFaceEnable_invalidCaps(void) {
-	GLenum invalidCaps[] = {(GLenum)0x0000, (GLenum)0x0BAD, (GLenum)0x1234,
-				(GLenum)0xDEAD, (GLenum)0xFFFF};
-	int i;
-	int n = sizeof(invalidCaps) / sizeof(invalidCaps[0]);
-
-	printf("TEST: Invalid Capability Values\n");
-	resetState2();
-
-	for (i = 0; i < n; i++) {
-		GLenum err;
-
-		glEnable(invalidCaps[i]);
-		err = glGetError();
-		assert(err == GL_INVALID_ENUM);
-
-		glDisable(invalidCaps[i]);
-		err = glGetError();
-		assert(err == GL_INVALID_ENUM);
-	}
-
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-
-	resetState2();
-	printf("  Sonuc: %d gecersiz cap reddedildi\n", n);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 4: Cap kombinasyonlari
- *
- * Birden fazla cap'in ayni anda acik/kapali olmasi durumunda
- * her birinin bagimsiz yonetildigini dogrular. Cap'ler birbirine
- * bagli olmamali, birinin durumu digerini etkilememelidir.
- * ============================================================ */
-
-void test_cullFaceEnable_capCombinations(void) {
-	printf("TEST: Capability Combinations\n");
-	resetState2();
-
-	/* Hicbiri acik degil */
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_FALSE);
-
-	/* Biri acik, digeri kapali */
-	glEnable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_FALSE);
-
-	/* Ikisi de acik */
-	glEnable(GL_SCISSOR_TEST);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_TRUE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_TRUE);
-
-	/* Biri kapali, digeri acik */
-	glDisable(GL_CULL_FACE);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_TRUE);
-
-	/* Ikisi de kapali */
-	glDisable(GL_SCISSOR_TEST);
-	assert(glIsEnabled(GL_CULL_FACE) == GL_FALSE);
-	assert(glIsEnabled(GL_SCISSOR_TEST) == GL_FALSE);
-
-	resetState2();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine (GL_CCW) getirir ve birikmis
- * hatalari temizler; boylece testler birbirine bagimli olmaz.
- * checkStatePreserved: Reddedilen cagrilarin mevcut durumu
- * bozup bozmadigini dogrular; beklenen degerle gercek deger
- * uyusmazsa program assert ile durur. Bu iki fonksiyon olmadan
- * hata ayiklama zorlasir, cunku hangi testin hangi durumu
- * biraktigi takip edilemez.
- * ============================================================ */
-
-static void resetState3(void) {
-	glFrontFace(GL_CCW);
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
-
-static void checkStatePreserved3(GLint expected) {
-	GLint actual;
-	glGetIntegerv(GL_FRONT_FACE, &actual);
-	if (actual != expected) {
-		printf("  [FAIL] Durum bozuldu: beklenen 0x%X, gercek 0x%X\n",
-		       expected, actual);
-		assert(0);
-	}
-}
-
-/* ============================================================
- * TEST 1: Hata kuyrugu butunlugu
- *
- * Ard arda gecersiz enum gonderimi altinda hata kuyrugunun
- * dogru sekilde doldugunu, bosaldigini ve temizlendikten sonra
- * normal islemlerin devam ettigini dogrular.
- * ============================================================ */
-
-void test_frontFace_errorQueue(void) {
-	int i;
-	GLenum err;
-	int hataSayisi = 0;
-
-	printf("TEST: Error Queue Management\n");
-	resetState3();
-
-	for (i = 0; i < 100; i++) {
-		glFrontFace((GLenum)(0x0BAD + i));
-	}
-
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		assert(err == GL_INVALID_ENUM);
-		hataSayisi++;
-	}
-
-	printf("  Kuyruktan okunan hata sayisi: %d\n", hataSayisi);
-	assert(hataSayisi > 0);
-
-	glFrontFace(GL_CW);
-	assert(glGetError() == GL_NO_ERROR);
-	checkStatePreserved3(GL_CW);
-
-	resetState3();
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 2: Coklu cagri ve durum gecisleri
- *
- * GL_CW ve GL_CCW arasinda hizli gecisler yaparak durum
- * makinesinin tutarliligini dogrular. Her gecisten sonra
- * durum sorgulanir ve beklenen degerle eslestigi kontrol edilir.
- * ============================================================ */
-
-void test_frontFace_rapidToggle(void) {
-	int i;
-	const int tekrar = 10000;
-
-	printf("TEST: Rapid Toggle (CW <-> CCW)\n");
-	resetState3();
-
-	for (i = 0; i < tekrar; i++) {
-		GLenum hedef = (i % 2 == 0) ? GL_CW : GL_CCW;
-		GLint face;
-
-		glFrontFace(hedef);
-		assert(glGetError() == GL_NO_ERROR);
-
-		glGetIntegerv(GL_FRONT_FACE, &face);
-		assert(face == hedef);
-	}
-
-	glFrontFace(GL_CCW);
-	checkStatePreserved3(GL_CCW);
-	assert(glGetError() == GL_NO_ERROR);
-
-	printf("  Sonuc: %d gecis tamamlandi\n", tekrar);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 3: Gecersiz cagrilar arasinda gecerli cagrilar
- *
- * Gecersiz enum'larin arasina gecerli degerler serpistirerek
- * surucunun hata durumundan kurtulup kurtulamadigini dogrular.
- * Bazi implementasyonlar hata sonrasi "takili" kalabilir.
- * ============================================================ */
-
-void test_frontFace_mixedValidity(void) {
-	int i;
-	GLenum pattern[] = {GL_CW, (GLenum)0x1234, GL_CCW, (GLenum)0x5678,
-			    GL_CW, (GLenum)0x9ABC, GL_CCW, (GLenum)0xDEF0};
-	int n = sizeof(pattern) / sizeof(pattern[0]);
-
-	printf("TEST: Mixed Validity Pattern\n");
-	resetState3();
-
-	for (i = 0; i < n; i++) {
-		GLenum deger = pattern[i];
-		GLenum beklenen = (deger == GL_CW || deger == GL_CCW)
-				      ? GL_NO_ERROR
-				      : GL_INVALID_ENUM;
-		GLenum err;
-
-		glFrontFace(deger);
-		err = glGetError();
-		assert(err == beklenen);
-	}
-
-	glFrontFace(GL_CCW);
-	checkStatePreserved3(GL_CCW);
-	assert(glGetError() == GL_NO_ERROR);
-
-	printf("  Sonuc: %d karisik cagri tamamlandi\n", n);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 4: Display list etkilesimi (Eski OpenGL)
- *
- * glFrontFace cagrilarinin display listeye dogru sekilde
- * kaydedilip kaydedilmedigini dogrular. Gecersiz degerler
- * liste derlenirken hata uretmeli, listeye yazilmamalidir.
- * ============================================================ */
-
-void test_frontFace_displayList(void) {
-	GLuint list;
-	GLint face;
-
-	printf("TEST: Display List Interaction\n");
-	resetState3();
-
-	list = glGenLists(1);
-	glNewList(list, GL_COMPILE);
-
-	glFrontFace(GL_CW);
-	EXPECT_GL_ERROR(glGetError(), (glGetError() == GL_NO_ERROR), "test_frontFace_displayList failed.");
-
-	glFrontFace((GLenum)0x0BAD);
-	/* Hata aninda uretilebilir veya listeye kaydedilebilir;
-	 * davranis implementasyona baglidir. */
-
-	glEndList();
-
-	glFrontFace(GL_CCW);
-	glCallList(list);
-
-	glGetIntegerv(GL_FRONT_FACE, &face);
-	printf("  List sonrasi durum: 0x%X\n", face);
-
-	glDeleteLists(list, 1);
-	resetState3();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 5: Push/PopAttrib etkilesimi
- *
- * glPushAttrib ve glPopAttrib ile GL_TRANSFORM_BIT kullanarak
- * FrontFace durumunun yigina kaydedilip geri yuklendigini
- * dogrular. Durum yonetiminin bu mekanizmayla uyumlu calismasi
- * gerekir.
- * ============================================================ */
-
-void test_frontFace_attribStack(void) {
-	GLint face;
-
-	printf("TEST: Attribute Stack (Push/PopAttrib)\n");
-	resetState3();
-
-	glFrontFace(GL_CW);
-	assert(glGetError() == GL_NO_ERROR);
-
-	glPushAttrib(GL_TRANSFORM_BIT);
-
-	glFrontFace(GL_CCW);
-	EXPECT_GL_ERROR(glGetError(), (glGetError() == GL_NO_ERROR), "test_frontFace_attribStack failed.");
-	checkStatePreserved3(GL_CCW);
-
-	glPopAttrib();
-
-	glGetIntegerv(GL_FRONT_FACE, &face);
-	printf("  Pop sonrasi durum: 0x%X (beklenen GL_CW=0x%X)\n", face,
-	       GL_CW);
-
-	resetState3();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 6: Culling kombinasyonlari
- *
- * glFrontFace ile glCullFace'in farkli kombinasyonlarinda
- * tutarli davranis gosterdigini dogrular. Her kombinasyon
- * sonrasi durum sorgulanir.
- * ============================================================ */
-
-void test_frontFace_cullCombinations(void) {
-	GLenum frontModes[] = {GL_CCW, GL_CW};
-	GLenum cullModes[] = {GL_BACK, GL_FRONT, GL_FRONT_AND_BACK};
-	int i, j;
-
-	printf("TEST: Cull Face Combinations\n");
-	resetState3();
-
-	for (i = 0; i < 2; i++) {
-		for (j = 0; j < 3; j++) {
-			GLint face, cull;
-
-			glFrontFace(frontModes[i]);
-			glCullFace(cullModes[j]);
-			assert(glGetError() == GL_NO_ERROR);
-
-			glGetIntegerv(GL_FRONT_FACE, &face);
-			glGetIntegerv(GL_CULL_FACE_MODE, &cull);
-
-			assert(face == frontModes[i]);
-			assert(cull == cullModes[j]);
-		}
-	}
-
-	glDisable(GL_CULL_FACE);
-	resetState3();
-	printf("  Sonuc: 6 kombinasyon tamamlandi\n");
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * TEST 7: Cok buyuk enum degerleri
- *
- * 32-bit enum araliginin ust kisimlarini test eder.
- * OpenGL spec 16-bit enum uzayini kullanir ancak 32-bit
- * degerler gonderildiginde implementasyonun davranisi
- * belirsizdir. Cokme veya durum bozulmasi kritik hatadir.
- * ============================================================ */
-
-void test_frontFace_largeEnum(void) {
-	GLenum largeValues[] = {(GLenum)0x10000, (GLenum)0x7FFFFFFF,
-				(GLenum)0x80000000, (GLenum)0xFFFFFFFF};
-	int i;
-	int n = sizeof(largeValues) / sizeof(largeValues[0]);
-
-	printf("TEST: Large Enum Values\n");
-	resetState3();
-
-	for (i = 0; i < n; i++) {
-		GLenum err;
-
-		glFrontFace(largeValues[i]);
-		err = glGetError();
-
-		printf("  Enum=0x%08X -> 0x%X\n", largeValues[i], err);
-	}
-
-	checkStatePreserved3(GL_CCW);
-	resetState3();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
-}
-
-/* ============================================================
- * TEST 8: Thread benzeri hizli ardisik cagri
- *
- * Tek bir thread icerisinde glFrontFace'e ait cagrilari
- * mimimum gecikmeyle ard arda gondererek durum makinesinin
- * race condition benzeri senaryolarda tutarli kalip
- * kalmadigini gozlemler.
- * ============================================================ */
-
-void test_frontFace_rapidFire(void) {
-	int i;
-	const int tekrar = 50000;
-
-	printf("TEST: Rapid Fire (50K calls)\n");
-	resetState3();
-
-	for (i = 0; i < tekrar; i++) {
-		glFrontFace(GL_CW);
-		glFrontFace(GL_CCW);
-	}
-
-	glGetError();
-	glFrontFace(GL_CW);
-	assert(glGetError() == GL_NO_ERROR);
-	checkStatePreserved3(GL_CW);
-
-	resetState3();
-	printf("  Sonuc: %d cift cagri tamamlandi\n", tekrar);
-	printf("  [PASS]\n\n");
-}
-
-/* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi/sonrasi OpenGL durumunu ve hata
- * kuyrugunu temizler. checkStatePreserved: Reddedilen cagrilarin
- * mevcut GL_LINE_WIDTH'i degistirmedigini dogrular; basarisizlik
- * durumunda assert ile program durur.
- * ============================================================ */
-static void resetState4(void) {
-	glLineWidth(1.0f);
-	while (glGetError() != GL_NO_ERROR)
-		;
-}
-
-static void checkStatePreserved4(GLfloat expected) {
-	GLfloat actual;
-	glGetFloatv(GL_LINE_WIDTH, &actual);
-	if (actual != expected) {
-		printf("  [FAIL] Durum bozuldu: beklenen %f, gercek %f\n",
-		       expected, actual);
-		assert(0);
-	}
-}
-
-/* ============================================================
- * TEST 1: Sozlesme dogrulama — gecerli ve gecersiz girdiler
- * ============================================================ */
-
-/*
- * glLineWidth'in temel sozlesmesini dogrular: pozitif degerler hatasiz
- * kabul edilmeli, pozitif olmayan degerler GL_INVALID_VALUE ile
- * reddedilmelidir. Reddedilen cagrilar idempotent olmalidir; yani
- * mevcut GL_LINE_WIDTH durumunu degistirmemelidir. Bu ozellik,
- * basarisiz bir cagrinin sonraki cizim komutlarina sirayet etmesini
- * ve belirlenemez goruntu olusmasini engeller.
- */
-
 void test_lineWidth_basicRobustness(void) {
 	GLfloat width;
 	GLenum err;
 
 	printf("TEST: Basic Robustness\n");
-	resetState4();
+	resetState_lineWidth();
 
 	glLineWidth(2.0f);
 	err = glGetError();
-	assert(err == GL_NO_ERROR);
+	EXPECT_GL_ERROR(
+	    err, (err == GL_NO_ERROR),
+	    "test_lineWidth_basicRobustness failed. Valid width rejected.");
 
 	glGetFloatv(GL_LINE_WIDTH, &width);
-	assert(width == 2.0f);
+	EXPECT_GL_ERROR(
+	    width, (width == 2.0f),
+	    "test_lineWidth_basicRobustness failed. Width not set correctly.");
 
 	glLineWidth(0.0f);
 	err = glGetError();
-	assert(err == GL_INVALID_VALUE);
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "test_lineWidth_basicRobustness failed. Zero width accepted.");
 
 	glLineWidth(-5.0f);
 	err = glGetError();
-	assert(err == GL_INVALID_VALUE);
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "test_lineWidth_basicRobustness failed. Negative width accepted.");
 
-	checkStatePreserved4(2.0f);
-	assert(glGetError() == GL_NO_ERROR);
+	checkStatePreserved_lineWidth(2.0f);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(
+		    _e, (_e == GL_NO_ERROR),
+		    "test_lineWidth_basicRobustness failed. Residual error.");
+	}
 
-	resetState4();
-	printf("  [PASS]\n\n");
+	resetState_lineWidth();
 }
 
 /* ============================================================
- * TEST 2: Parametrik tarama — sinir deger kesfi
+ * glLineWidth — Parametrik Tarama
+ * ============================================================
+ *
+ * [-1000.0, +1000.0] araliginda 0.1 çözünürlükle tarama
+ * yaparak implementasyona özgü sinir anomalilerini ortaya
+ * çikarir. w <= 0 → GL_INVALID_VALUE, w > 0 → GL_NO_ERROR.
  * ============================================================ */
-
-/*
- * glLineWidth'i surekli bir parametrik aralikta test ederek, noktasal
- * kontrollerin yakalayamayacagi implementasyon-ozgulu sinir
- * anomalilerini ortaya cikarir. Tarama [-1000.0, +1000.0] araliginda
- * 0.1 cozunurluguyle gerceklestirilir (20.001 ornek):
- *
- *   w <= 0  → GL_INVALID_VALUE  (spec ile zorunlu reddetme)
- *   w > 0   → GL_NO_ERROR       (kabul, kirpmali)
- *
- * Dongu tam sayi indeksleme ve basit carpma kullanir; birikimli
- * yuvarlama hatasi olusmaz.
- */
-
 void test_lineWidth_stressSweep(void) {
 	int i;
 	int passCount = 0;
 	int failCount = 0;
 
 	printf("TEST: Stress Sweep (-1000.0 .. +1000.0)\n");
-	resetState4();
+	resetState_lineWidth();
 
 	for (i = -10000; i <= 10000; i++) {
 		float w = (float)i * 0.1f;
@@ -2406,51 +3106,38 @@ void test_lineWidth_stressSweep(void) {
 	}
 
 	glLineWidth(1.0f);
-	checkStatePreserved4(1.0f);
-	assert(glGetError() == GL_NO_ERROR);
+	checkStatePreserved_lineWidth(1.0f);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(
+		    _e, (_e == GL_NO_ERROR),
+		    "test_lineWidth_stressSweep failed. Residual error.");
+	}
 
 	printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
-	assert(failCount == 0);
-	printf("  [PASS]\n\n");
+	EXPECT_GL_ERROR(failCount, (failCount == 0),
+			"test_lineWidth_stressSweep failed.");
+
+	resetState_lineWidth();
 }
 
 /* ============================================================
- * TEST 3: IEEE-754 ozel degerleri
- * ============================================================ */
-/*
- * IEEE-754 ozel kayan nokta degerleri altinda davranisi degerlendirir:
- *   NaN         — karsilastirma islemleri tanimsizdir; NaN <= 0
- *                yanlis doner, dolayisiyla basit aralik kontrolleri
- *                NaN'i kabul edebilir
- *   +Sonsuz     — her sonlu implementasyon limitini asar
- *   -Sonsuz     — isaret biti setlidir; negatif olarak reddedilmeli
+ * glLineWidth — IEEE-754 Özel Degerleri
+ * ============================================================
  *
- * OpenGL spec NaN davranisini acikca tanimlamaz, ancak robust bir
- * implementasyon cokmemeli, dahili istisna uretmemeli ve surucu
- * durumunu bozmamalidir. Bu test bilgilendiricidir; kesin hata
- * kodlari implementasyona baglidir.
- * KISICA:
- * NaN ve ±Infinity degerlerinin glLineWidth tarafindan nasil
- * ele alindigini gozlemler. Bu degerler icin OpenGL spec kesin
- * bir davranis belirtmez; farkli suruculer farkli hata kodlari
- * dondurebilir veya sessizce kirpabilir. Testin amaci kesin
- * bir dogrulama yapmak degil, implementasyonun cokmedigini
- * ve durumu bozmadigini kontrol etmektir. Cikti insani tarafindan
- * degerlendirilir: INVALID_VALUE veya NO_ERROR makul karsilanir,
- * ancak crash, segfault veya GL_LINE_WIDTH degisikligi kritik
- * bir robustness acigi olarak rapor edilmelidir.
- * segfault veya GL_LINE_WIDTH degisikligi,
- * surucunun ozel float degerleri isleyememesinden kaynaklanan kritik bir
- * robustness acigidir; bu durumda uygulama aniden sonlanir veya sonraki
- * cizim komutlarinda goruntu bozulmasina yol acar.
- */
-
+ * NaN, +Infinity, -Infinity degerlerinin glLineWidth
+ * tarafindan nasil ele alindigini gözlemler. OpenGL spec
+ * bu degerler için kesin bir davranis belirtmez; farkli
+ * sürücüler farkli hata kodlari döndürebilir veya sessizce
+ * kirpabilir. Testin amaci implementasyonun çökmedigini
+ * ve durumu bozmadigini kontrol etmektir.
+ * ============================================================ */
 void test_lineWidth_specialFloats(void) {
 	GLenum err;
 	GLfloat width;
 
 	printf("TEST: Special Float Values (NaN, Inf)\n");
-	resetState4();
+	resetState_lineWidth();
 
 	glLineWidth(NAN);
 	err = glGetError();
@@ -2469,181 +3156,935 @@ void test_lineWidth_specialFloats(void) {
 	glGetFloatv(GL_LINE_WIDTH, &width);
 	printf("  Son durum: width=%f (beklenen 1.0)\n", width);
 
-	resetState4();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
+	resetState_lineWidth();
+	printf("  [BILGI] Manuel inceleme gerekir\n");
 }
 
 /* ============================================================
- * TEST 4: Hata kuyrugu butunlugu
+ * glLineWidth — Hata Kuyrugu Bütünlügü
+ * ============================================================
+ *
+ * Sürekli hata enjeksiyonu altinda hata kuyrugu davranisini
+ * dogrular. Hatalar glGetError ile kaydedilir, kuyruk
+ * GL_NO_ERROR'a kadar tamamen bosaltilabilir olmalidir.
  * ============================================================ */
-
-/*
- * Surekli hata enjeksiyonu altinda hata kuyrugu davranisini dogrular.
- * OpenGL en az bir hata kaydini garanti eder; kuyruk derinligi
- * implementasyona baglidir. Test sunlari kontrol eder:
- *
- *   - Hatalar glGetError ile kaydedilir ve okunabilir
- *   - Kuyruk GL_NO_ERROR'a kadar tamamen bosaltilabilir
- *   - Bosaltma sonrasi islemler eski hata kirliliginden etkilenmez
- *
- * Kuyrugun duzgun bosaltilamamasi, bozuk hata durumu izleme
- * isaretidir; bu durum uretim ortaminda sonraki hatalarin
- * maskelenmesine yol acar.
- */
-
 void test_lineWidth_errorQueue(void) {
 	int i;
 	GLenum err;
 	int errorCount = 0;
 
 	printf("TEST: Error Queue Management\n");
-	resetState4();
+	resetState_lineWidth();
 
 	for (i = 0; i < 50; i++) {
 		glLineWidth(-1.0f * (i + 1));
 	}
 
 	while ((err = glGetError()) != GL_NO_ERROR) {
-		assert(err == GL_INVALID_VALUE);
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+				"test_lineWidth_errorQueue failed. Unexpected "
+				"error code in queue.");
 		errorCount++;
 	}
 
 	printf("  Kuyruktan okunan hata sayisi: %d\n", errorCount);
-	assert(errorCount > 0);
+	EXPECT_GL_ERROR(
+	    errorCount, (errorCount > 0),
+	    "test_lineWidth_errorQueue failed. No errors recorded.");
 
 	glLineWidth(4.0f);
-	assert(glGetError() == GL_NO_ERROR);
-	checkStatePreserved4(4.0f);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(
+		    _e, (_e == GL_NO_ERROR),
+		    "test_lineWidth_errorQueue failed. Post-drain error.");
+	}
+	checkStatePreserved_lineWidth(4.0f);
 
-	resetState4();
-	printf("  [PASS]\n\n");
+	resetState_lineWidth();
 }
 
 /* ============================================================
- * TEST 5: Implementasyon limitleri ve kirpma
+ * glLineWidth — Implementasyon Limitleri
+ * ============================================================
+ *
+ * GL_ALIASED_LINE_WIDTH_RANGE ile desteklenen aralik
+ * sorgulanir. Aralik üstü pozitif degerin hata üretmedigini
+ * ve GL_LINE_WIDTH sorgusunun specified degeri döndürdügünü
+ * dogrular.
  * ============================================================ */
-
-/*
- * glLineWidth'in implementasyon limitlerini asan degerleri sessizce
- * kirpma davranisini dogrular. GL_LINE_WIDTH_RANGE ile desteklenen
- * aralik sorgulanir; limitin uzerindeki degerler hata uretmeden
- * maksimuma cekilir.
- */
-
 void test_lineWidth_limits(void) {
-	GLfloat widthRange[2];
+	GLfloat range[2];
 	GLfloat width;
+	GLfloat request;
+	GLenum err;
 
-	printf("TEST: Implementation Limits\n");
-	resetState4();
+	printf("TEST: Implementation Limits (Aliased Line Width Range)\n");
+	resetState_lineWidth();
 
-	glGetFloatv(GL_LINE_WIDTH_RANGE, widthRange);
+	range[0] = range[1] = -1.0f;
+	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_lineWidth_limits failed. Range query error.");
 
-	printf("  Line width araligi: [%.2f, %.2f]\n", widthRange[0],
-	       widthRange[1]);
+	printf("  ALIASED_LINE_WIDTH_RANGE: [%.2f, %.2f]\n", range[0],
+	       range[1]);
 
-	GLfloat maxLimit = widthRange[1];
+	EXPECT_GL_ERROR(
+	    range[0], (range[0] > 0.0f),
+	    "test_lineWidth_limits failed. Min range not positive.");
+	EXPECT_GL_ERROR(range[1], (range[1] >= range[0]),
+			"test_lineWidth_limits failed. Max < Min.");
+	EXPECT_GL_ERROR(
+	    range[0], (range[0] <= 1.0f),
+	    "test_lineWidth_limits failed. Range does not include 1.0.");
+	EXPECT_GL_ERROR(
+	    range[1], (range[1] >= 1.0f),
+	    "test_lineWidth_limits failed. Range does not include 1.0.");
 
-	glLineWidth(maxLimit * 10.0f);
-	EXPECT_GL_ERROR(glGetError(), (glGetError() == GL_NO_ERROR), "test_lineWidth_limits failed.");
+	request = range[1] * 10.0f;
+	glLineWidth(request);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_lineWidth_limits failed. Over-range positive "
+			"width rejected.");
 
 	glGetFloatv(GL_LINE_WIDTH, &width);
-	printf("  Istek %.1f, gercek %.1f (kirpilmis)\n", maxLimit * 10.0f,
-	       width);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_lineWidth_limits failed.");
+	}
+	if (fabsf(width - request) > request * 1e-5f) {
+		printf("  [FAIL] state erken clamp'lenmis: istek %.1f, sorgu "
+		       "%.1f\n",
+		       request, width);
+		retcode = 1;
+	}
+	printf("  Istek %.1f -> GL_LINE_WIDTH %.1f (specified korunuyor)\n",
+	       request, width);
 
-	EXPECT_GL_ERROR(false, width <= maxLimit * 1.01f, "test_lineWidth_limits failed.");
-//	assert(width <= maxLimit * 1.01f);
+	glLineWidth(range[0]);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(
+		    _e, (_e == GL_NO_ERROR),
+		    "test_lineWidth_limits failed. Min range rejected.");
+	}
 
-	resetState4();
-	printf("  [PASS]\n\n");
+	resetState_lineWidth();
 }
 
 /* ============================================================
- * Test altyapisi
+ * glCullFace — Temel Robustness
+ * ============================================================
  *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine getirir ve birikmis hatalari
- * temizler; boylece testler birbirine bagimli olmaz.
+ * glCullFace() fonksiyonunun kabul ettigi üç geçerli enum
+ * degeri dogrulanir. Ardindan geçersiz enum degerleri
+ * gönderilerek GL_INVALID_ENUM üretildigi ve mevcut state'in
+ * degismedigi kontrol edilir.
  * ============================================================ */
+void test_cullFace_basicRobustness(void) {
+	GLenum err;
+	printf("TEST : Basic Robustness\n");
+	resetState_cullFace();
+	glCullFace(GL_BACK);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_basicRobustness failed.");
+	}
+	checkStatePreserved_cullFace(GL_BACK);
 
-static void resetState5(void) {
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_DEPTH_TEST);
-	glPolygonOffset(0.0f, 0.0f);
-	while (glGetError() != GL_NO_ERROR)
-		;
+	glCullFace(GL_FRONT);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_basicRobustness failed.");
+	}
+	checkStatePreserved_cullFace(GL_FRONT);
+
+	glCullFace(GL_FRONT_AND_BACK);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_basicRobustness failed.");
+	}
+	checkStatePreserved_cullFace(GL_FRONT_AND_BACK);
+
+	glCullFace((GLenum)0x0BAD);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_ENUM),
+	    "test_cullFace_basicRobustness failed. Invalid enum accepted.");
+	checkStatePreserved_cullFace(GL_FRONT_AND_BACK);
+
+	glCullFace(GL_CCW);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"test_cullFace_basicRobustness failed. GL_CCW accepted "
+			"as cull mode.");
+	checkStatePreserved_cullFace(GL_FRONT_AND_BACK);
+	resetState_cullFace();
 }
 
 /* ============================================================
- * TEST 1: Sozlesme ve durum yonetimi
+ * glCullFace — Stres Taramasi
+ * ============================================================
  *
- * glPolygonOffset'in temel sozlesmesini dogrular: tum float
- * degerler kabul edilmeli, hicbiri hata uretmemelidir. Spec'te
- * yasak deger yoktur; implementasyon degerleri sessizce
- * kendi araligina kirpmalidir. Ayrica durum sorgusunun
- * tutarli sonuc verdigi kontrol edilir.
+ * 16-bit GLenum uzayindaki tüm degerler sistematik olarak
+ * denenir. Yalnizca GL_BACK, GL_FRONT, GL_FRONT_AND_BACK
+ * degerlerinin kabul edilmesi beklenir.
  * ============================================================ */
+void test_cullFace_stressSweep(void) {
+	GLenum mode;
+	int passCount = 0;
+	int failCount = 0;
+	printf("TEST : Stress Sweep\n");
+	resetState_cullFace();
 
+	for (mode = 0; mode < 65536; mode++) {
+		glCullFace(GL_BACK);
+		while (glGetError() != GL_NO_ERROR)
+			;
+
+		GLenum expected = (mode == GL_BACK || mode == GL_FRONT ||
+				   mode == GL_FRONT_AND_BACK)
+				      ? GL_NO_ERROR
+				      : GL_INVALID_ENUM;
+
+		GLenum err;
+		glCullFace(mode);
+		err = glGetError();
+		if (err != expected) {
+			printf("  [FAIL] Enum=0x%X Beklenen=0x%X Gelen=0x%X\n",
+			       mode, expected, err);
+			failCount++;
+		} else {
+			passCount++;
+		}
+
+		if (err == GL_INVALID_ENUM) {
+			checkStatePreserved_cullFace(GL_BACK);
+		}
+	}
+
+	printf("  PASS : %d\n", passCount);
+	printf("  FAIL : %d\n", failCount);
+
+	EXPECT_GL_ERROR(failCount, (failCount == 0),
+			"test_cullFace_stressSweep failed.");
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — Hata Kuyrugu Yönetimi
+ * ============================================================
+ *
+ * Arka arkaya çok sayida geçersiz enum gönderildiginde hata
+ * kuyrugunun bozulmadigi dogrulanir. Daha sonra geçerli bir
+ * çagri yapilarak sürücünün normal çalismaya döndügü kontrol
+ * edilir.
+ * ============================================================ */
+void test_cullFace_errorQueue(void) {
+	GLenum err;
+	int i;
+	int errorCount = 0;
+	printf("TEST : Error Queue Management\n");
+	resetState_cullFace();
+	for (i = 0; i < 100; i++) {
+		glCullFace((GLenum)(0x5000 + i));
+	}
+
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_cullFace_errorQueue failed. Unexpected "
+				"error in queue.");
+		errorCount++;
+	}
+	EXPECT_GL_ERROR(errorCount, (errorCount > 0),
+			"test_cullFace_errorQueue failed. No errors recorded.");
+	glCullFace(GL_FRONT);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_errorQueue failed.");
+	}
+	checkStatePreserved_cullFace(GL_FRONT);
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — Hizli Geçis (Rapid Toggle)
+ * ============================================================
+ *
+ * GL_BACK, GL_FRONT ve GL_FRONT_AND_BACK arasinda yüz binlerce
+ * kez geçis yapilarak OpenGL durum makinesinin kararlilığı
+ * dogrulanir.
+ * ============================================================ */
+void test_cullFace_rapidToggle(void) {
+	const int repeat = 100000;
+	int i;
+	printf("TEST : Rapid Toggle\n");
+	resetState_cullFace();
+	for (i = 0; i < repeat; i++) {
+		GLenum expected;
+		GLint current;
+		switch (i % 3) {
+		case 0:
+			expected = GL_BACK;
+			break;
+		case 1:
+			expected = GL_FRONT;
+			break;
+		default:
+			expected = GL_FRONT_AND_BACK;
+			break;
+		}
+		glCullFace(expected);
+		{
+			GLenum _e = glGetError();
+			EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+					"test_cullFace_rapidToggle failed.");
+		}
+		glGetIntegerv(GL_CULL_FACE_MODE, &current);
+		EXPECT_GL_ERROR(
+		    current, (current == (GLint)expected),
+		    "test_cullFace_rapidToggle failed. State mismatch.");
+	}
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — Durum Korunumu (State Preservation)
+ * ============================================================
+ *
+ * Geçersiz glCullFace() çagrilarinin mevcut
+ * GL_CULL_FACE_MODE degerini degistirmedigi dogrulanir.
+ * ============================================================ */
+void test_cullFace_statePreservation(void) {
+	GLenum err;
+	GLenum invalidEnums[] = {0, 1, 2, 1234, 9999, 0xFFFF, 0xFFFFFFFF};
+	int i;
+	printf("TEST : State Preservation\n");
+	resetState_cullFace();
+	glCullFace(GL_FRONT);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_statePreservation failed.");
+	}
+	checkStatePreserved_cullFace(GL_FRONT);
+	for (i = 0; i < (int)(sizeof(invalidEnums) / sizeof(invalidEnums[0]));
+	     i++) {
+		glCullFace(invalidEnums[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_cullFace_statePreservation failed. "
+				"Invalid enum not rejected.");
+		checkStatePreserved_cullFace(GL_FRONT);
+	}
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — FrontFace Kombinasyonlari
+ * ============================================================
+ *
+ * glFrontFace() ile glCullFace() fonksiyonlarinin birlikte
+ * kullanildiginda birbirlerinin durumunu bozmadigi dogrulanir.
+ * ============================================================ */
+void test_cullFace_frontFaceCombination(void) {
+	GLenum frontModes[] = {GL_CCW, GL_CW};
+	GLenum cullModes[] = {GL_BACK, GL_FRONT, GL_FRONT_AND_BACK};
+	int i, j;
+	printf("TEST : FrontFace Combination\n");
+	resetState_cullFace();
+	for (i = 0; i < 2; i++) {
+		for (j = 0; j < 3; j++) {
+			GLint front, cull;
+			glFrontFace(frontModes[i]);
+			{
+				GLenum _e = glGetError();
+				EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+						"test_cullFace_"
+						"frontFaceCombination failed.");
+			}
+			glCullFace(cullModes[j]);
+			{
+				GLenum _e = glGetError();
+				EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+						"test_cullFace_"
+						"frontFaceCombination failed.");
+			}
+			glGetIntegerv(GL_FRONT_FACE, &front);
+			glGetIntegerv(GL_CULL_FACE_MODE, &cull);
+			EXPECT_GL_ERROR(front, (front == (GLint)frontModes[i]),
+					"test_cullFace_frontFaceCombination "
+					"failed. Front mismatch.");
+			EXPECT_GL_ERROR(cull, (cull == (GLint)cullModes[j]),
+					"test_cullFace_frontFaceCombination "
+					"failed. Cull mismatch.");
+		}
+	}
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — Büyük Geçersiz Enum
+ * ============================================================
+ *
+ * Çok büyük GLenum degerleri gönderildiginde sürücünün
+ * çökmedigini ve GL_INVALID_ENUM ürettigini dogrular.
+ * ============================================================ */
+void test_cullFace_largeEnum(void) {
+	GLenum values[] = {(GLenum)0x10000, (GLenum)0x7FFFFFFF,
+			   (GLenum)0x80000000, (GLenum)0xFFFFFFFF};
+	int i;
+	printf("TEST : Large Invalid Enum Values\n");
+	resetState_cullFace();
+	for (i = 0; i < (int)(sizeof(values) / sizeof(values[0])); i++) {
+		GLenum err;
+		glCullFace(values[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_cullFace_largeEnum failed.");
+		checkStatePreserved_cullFace(GL_BACK);
+	}
+	resetState_cullFace();
+}
+
+/* ============================================================
+ * glCullFace — Rapid Fire
+ * ============================================================
+ *
+ * glCullFace() fonksiyonunu çok kisa araliklarla art arda
+ * çagirarak sürücünün yogun kullanim altinda kararlilığını
+ * dogrular.
+ * ============================================================ */
+void test_cullFace_rapidFire(void) {
+	const unsigned int repeat = 1000000;
+	unsigned int i;
+	printf("TEST : Rapid Fire\n");
+	resetState_cullFace();
+	for (i = 0; i < repeat; i++) {
+		glCullFace(GL_BACK);
+		glCullFace(GL_FRONT);
+		glCullFace(GL_FRONT_AND_BACK);
+	}
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFace_rapidFire failed.");
+	}
+	checkStatePreserved_cullFace(GL_FRONT_AND_BACK);
+	resetState_cullFace();
+	printf("  %u cagri tamamlandi.\n", repeat * 3);
+}
+
+/* ============================================================
+ * glCullFace — Rastgele Fuzz Testi
+ * ============================================================
+ *
+ * Rastgele GLenum degerleri gönderilerek sürücünün
+ * beklenmeyen girdiler karsisindaki dayaniklilığı test edilir.
+ * ============================================================ */
+void test_cullFace_randomFuzz(void) {
+	unsigned int i;
+	printf("TEST : Random Fuzz Test\n");
+	resetState_cullFace();
+	srand(12345);
+	for (i = 0; i < 1000000; i++) {
+		GLenum value;
+		GLenum err;
+		switch (rand() % 5) {
+		case 0:
+			value = GL_BACK;
+			break;
+		case 1:
+			value = GL_FRONT;
+			break;
+		case 2:
+			value = GL_FRONT_AND_BACK;
+			break;
+		default:
+			value = (GLenum)rand();
+			break;
+		}
+		glCullFace(value);
+		err = glGetError();
+		EXPECT_GL_ERROR(
+		    err, (err == GL_NO_ERROR || err == GL_INVALID_ENUM),
+		    "test_cullFace_randomFuzz failed. Unexpected error code.");
+	}
+	resetState_cullFace();
+	printf("  1,000,000 rastgele test tamamlandi.\n");
+}
+
+/* ============================================================
+ * glEnable/Disable — Temel Robustness
+ * ============================================================
+ *
+ * glEnable/glDisable(GL_CULL_FACE)'in temel sözlesmesini,
+ * gerçek culling davranisini ve cap izolasyonunu dogrular.
+ * ============================================================ */
+void test_cullFaceEnable_basicRobustness(void) {
+	printf("TEST: Enable/Disable Basic Robustness\n");
+	resetState_cullFaceEnable();
+
+	glEnable(GL_CULL_FACE);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFaceEnable_basicRobustness failed.");
+	}
+	EXPECT_GL_ERROR(
+	    glIsEnabled(GL_CULL_FACE), (glIsEnabled(GL_CULL_FACE) == GL_TRUE),
+	    "test_cullFaceEnable_basicRobustness failed. Enable did not work.");
+
+	glDisable(GL_CULL_FACE);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFaceEnable_basicRobustness failed.");
+	}
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_FALSE),
+			"test_cullFaceEnable_basicRobustness failed. Disable "
+			"did not work.");
+
+	glDisable(GL_CULL_FACE);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFaceEnable_basicRobustness failed. "
+				"Idempotent disable.");
+	}
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFaceEnable_basicRobustness failed. "
+				"Double enable.");
+	}
+
+	glDisable(GL_CULL_FACE);
+	glEnable((GLenum)0x0BAD);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_INVALID_ENUM),
+				"test_cullFaceEnable_basicRobustness failed. "
+				"Invalid cap accepted.");
+	}
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_FALSE),
+			"test_cullFaceEnable_basicRobustness failed. Invalid "
+			"cap changed state.");
+
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_SCISSOR_TEST);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_cullFaceEnable_basicRobustness failed.");
+	}
+	glDisable(GL_SCISSOR_TEST);
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_TRUE),
+			"test_cullFaceEnable_basicRobustness failed. Cap "
+			"isolation broken.");
+
+	resetState_cullFaceEnable();
+}
+
+/* ============================================================
+ * glEnable/Disable — Hizli Toggle
+ * ============================================================ */
+void test_cullFaceEnable_rapidToggle(void) {
+	int i;
+	const int tekrar = 10000;
+	printf("TEST: Rapid Toggle (Enable <-> Disable)\n");
+	resetState_cullFaceEnable();
+	for (i = 0; i < tekrar; i++) {
+		GLboolean beklenen = (i % 2 == 0) ? GL_TRUE : GL_FALSE;
+		if (beklenen)
+			glEnable(GL_CULL_FACE);
+		else
+			glDisable(GL_CULL_FACE);
+		{
+			GLenum _e = glGetError();
+			EXPECT_GL_ERROR(
+			    _e, (_e == GL_NO_ERROR),
+			    "test_cullFaceEnable_rapidToggle failed.");
+		}
+		EXPECT_GL_ERROR(
+		    glIsEnabled(GL_CULL_FACE),
+		    (glIsEnabled(GL_CULL_FACE) == beklenen),
+		    "test_cullFaceEnable_rapidToggle failed. State mismatch.");
+	}
+	resetState_cullFaceEnable();
+	printf("  Sonuc: %d toggle tamamlandi\n", tekrar);
+}
+
+/* ============================================================
+ * glEnable/Disable — Geçersiz Cap Taramasi
+ * ============================================================ */
+void test_cullFaceEnable_invalidCaps(void) {
+	GLenum invalidCaps[] = {(GLenum)0x0000, (GLenum)0x0BAD, (GLenum)0x1234,
+				(GLenum)0xDEAD, (GLenum)0xFFFF};
+	int i;
+	int n = sizeof(invalidCaps) / sizeof(invalidCaps[0]);
+	printf("TEST: Invalid Capability Values\n");
+	resetState_cullFaceEnable();
+	for (i = 0; i < n; i++) {
+		GLenum err;
+		glEnable(invalidCaps[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_cullFaceEnable_invalidCaps failed. "
+				"Enable accepted invalid cap.");
+		glDisable(invalidCaps[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_cullFaceEnable_invalidCaps failed. "
+				"Disable accepted invalid cap.");
+	}
+	EXPECT_GL_ERROR(
+	    glIsEnabled(GL_CULL_FACE), (glIsEnabled(GL_CULL_FACE) == GL_FALSE),
+	    "test_cullFaceEnable_invalidCaps failed. State changed.");
+	resetState_cullFaceEnable();
+	printf("  Sonuc: %d gecersiz cap reddedildi\n", n);
+}
+
+/* ============================================================
+ * glEnable/Disable — Cap Kombinasyonlari
+ * ============================================================ */
+void test_cullFaceEnable_capCombinations(void) {
+	printf("TEST: Capability Combinations\n");
+	resetState_cullFaceEnable();
+
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_FALSE),
+			"test_cullFaceEnable_capCombinations failed.");
+	EXPECT_GL_ERROR(glIsEnabled(GL_SCISSOR_TEST),
+			(glIsEnabled(GL_SCISSOR_TEST) == GL_FALSE),
+			"test_cullFaceEnable_capCombinations failed.");
+
+	glEnable(GL_CULL_FACE);
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_TRUE),
+			"test_cullFaceEnable_capCombinations failed.");
+	EXPECT_GL_ERROR(glIsEnabled(GL_SCISSOR_TEST),
+			(glIsEnabled(GL_SCISSOR_TEST) == GL_FALSE),
+			"test_cullFaceEnable_capCombinations failed.");
+
+	glEnable(GL_SCISSOR_TEST);
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_TRUE),
+			"test_cullFaceEnable_capCombinations failed.");
+	EXPECT_GL_ERROR(glIsEnabled(GL_SCISSOR_TEST),
+			(glIsEnabled(GL_SCISSOR_TEST) == GL_TRUE),
+			"test_cullFaceEnable_capCombinations failed.");
+
+	glDisable(GL_CULL_FACE);
+	EXPECT_GL_ERROR(glIsEnabled(GL_CULL_FACE),
+			(glIsEnabled(GL_CULL_FACE) == GL_FALSE),
+			"test_cullFaceEnable_capCombinations failed.");
+	EXPECT_GL_ERROR(glIsEnabled(GL_SCISSOR_TEST),
+			(glIsEnabled(GL_SCISSOR_TEST) == GL_TRUE),
+			"test_cullFaceEnable_capCombinations failed.");
+
+	glDisable(GL_SCISSOR_TEST);
+	resetState_cullFaceEnable();
+}
+
+/* ============================================================
+ * glFrontFace — Hata Kuyrugu Yönetimi
+ * ============================================================ */
+void test_frontFace_errorQueue(void) {
+	GLenum err;
+	int errorCount = 0;
+	int i;
+	printf("TEST : Error Queue Management\n");
+	resetState_frontFace();
+	for (i = 0; i < 100; i++) {
+		glFrontFace((GLenum)(0x5000 + i));
+	}
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_frontFace_errorQueue failed.");
+		errorCount++;
+	}
+	EXPECT_GL_ERROR(errorCount, (errorCount > 0),
+			"test_frontFace_errorQueue failed. No errors.");
+	glFrontFace(GL_CW);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_frontFace_errorQueue failed.");
+	}
+	checkStatePreserved_frontFace(GL_CW);
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — Hizli Geçis
+ * ============================================================ */
+void test_frontFace_rapidToggle(void) {
+	const int repeat = 100000;
+	int i;
+	printf("TEST : Rapid Toggle\n");
+	resetState_frontFace();
+	for (i = 0; i < repeat; i++) {
+		GLenum expected = (i & 1) ? GL_CCW : GL_CW;
+		GLint current;
+		glFrontFace(expected);
+		{
+			GLenum _e = glGetError();
+			EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+					"test_frontFace_rapidToggle failed.");
+		}
+		glGetIntegerv(GL_FRONT_FACE, &current);
+		EXPECT_GL_ERROR(current, (current == (GLint)expected),
+				"test_frontFace_rapidToggle failed.");
+	}
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — Karisik Geçerli/Geçersiz Çagrilar
+ * ============================================================ */
+void test_frontFace_mixedValidity(void) {
+	GLenum sequence[] = {GL_CW, 0x1111, GL_CCW, 0x2222,
+			     GL_CW, 0x3333, GL_CCW, 0x4444};
+	int count = sizeof(sequence) / sizeof(sequence[0]);
+	int i;
+	printf("TEST : Mixed Validity\n");
+	resetState_frontFace();
+	for (i = 0; i < count; i++) {
+		GLenum value = sequence[i];
+		GLenum expectedError = (value == GL_CW || value == GL_CCW)
+					   ? GL_NO_ERROR
+					   : GL_INVALID_ENUM;
+		glFrontFace(value);
+		{
+			GLenum _e = glGetError();
+			EXPECT_GL_ERROR(_e, (_e == expectedError),
+					"test_frontFace_mixedValidity failed.");
+		}
+		if (value == GL_CW)
+			checkStatePreserved_frontFace(GL_CW);
+		if (value == GL_CCW)
+			checkStatePreserved_frontFace(GL_CCW);
+	}
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — Durum Korunumu
+ * ============================================================ */
+void test_frontFace_statePreservation(void) {
+	GLenum err;
+	GLenum invalidEnums[] = {0, 1, 2, 1234, 9999, 0xFFFF, 0xFFFFFFFF};
+	int i;
+	printf("TEST : State Preservation\n");
+	resetState_frontFace();
+	glFrontFace(GL_CW);
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_frontFace_statePreservation failed.");
+	}
+	checkStatePreserved_frontFace(GL_CW);
+	for (i = 0; i < (int)(sizeof(invalidEnums) / sizeof(invalidEnums[0]));
+	     i++) {
+		glFrontFace(invalidEnums[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_frontFace_statePreservation failed.");
+		checkStatePreserved_frontFace(GL_CW);
+	}
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — CullFace Kombinasyonlari
+ * ============================================================ */
+void test_frontFace_cullCombinations(void) {
+	GLenum frontModes[] = {GL_CCW, GL_CW};
+	GLenum cullModes[] = {GL_FRONT, GL_BACK, GL_FRONT_AND_BACK};
+	int i, j;
+	printf("TEST : Cull Face Combinations\n");
+	resetState_frontFace();
+	glEnable(GL_CULL_FACE);
+	for (i = 0; i < 2; i++) {
+		for (j = 0; j < 3; j++) {
+			GLint currentFront, currentCull;
+			glFrontFace(frontModes[i]);
+			{
+				GLenum _e = glGetError();
+				EXPECT_GL_ERROR(
+				    _e, (_e == GL_NO_ERROR),
+				    "test_frontFace_cullCombinations failed.");
+			}
+			glCullFace(cullModes[j]);
+			{
+				GLenum _e = glGetError();
+				EXPECT_GL_ERROR(
+				    _e, (_e == GL_NO_ERROR),
+				    "test_frontFace_cullCombinations failed.");
+			}
+			glGetIntegerv(GL_FRONT_FACE, &currentFront);
+			glGetIntegerv(GL_CULL_FACE_MODE, &currentCull);
+			EXPECT_GL_ERROR(
+			    currentFront,
+			    (currentFront == (GLint)frontModes[i]),
+			    "test_frontFace_cullCombinations failed.");
+			EXPECT_GL_ERROR(
+			    currentCull, (currentCull == (GLint)cullModes[j]),
+			    "test_frontFace_cullCombinations failed.");
+		}
+	}
+	glDisable(GL_CULL_FACE);
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — Büyük Geçersiz Enum
+ * ============================================================ */
+void test_frontFace_largeEnum(void) {
+	GLenum values[] = {(GLenum)0x10000, (GLenum)0x7FFFFFFF,
+			   (GLenum)0x80000000, (GLenum)0xFFFFFFFF};
+	int i;
+	printf("TEST : Large Invalid Enum Values\n");
+	resetState_frontFace();
+	for (i = 0; i < (int)(sizeof(values) / sizeof(values[0])); i++) {
+		GLenum err;
+		glFrontFace(values[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+				"test_frontFace_largeEnum failed.");
+		checkStatePreserved_frontFace(GL_CCW);
+	}
+	resetState_frontFace();
+}
+
+/* ============================================================
+ * glFrontFace — Rapid Fire
+ * ============================================================ */
+void test_frontFace_rapidFire(void) {
+	const unsigned int repeat = 1000000;
+	unsigned int i;
+	printf("TEST : Rapid Fire\n");
+	resetState_frontFace();
+	for (i = 0; i < repeat; i++) {
+		glFrontFace(GL_CW);
+		glFrontFace(GL_CCW);
+	}
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_frontFace_rapidFire failed.");
+	}
+	checkStatePreserved_frontFace(GL_CCW);
+	resetState_frontFace();
+	printf("  %u cift cagri tamamlandi.\n", repeat);
+}
+
+/* ============================================================
+ * glFrontFace — Rastgele Fuzz Testi
+ * ============================================================ */
+void test_frontFace_randomFuzz(void) {
+	unsigned int i;
+	printf("TEST : Random Fuzz Test\n");
+	resetState_frontFace();
+	srand(12345);
+	for (i = 0; i < 1000000; i++) {
+		GLenum value;
+		GLenum err;
+		switch (rand() % 4) {
+		case 0:
+			value = GL_CW;
+			break;
+		case 1:
+			value = GL_CCW;
+			break;
+		default:
+			value = (GLenum)rand();
+			break;
+		}
+		glFrontFace(value);
+		err = glGetError();
+		EXPECT_GL_ERROR(err,
+				(err == GL_NO_ERROR || err == GL_INVALID_ENUM),
+				"test_frontFace_randomFuzz failed.");
+	}
+	resetState_frontFace();
+	printf("  1,000,000 rastgele test tamamlandi.\n");
+}
+
+/* ============================================================
+ * glPolygonOffset — Temel Robustness
+ * ============================================================ */
 void test_polygonOffset_basicRobustness(void) {
 	GLfloat f = 0.0f, u = 0.0f;
-
 	printf("TEST: Basic Robustness\n");
-	resetState5();
-
-	/* Tum float degerler kabul edilmeli, hata uretilmemeli */
+	resetState_polygonOffset();
 	glPolygonOffset(0.0f, 0.0f);
-	assert(glGetError() == GL_NO_ERROR);
-
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_polygonOffset_basicRobustness failed.");
+	}
 	glPolygonOffset(-1000.0f, -1000.0f);
-	assert(glGetError() == GL_NO_ERROR);
-
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_polygonOffset_basicRobustness failed.");
+	}
 	glPolygonOffset(1e30f, 1e30f);
-	assert(glGetError() == GL_NO_ERROR);
-
-	glPolygonOffset(-1e30f, -1e30f);
-	assert(glGetError() == GL_NO_ERROR);
-
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_polygonOffset_basicRobustness failed.");
+	}
 	glPolygonOffset(NAN, NAN);
-	assert(glGetError() == GL_NO_ERROR);
-
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_polygonOffset_basicRobustness failed.");
+	}
 	glPolygonOffset(INFINITY, INFINITY);
-	assert(glGetError() == GL_NO_ERROR);
-
-	/* Durum sorgusu son yazilan degerleri vermeli */
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_NO_ERROR),
+				"test_polygonOffset_basicRobustness failed.");
+	}
 	glPolygonOffset(2.0f, 3.0f);
 	glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
 	glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
-	assert(f == 2.0f && u == 3.0f);
-	assert(glGetError() == GL_NO_ERROR);
-
-	resetState5();
-	printf("  [PASS]\n\n");
+	EXPECT_GL_ERROR(
+	    f, (f == 2.0f && u == 3.0f),
+	    "test_polygonOffset_basicRobustness failed. State mismatch.");
+	resetState_polygonOffset();
 }
 
 /* ============================================================
- * TEST 2: Stres taramasi
- *
- * Genis bir float araliginda sistematik tarama yaparak
- * implementasyonun tutarliligini dogrular. Negatif, sifir,
- * pozitif ve cok buyuk degerler test edilir.
+ * glPolygonOffset — Stres Taramasi
  * ============================================================ */
-
 void test_polygonOffset_stressSweep(void) {
 	int i;
 	int passCount = 0;
 	int failCount = 0;
-
 	printf("TEST: Stress Sweep\n");
-	resetState5();
-
+	resetState_polygonOffset();
 	for (i = -10000; i <= 10000; i++) {
 		float val = (float)i * 0.1f;
-		GLenum err;
-
 		glPolygonOffset(val, val);
-		err = glGetError();
-
+		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			printf("  [FAIL] val=%.1f -> 0x%X\n", val, err);
 			failCount++;
@@ -2651,104 +4092,557 @@ void test_polygonOffset_stressSweep(void) {
 			passCount++;
 		}
 	}
-
 	printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
-	assert(failCount == 0);
-
-	resetState5();
-	printf("  [PASS]\n\n");
+	EXPECT_GL_ERROR(failCount, (failCount == 0),
+			"test_polygonOffset_stressSweep failed.");
+	resetState_polygonOffset();
 }
 
 /* ============================================================
- * TEST 3: Hata kuyrugu butunlugu
- *
- * Ard arda cok sayida glPolygonOffset cagrisi sonrasi hata
- * kuyrugunun dogru calistigini dogrular. Spec'e gore bu
- * fonksiyon hata uretmez; kuyruk temiz kalmalidir.
+ * glPolygonOffset — Hata Kuyrugu Bütünlügü
  * ============================================================ */
-
 void test_polygonOffset_errorQueue(void) {
 	int i;
-	GLenum err;
-
 	printf("TEST: Error Queue Integrity\n");
-	resetState5();
-
+	resetState_polygonOffset();
 	for (i = 0; i < 1000; i++) {
 		glPolygonOffset((float)i, (float)-i);
 	}
-
-	err = glGetError();
-	assert(err == GL_NO_ERROR);
-
+	GLenum err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_polygonOffset_errorQueue failed.");
 	printf("  1000 cagri sonrasi kuyruk temiz\n");
-
-	resetState5();
-	printf("  [PASS]\n\n");
+	resetState_polygonOffset();
 }
 
 /* ============================================================
- * TEST 4: Durum korunumu ve gecersiz cagri etkilesimi
- *
- * glPolygonOffset cagrilarinin diger OpenGL cagrilarinin
- * hata durumundan etkilenmedigini dogrular. Baska fonksiyonlar
- * hata uretse bile PolygonOffset durumu bozulmamali.
+ * glPolygonOffset — Durum Korunumu
  * ============================================================ */
-
 void test_polygonOffset_statePreservation(void) {
 	GLfloat f = 0.0f, u = 0.0f;
-
 	printf("TEST: State Preservation\n");
-	resetState5();
-
+	resetState_polygonOffset();
 	glPolygonOffset(5.0f, 7.0f);
-
-	/* Baska bir fonksiyondan hata uret */
 	glFrontFace((GLenum)0x0BAD);
-	assert(glGetError() == GL_INVALID_ENUM);
-
-	/* PolygonOffset durumu bozulmamis olmali */
+	{
+		GLenum _e = glGetError();
+		EXPECT_GL_ERROR(_e, (_e == GL_INVALID_ENUM),
+				"test_polygonOffset_statePreservation failed.");
+	}
 	glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
 	glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
-	assert(f == 5.0f && u == 7.0f);
-
-	resetState5();
-	printf("  [PASS]\n\n");
+	EXPECT_GL_ERROR(
+	    f, (f == 5.0f && u == 7.0f),
+	    "test_polygonOffset_statePreservation failed. State corrupted.");
+	resetState_polygonOffset();
 }
 
 /* ============================================================
- * TEST 5: Ozel float degerleri
- *
- * IEEE-754 ozel degerlerinin (NaN, ±Infinity) davranisini
- * inceler. OpenGL spec bu degerleri acikca tanimlamaz;
- * cokme veya durum bozulmasi kritik hatadir.
+ * glPolygonOffset — Özel Float Degerleri
  * ============================================================ */
-
 void test_polygonOffset_specialFloats(void) {
 	GLenum err;
 	GLfloat f, u;
-
 	printf("TEST: Special Float Values\n");
-	resetState5();
-
+	resetState_polygonOffset();
 	glPolygonOffset(NAN, NAN);
 	err = glGetError();
 	printf("  NaN       -> 0x%X\n", err);
-
 	glPolygonOffset(INFINITY, INFINITY);
 	err = glGetError();
 	printf("  +INFINITY -> 0x%X\n", err);
-
 	glPolygonOffset(-INFINITY, -INFINITY);
 	err = glGetError();
 	printf("  -INFINITY -> 0x%X\n", err);
-
 	glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
 	glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
 	printf("  Son durum: factor=%f, units=%f\n", f, u);
+	resetState_polygonOffset();
+	printf("  [BILGI] Manuel inceleme gerekir\n");
+}
 
-	resetState5();
-	printf("  [BILGI] Manuel inceleme gerekir\n\n");
+/****************************************/
+/***** Viewport and Clipping *****/
+/****************************************/
+
+/* ============================================================
+ * glViewport — Temel Robustness
+ * ============================================================ */
+void test_viewport_basicRobustness(void) {
+	GLint viewport[4];
+	GLenum err;
+	printf("TEST: Basic Robustness\n");
+	resetState_viewport();
+	glViewport(10, 20, 640, 480);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_viewport_basicRobustness failed.");
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	EXPECT_GL_ERROR(
+	    viewport[0],
+	    (viewport[0] == 10 && viewport[1] == 20 && viewport[2] == 640 &&
+	     viewport[3] == 480),
+	    "test_viewport_basicRobustness failed. Viewport not set.");
+	glViewport(10, 20, -1, 480);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "test_viewport_basicRobustness failed. Negative width accepted.");
+	checkStatePreserved_viewport(10, 20, 640, 480);
+	glViewport(10, 20, 640, -1);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "test_viewport_basicRobustness failed. Negative height accepted.");
+	checkStatePreserved_viewport(10, 20, 640, 480);
+	resetState_viewport();
+}
+
+/* ============================================================
+ * glViewport — Negatif Boyut Taramasi
+ * ============================================================ */
+void test_viewport_negativeDimensions(void) {
+	int w, h;
+	int passCount = 0;
+	int failCount = 0;
+	printf("TEST: Negative Dimension Sweep\n");
+	resetState_viewport();
+	for (w = -100; w <= 100; w++) {
+		for (h = -100; h <= 100; h++) {
+			GLenum expected =
+			    (w < 0 || h < 0) ? GL_INVALID_VALUE : GL_NO_ERROR;
+			glViewport(0, 0, w, h);
+			GLenum err = glGetError();
+			if (err != expected) {
+				failCount++;
+			} else {
+				passCount++;
+			}
+		}
+	}
+	printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
+	EXPECT_GL_ERROR(failCount, (failCount == 0),
+			"test_viewport_negativeDimensions failed.");
+	resetState_viewport();
+}
+
+/* ============================================================
+ * glViewport — Sinir Koordinatlari
+ * ============================================================ */
+void test_viewport_boundaryCoordinates(void) {
+	GLint viewport[4];
+	GLenum err;
+	printf("TEST: Boundary Coordinates\n");
+	resetState_viewport();
+	GLint coordinates[][2] = {{0, 0},
+				  {-1, -1},
+				  {INT_MAX, INT_MAX},
+				  {INT_MIN, INT_MIN},
+				  {INT_MAX, INT_MIN},
+				  {INT_MIN, INT_MAX},
+				  {-1000000, -1000000},
+				  {1000000, 1000000}};
+	int count = sizeof(coordinates) / sizeof(coordinates[0]);
+	for (int i = 0; i < count; i++) {
+		glViewport(coordinates[i][0], coordinates[i][1], 640, 480);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_viewport_boundaryCoordinates failed.");
+	}
+	resetState_viewport();
+}
+
+/* ============================================================
+ * glViewport — Maksimum Boyutlar
+ * ============================================================ */
+void test_viewport_limits(void) {
+	GLint maxViewport[2];
+	GLenum err;
+	printf("TEST: Maximum Viewport Limits\n");
+	resetState_viewport();
+	glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxViewport);
+	printf("  Desteklenen maksimum viewport : %d x %d\n", maxViewport[0],
+	       maxViewport[1]);
+	glViewport(0, 0, maxViewport[0], maxViewport[1]);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_viewport_limits failed. Max viewport rejected.");
+	glViewport(0, 0, maxViewport[0] * 2, maxViewport[1] * 2);
+	err = glGetError();
+	if (err != GL_NO_ERROR)
+		printf("  Uyari : Buyuk viewport Error=0x%X\n", err);
+	glViewport(0, 0, INT_MAX, INT_MAX);
+	err = glGetError();
+	if (err != GL_NO_ERROR)
+		printf("  Uyari : INT_MAX Error=0x%X\n", err);
+	resetState_viewport();
+}
+
+/* ============================================================
+ * glViewport — Hata Kuyrugu ve Durum Korunumu
+ * ============================================================ */
+void test_viewport_errorQueue(void) {
+	GLenum err;
+	printf("TEST: Error Queue and State Preservation\n");
+	resetState_viewport();
+	glViewport(50, 50, 400, 300);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_viewport_errorQueue failed.");
+	glViewport(50, 50, -1, 300);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_INVALID_VALUE),
+	    "test_viewport_errorQueue failed. Negative width accepted.");
+	checkStatePreserved_viewport(50, 50, 400, 300);
+	glViewport(0, 0, 640, 480);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_NO_ERROR),
+	    "test_viewport_errorQueue failed. Post-error call failed.");
+	resetState_viewport();
+}
+
+/* ============================================================
+ * glViewport — Rastgele Stres Testi
+ * ============================================================ */
+void test_viewport_stress(void) {
+	unsigned int i;
+	printf("TEST: Random Stress Test\n");
+	resetState_viewport();
+	srand(12345);
+	for (i = 0; i < 1000000; i++) {
+		GLint x = (rand() % 2000000000) - 1000000000;
+		GLint y = (rand() % 2000000000) - 1000000000;
+		GLsizei width = (rand() % 2000000000) - 1000000000;
+		GLsizei height = (rand() % 2000000000) - 1000000000;
+		GLenum expected =
+		    (width < 0 || height < 0) ? GL_INVALID_VALUE : GL_NO_ERROR;
+		glViewport(x, y, width, height);
+		GLenum err = glGetError();
+		EXPECT_GL_ERROR(err, (err == expected),
+				"test_viewport_stress failed.");
+	}
+	resetState_viewport();
+	printf("  1,000,000 rastgele viewport testi tamamlandi.\n");
+}
+
+/* ============================================================
+ * glDepthRange — Temel Robustness
+ * ============================================================ */
+void test_depthRange_basicRobustness(void) {
+	GLdouble depthRange[2];
+	GLenum err;
+	printf("TEST: Basic Robustness\n");
+	resetState_depthRange();
+	glDepthRange(0.0, 1.0);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_depthRange_basicRobustness failed.");
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	EXPECT_GL_ERROR(depthRange[0],
+			(fabs(depthRange[0] - 0.0) < 0.000001 &&
+			 fabs(depthRange[1] - 1.0) < 0.000001),
+			"test_depthRange_basicRobustness failed.");
+	glDepthRange(1.0, 0.0);
+	err = glGetError();
+	EXPECT_GL_ERROR(
+	    err, (err == GL_NO_ERROR),
+	    "test_depthRange_basicRobustness failed. Reversed range rejected.");
+	resetState_depthRange();
+}
+
+/* ============================================================
+ * glDepthRange — Parametrik Tarama
+ * ============================================================ */
+void test_depthRange_parameterSweep(void) {
+	int nearStep, farStep;
+	int passCount = 0;
+	int failCount = 0;
+	printf("TEST: Parameter Sweep\n");
+	resetState_depthRange();
+	for (nearStep = -10; nearStep <= 20; nearStep++) {
+		for (farStep = -10; farStep <= 20; farStep++) {
+			GLdouble nearVal = nearStep / 10.0;
+			GLdouble farVal = farStep / 10.0;
+			glDepthRange(nearVal, farVal);
+			GLenum err = glGetError();
+			if (err != GL_NO_ERROR) {
+				failCount++;
+			} else {
+				passCount++;
+			}
+		}
+	}
+	printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
+	EXPECT_GL_ERROR(failCount, (failCount == 0),
+			"test_depthRange_parameterSweep failed.");
+	resetState_depthRange();
+}
+
+/* ============================================================
+ * glDepthRange — Özel Kayan Nokta Degerleri
+ * ============================================================ */
+void test_depthRange_specialValues(void) {
+	GLenum err;
+	printf("TEST: Special Floating Point Values\n");
+	resetState_depthRange();
+	GLdouble tests[][2] = {{0.0, 1.0},	    {1.0, 0.0},
+			       {-1.0, 2.0},	    {-DBL_MAX, DBL_MAX},
+			       {DBL_MAX, -DBL_MAX}, {DBL_MIN, DBL_MAX},
+			       {-DBL_MIN, DBL_MIN}, {1000000.0, -1000000.0}};
+	int count = sizeof(tests) / sizeof(tests[0]);
+	for (int i = 0; i < count; i++) {
+		glDepthRange(tests[i][0], tests[i][1]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_depthRange_specialValues failed.");
+	}
+	resetState_depthRange();
+}
+
+/* ============================================================
+ * glDepthRange — State Query Dogrulamasi
+ * ============================================================ */
+void test_depthRange_stateQuery(void) {
+	GLdouble depthRange[2];
+	GLenum err;
+	printf("TEST: State Query\n");
+	resetState_depthRange();
+	GLdouble values[][2] = {
+	    {0.0, 1.0}, {1.0, 0.0}, {0.25, 0.75}, {-1.0, 2.0}, {5.0, -5.0}};
+	int count = sizeof(values) / sizeof(values[0]);
+	for (int i = 0; i < count; i++) {
+		glDepthRange(values[i][0], values[i][1]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_depthRange_stateQuery failed.");
+		glGetDoublev(GL_DEPTH_RANGE, depthRange);
+		EXPECT_GL_ERROR(
+		    depthRange[0],
+		    (depthRange[0] >= 0.0 && depthRange[0] <= 1.0),
+		    "test_depthRange_stateQuery failed. Near out of range.");
+		EXPECT_GL_ERROR(
+		    depthRange[1],
+		    (depthRange[1] >= 0.0 && depthRange[1] <= 1.0),
+		    "test_depthRange_stateQuery failed. Far out of range.");
+	}
+	resetState_depthRange();
+}
+
+/* ============================================================
+ * glDepthRange — Hata Kuyrugu ve Durum Korunumu
+ * ============================================================ */
+void test_depthRange_errorQueue(void) {
+	GLdouble depthRange[2];
+	GLenum err;
+	printf("TEST: Error Queue and State Preservation\n");
+	resetState_depthRange();
+	glDepthRange(0.20, 0.80);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_depthRange_errorQueue failed.");
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	EXPECT_GL_ERROR(depthRange[0],
+			(depthRange[0] >= 0.0 && depthRange[0] <= 1.0),
+			"test_depthRange_errorQueue failed.");
+	glDepthRange(-1000.0, 1000.0);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_depthRange_errorQueue failed.");
+	resetState_depthRange();
+}
+
+/* ============================================================
+ * glDepthRange — Rastgele Stres Testi
+ * ============================================================ */
+void test_depthRange_stress(void) {
+	unsigned int i;
+	printf("TEST: Random Stress Test\n");
+	resetState_depthRange();
+	srand(12345);
+	for (i = 0; i < 10000; i++) {
+		GLdouble nearValue =
+		    ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
+		GLdouble farValue = ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
+		glDepthRange(nearValue, farValue);
+		GLenum err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_depthRange_stress failed.");
+	}
+	resetState_depthRange();
+	printf("  1,000,000 rastgele test tamamlandi.\n");
+}
+
+/****************************************/
+/******* Pixel Rectangles *******/
+/****************************************/
+
+/* ============================================================
+ * glPixelStorei — Temel Robustness
+ * ============================================================ */
+void test_pixelStore_basicRobustness(void) {
+	GLenum err;
+	GLint validValues[] = {1, 2, 4, 8};
+	printf("TEST: Basic Robustness\n");
+	resetState_pixelStore();
+	for (int i = 0; i < 4; i++) {
+		glPixelStorei(GL_PACK_ALIGNMENT, validValues[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_pixelStore_basicRobustness failed. "
+				"PACK_ALIGNMENT rejected.");
+		checkStatePreserved_pixelStore(GL_PACK_ALIGNMENT,
+					       validValues[i]);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, validValues[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+				"test_pixelStore_basicRobustness failed. "
+				"UNPACK_ALIGNMENT rejected.");
+		checkStatePreserved_pixelStore(GL_UNPACK_ALIGNMENT,
+					       validValues[i]);
+	}
+	resetState_pixelStore();
+}
+
+/* ============================================================
+ * glPixelStorei — Geçersiz Hizalama Degerleri
+ * ============================================================ */
+void test_pixelStore_invalidAlignment(void) {
+	GLenum err;
+	GLint invalidValues[] = {0,  3,	 5,  6,	  7,	   9,
+				 -1, -2, 10, 100, INT_MAX, INT_MIN};
+	printf("TEST: Invalid Alignment Values\n");
+	resetState_pixelStore();
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	for (int i = 0;
+	     i < (int)(sizeof(invalidValues) / sizeof(invalidValues[0])); i++) {
+		glPixelStorei(GL_PACK_ALIGNMENT, invalidValues[i]);
+		err = glGetError();
+		EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+				"test_pixelStore_invalidAlignment failed.");
+		checkStatePreserved_pixelStore(GL_PACK_ALIGNMENT, 4);
+	}
+	resetState_pixelStore();
+}
+
+/* ============================================================
+ * glPixelStorei — Geçersiz pname Degerleri
+ * ============================================================ */
+void test_pixelStore_invalidPname(void) {
+	GLenum err;
+	GLenum pname;
+	printf("TEST: Invalid pname Values\n");
+	resetState_pixelStore();
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	checkStatePreserved_pixelStore(GL_PACK_ALIGNMENT, 4);
+	for (pname = 0; pname < 10000; pname++) {
+		if (pname == GL_PACK_ALIGNMENT || pname == GL_UNPACK_ALIGNMENT)
+			continue;
+		glPixelStorei(pname, 4);
+		err = glGetError();
+		if (err != GL_INVALID_ENUM && err != GL_NO_ERROR) {
+			EXPECT_GL_ERROR(err, 0,
+					"test_pixelStore_invalidPname failed. "
+					"Unexpected error.");
+		}
+		checkStatePreserved_pixelStore(GL_PACK_ALIGNMENT, 4);
+	}
+	resetState_pixelStore();
+}
+
+/* ============================================================
+ * glPixelStorei — Durum Korunumu
+ * ============================================================ */
+void test_pixelStore_statePreservation(void) {
+	GLenum err;
+	GLint value;
+	printf("TEST: State Preservation\n");
+	resetState_pixelStore();
+	glPixelStorei(GL_PACK_ALIGNMENT, 8);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_pixelStore_statePreservation failed.");
+	glGetIntegerv(GL_PACK_ALIGNMENT, &value);
+	EXPECT_GL_ERROR(value, (value == 8),
+			"test_pixelStore_statePreservation failed.");
+	glPixelStorei(GL_PACK_ALIGNMENT, 3);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"test_pixelStore_statePreservation failed. Invalid "
+			"value accepted.");
+	glGetIntegerv(GL_PACK_ALIGNMENT, &value);
+	EXPECT_GL_ERROR(value, (value == 8),
+			"test_pixelStore_statePreservation failed. State "
+			"changed on invalid call.");
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 2);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_pixelStore_statePreservation failed.");
+	glPixelStorei(GL_UNPACK_ALIGNMENT, -5);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"test_pixelStore_statePreservation failed.");
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &value);
+	EXPECT_GL_ERROR(
+	    value, (value == 2),
+	    "test_pixelStore_statePreservation failed. Unpack state changed.");
+	resetState_pixelStore();
+}
+
+/* ============================================================
+ * glPixelStorei — Hata Kuyrugu ve Durum Korunumu
+ * ============================================================ */
+void test_pixelStore_errorQueue(void) {
+	GLenum err;
+	printf("TEST: Error Queue and State Preservation\n");
+	resetState_pixelStore();
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_pixelStore_errorQueue failed.");
+	glPixelStorei(GL_PACK_ALIGNMENT, 3);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"test_pixelStore_errorQueue failed.");
+	glPixelStorei(GL_TEXTURE_2D, 4);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"test_pixelStore_errorQueue failed.");
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 8);
+	err = glGetError();
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR),
+			"test_pixelStore_errorQueue failed.");
+	checkStatePreserved_pixelStore(GL_UNPACK_ALIGNMENT, 8);
+	resetState_pixelStore();
+}
+
+/* ============================================================
+ * glPixelStorei — Rastgele Stres Testi
+ * ============================================================ */
+void test_pixelStore_stress(void) {
+	unsigned int i;
+	printf("TEST: Random Stress Test\n");
+	resetState_pixelStore();
+	srand(12345);
+	GLenum validPnames[] = {GL_PACK_ALIGNMENT, GL_UNPACK_ALIGNMENT};
+	for (i = 0; i < 1000000; i++) {
+		GLenum pname;
+		if (rand() % 2)
+			pname = validPnames[rand() % 2];
+		else
+			pname = (GLenum)rand();
+		GLint value = (rand() % 200) - 100;
+		glPixelStorei(pname, value);
+		GLenum err = glGetError();
+		EXPECT_GL_ERROR(
+		    err,
+		    (err == GL_NO_ERROR || err == GL_INVALID_ENUM ||
+		     err == GL_INVALID_VALUE),
+		    "test_pixelStore_stress failed. Unexpected error code.");
+	}
+	resetState_pixelStore();
+	printf("  1,000,000 rastgele test tamamlandi.\n");
 }
 
 /***********************************/
@@ -2758,6 +4652,7 @@ void test_polygonOffset_specialFloats(void) {
 void init() { printf("init\n"); }
 
 void draw() {
+	/* Shaders and Programs */
 	runTest(rTest_CreateProgram);
 	runTest(rTest_ProgramBinary_unalignedPtr);
 	runTest(rTest_ProgramBinary_memRevoke);
@@ -2767,24 +4662,69 @@ void draw() {
 	runTest(rTest_GetAttribLocation_nullPtr);
 	runTest(rTest_GetAttribLocation_reservedVariable);
 
-	//	runTest(rTest_DrawArrays_guardPageAttack); // SEGMENTATION FAULT
+	/* Uniforms */
+	runTest(rTest_GetUniformLocation_nullPtr);
+	runTest(rTest_GetUniformLocation_reservedPrefix);
+	runTest(rTest_Uniform_typeConfusion);
+	runTest(rTest_Uniform_invalidLocation);
+	runTest(rTest_Uniformv_negativeCount);
+	runTest(rTest_Uniformv_arrayOutOfBounds);
+	runTest(rTest_UniformMatrix_invalidTranspose);
+	runTest(rTest_UniformMatrix_typeMismatch);
+
+	/* Vertex Attributes */
+	runTest(rTest_GetVertexAttrib_invalidEnum);
+	runTest(rTest_GetVertexAttrib_indexOutOfBounds);
+	runTest(rTest_GetVertexAttribPointer_invalidEnum);
+	runTest(rTest_GetnUniform_negativeBufSize);
+	runTest(rTest_GetnUniform_invalidProgram);
+	runTest(rTest_GetProgramiv_invalidEnum);
+	runTest(rTest_GetProgramiv_typeConfusion);
+	runTest(rTest_VertexAttrib_indexOutOfBounds);
+	runTest(rTest_VertexAttribv_specialFloats);
+	runTest(rTest_VertexAttribPointer_invalidType);
+	runTest(rTest_VertexAttribPointer_invalidSize);
+	runTest(rTest_EnableDisableVertexAttrib_bounds);
+
+	/* Draw Calls */
+	runTest(rTest_DrawElements_invalidType);
+	runTest(rTest_DrawRangeElements_invalidRange);
+	runTest(rTest_DrawArrays_guardPageAttack); // SEGMENTATION FAULT
 	runTest(rTest_DrawArrays_outOfBounds);
 
-	runTest(rTest_glBufferSubData_invalid_enum_target);
-	runTest(rTest_glBufferSubData_invalid_value_negative_offset);
-	runTest(rTest_glBufferSubData_invalid_value_negative_size);
-	runTest(rTest_glBufferSubData_invalid_value_out_of_bounds);
-	runTest(rTest_glBufferSubData_invalid_operation_zero_buffer_bound);
-	runTest(rTest_glBufferSubData_offset_size_overflow_wraparound);
-	runTest(rTest_glBufferSubData_exact_boundary_offset);
-	runTest(rTest_glBufferSubData_negative_offset_compensating_size);
-	runTest(rTest_glBufferSubData_zero_size_null_data);
-	runTest(rTest_glBufferSubData_target_zero_bound);
-	runTest(rTest_glBufferSubData_into_zero_sized_store);
-	runTest(rTest_glBufferSubData_source_smaller_than_size);
-	runTest(rTest_glBufferSubData_dangling_data_pointer);
-	runTest(rTest_glBufferSubData_overlapping_misaligned_thrash);
+	/* Framebuffer Operations */
+	runTest(rTest_ColorMask_booleanConversion);
+	runTest(rTest_StencilMaskSeparate_invalidEnum);
+	runTest(rTest_Clear_invalidBitmask);
+	runTest(rTest_ClearColor_specialFloats);
+	runTest(rTest_ClearDepthf_clamping);
+	runTest(rTest_ClearStencil_bounds);
 
+	/* Buffer Objects — glGenBuffers */
+	runTest(rTest_glGenBuffers_invalid_value);
+	runTest(rTest_glGenBuffers_zero_count);
+	runTest(rTest_glGenBuffers_null_buffers);
+	runTest(rTest_glGenBuffers_large_n);
+	runTest(rTest_glGenBuffers_repeated_generation);
+	runTest(rTest_glGenBuffers_unique_names);
+	runTest(rTest_glGenBuffers_unbound_names_lifecycle);
+	runTest(rTest_glGenBuffers_double_delete);
+	runTest(rTest_glGenBuffers_huge_count_small_buffer); //SEGMENTATION FAULT
+
+	/* Buffer Objects — glBindBuffer */
+	runTest(rTest_glBindBuffer_invalid_enum);
+	runTest(rTest_glBindBuffer_new_name_without_gen);
+	runTest(rTest_glBindBuffer_deleted_buffer);
+	runTest(rTest_glBindBuffer_boundary_handles);
+	runTest(rTest_glBindBuffer_dirty_high_bits_enum);
+	runTest(rTest_glBindBuffer_rapid_cross_target_rebind_stress);
+	runTest(rTest_glBindBuffer_delete_while_double_bound);
+	runTest(rTest_glBindBuffer_zero_binding_query_thrash);
+	runTest(rTest_glBindBuffer_massive_namespace_fuzz);
+	runTest(rTest_glBindBuffer_binding_churn_stress);
+	runTest(rTest_glBindBuffer_lifecycle_stress);
+
+	/* Buffer Objects — glBufferData */
 	runTest(rTest_glBufferData_invalid_enum_target);
 	runTest(rTest_glBufferData_invalid_enum_usage);
 	runTest(rTest_glBufferData_invalid_value_negative_size);
@@ -2800,67 +4740,105 @@ void draw() {
 	runTest(rTest_glBufferData_dangling_data_pointer);
 	runTest(rTest_glBufferData_state_after_out_of_memory);
 
-	runTest(rTest_glBindBuffer_invalid_enum);
-	runTest(rTest_glBindBuffer_new_name_without_gen);
-	runTest(rTest_glBindBuffer_deleted_buffer);
-	runTest(rTest_glBindBuffer_boundary_handles);
-	runTest(rTest_glBindBuffer_dirty_high_bits_enum);
-	runTest(rTest_glBindBuffer_rapid_cross_target_rebind_stress);
-	runTest(rTest_glBindBuffer_delete_while_double_bound);
-	runTest(rTest_glBindBuffer_zero_binding_query_thrash);
-	runTest(rTest_glBindBuffer_massive_namespace_fuzz);
-	runTest(rTest_glBindBuffer_binding_churn_stress);
-	runTest(rTest_glBindBuffer_lifecycle_stress);
+	/* Buffer Objects — glBufferSubData */
+	runTest(rTest_glBufferSubData_invalid_enum_target);
+	runTest(rTest_glBufferSubData_invalid_value_negative_offset);
+	runTest(rTest_glBufferSubData_invalid_value_negative_size);
+	runTest(rTest_glBufferSubData_invalid_value_out_of_bounds);
+	runTest(rTest_glBufferSubData_invalid_operation_zero_buffer_bound);
+	runTest(rTest_glBufferSubData_offset_size_overflow_wraparound);
+	runTest(rTest_glBufferSubData_exact_boundary_offset);
+	runTest(rTest_glBufferSubData_negative_offset_compensating_size);
+	runTest(rTest_glBufferSubData_zero_size_null_data);
+	runTest(rTest_glBufferSubData_target_zero_bound);
+	runTest(rTest_glBufferSubData_into_zero_sized_store);
+	runTest(rTest_glBufferSubData_source_smaller_than_size);
+	runTest(rTest_glBufferSubData_dangling_data_pointer);
+	runTest(rTest_glBufferSubData_overlapping_misaligned_thrash);
 
-	runTest(rTest_glGenBuffers_invalid_value);
-	runTest(rTest_glGenBuffers_zero_count);
-	runTest(rTest_glGenBuffers_null_buffers);
-	runTest(rTest_glGenBuffers_large_n);
-	runTest(rTest_glGenBuffers_repeated_generation);
-	runTest(rTest_glGenBuffers_unique_names);
-	runTest(rTest_glGenBuffers_unbound_names_lifecycle);
-	runTest(rTest_glGenBuffers_double_delete);
-//	runTest(rTest_glGenBuffers_huge_count_small_buffer);  // SEGMENTATION FAULT
+	/* Buffer Objects — glGetBufferParameteriv */
+	runTest(rTest_glGetBufferParameteriv_invalid_enum_target);
+	runTest(rTest_glGetBufferParameteriv_invalid_enum_value);
+	runTest(
+	    rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound);
+	runTest(rTest_glGetBufferParameteriv_invalid_target);
+	runTest(rTest_glGetBufferParameteriv_invalid_value);
+	runTest(rTest_glGetBufferParameteriv_reserved_name_zero_bound);
+	runTest(rTest_glGetBufferParameteriv_element_array_zero_bound);
+	runTest(rTest_glGetBufferParameteriv_null_data_pointer); // SEGMENTATION FAULT
+	runTest(rTest_glGetBufferParameteriv_dangling_data_pointer); // HEAP CORRUPTION
+	runTest(rTest_glGetBufferParameteriv_size_consistency);
+	runTest(rTest_glGetBufferParameteriv_usage_initial_and_updates);
+	runTest(rTest_glGetBufferParameteriv_both_invalid);
+	runTest(rTest_glGetBufferParameteriv_after_delete_binding_reverts);
+	runTest(rTest_glGetBufferParameteriv_same_buffer_multiple_targets);
+	runTest(rTest_glGetBufferParameteriv_unaligned_data_pointer);
+	runTest(rTest_glGetBufferParameteriv_error_state_stress);
 
-	// glCullFace
-	runTest(test_cullFace_basicRobustness);
-	runTest(test_cullFace_stressSweep);
-	runTest(test_cullFace_errorQueue);
-	runTest(test_cullFace_rapidToggle);
-	runTest(test_cullFace_mixedValidity);
-	runTest(test_cullFace_enableDisable);
-	runTest(test_cullFace_frontFaceCombo);
-	runTest(test_cullFace_largeEnum);
-
-	// glEnable / glDisable (Cull Face)
-	runTest(test_cullFaceEnable_basicRobustness);
-	runTest(test_cullFaceEnable_rapidToggle);
-	runTest(test_cullFaceEnable_invalidCaps);
-	runTest(test_cullFaceEnable_capCombinations);
-
-	// glFrontFace
-	runTest(test_frontFace_errorQueue);
-	runTest(test_frontFace_rapidToggle);
-	runTest(test_frontFace_mixedValidity);
-	runTest(test_frontFace_displayList);
-	runTest(test_frontFace_attribStack);
-	runTest(test_frontFace_cullCombinations);
-	runTest(test_frontFace_largeEnum);
-	runTest(test_frontFace_rapidFire);
-
-	// glLineWidth
+	/* Rasterization — glLineWidth */
 	runTest(test_lineWidth_basicRobustness);
 	runTest(test_lineWidth_stressSweep);
 	runTest(test_lineWidth_specialFloats);
 	runTest(test_lineWidth_errorQueue);
 	runTest(test_lineWidth_limits);
 
-	// glPolygonOffset
+	/* Rasterization — glCullFace */
+	runTest(test_cullFace_basicRobustness);
+	runTest(test_cullFace_stressSweep); // SONSUZ DÖNGÜ
+	runTest(test_cullFace_errorQueue);
+	runTest(test_cullFace_rapidToggle);
+	runTest(test_cullFace_statePreservation);
+	runTest(test_cullFace_frontFaceCombination);
+	runTest(test_cullFace_largeEnum);
+	runTest(test_cullFace_rapidFire);
+	runTest(test_cullFace_randomFuzz);
+
+	/* Rasterization — glEnable/Disable */
+	runTest(test_cullFaceEnable_basicRobustness);
+	runTest(test_cullFaceEnable_rapidToggle);
+	runTest(test_cullFaceEnable_invalidCaps);
+	runTest(test_cullFaceEnable_capCombinations);
+
+	/* Rasterization — glFrontFace */
+	runTest(test_frontFace_errorQueue);
+	runTest(test_frontFace_rapidToggle);
+	runTest(test_frontFace_mixedValidity);
+	runTest(test_frontFace_statePreservation);
+	runTest(test_frontFace_cullCombinations);
+	runTest(test_frontFace_largeEnum);
+	runTest(test_frontFace_rapidFire);
+	runTest(test_frontFace_randomFuzz);
+
+	/* Rasterization — glPolygonOffset */
 	runTest(test_polygonOffset_basicRobustness);
 	runTest(test_polygonOffset_stressSweep);
 	runTest(test_polygonOffset_errorQueue);
 	runTest(test_polygonOffset_statePreservation);
 	runTest(test_polygonOffset_specialFloats);
+
+	/* Viewport and Clipping — glViewport */
+	runTest(test_viewport_basicRobustness);
+	runTest(test_viewport_negativeDimensions);
+	runTest(test_viewport_boundaryCoordinates);
+	runTest(test_viewport_limits);
+	runTest(test_viewport_errorQueue);
+	runTest(test_viewport_stress);
+
+	/* Viewport and Clipping — glDepthRange */
+	runTest(test_depthRange_basicRobustness);
+	runTest(test_depthRange_parameterSweep);
+	runTest(test_depthRange_specialValues);
+	runTest(test_depthRange_stateQuery);
+	runTest(test_depthRange_errorQueue);
+	runTest(test_depthRange_stress); // SONSUZ DÖNGÜ
+
+	/* Pixel Rectangles — glPixelStorei */
+	runTest(test_pixelStore_basicRobustness);
+	runTest(test_pixelStore_invalidAlignment);
+	runTest(test_pixelStore_invalidPname);
+	runTest(test_pixelStore_statePreservation);
+	runTest(test_pixelStore_errorQueue);
+	runTest(test_pixelStore_stress);
 
 #ifdef RUN_EXTESTS
 	runTest(rTest_invalidEnum);
@@ -2888,12 +4866,14 @@ void cleanup() { printf("cleanup\n"); }
 void rTest_invalidEnum() {
 	glEnable(0xffffffff);
 	GLenum err = glGetError();
-	assert(err == GL_INVALID_ENUM);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_ENUM),
+			"rTest_invalidEnum failed.");
 }
 void rTest_invalidValue() {
 	glLineWidth(-1.0f);
 	GLenum err = glGetError();
-	assert(err == GL_INVALID_VALUE);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_invalidValue failed.");
 }
 
 // state machine robustness
@@ -2902,7 +4882,7 @@ void rTest_stateRecovr() {
 	glGetError();
 	glEnable(GL_BLEND);
 	GLenum err = glGetError();
-	assert(err == GL_NO_ERROR);
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR), "rTest_stateRecovr failed.");
 }
 
 // resource management robustness
@@ -2932,7 +4912,6 @@ void rTest_oobDraw() {
 	glDrawArrays(GL_TRIANGLES, 0, 1000);
 	GLenum err = glGetError();
 	EXPECT_GL_ERROR(err, (err != GL_NO_ERROR), "rTest_oobDraw failed.");
-	//	assert(err != GL_NO_ERROR);
 }
 
 // shader robustness
@@ -2943,7 +4922,9 @@ void rTest_shaderCompilerError() {
 	glCompileShader(s);
 	GLint status;
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
-	assert(status == GL_FALSE);
+	EXPECT_GL_ERROR(status, (status == GL_FALSE),
+			"rTest_shaderCompilerError failed. Bad shader compiled "
+			"successfully.");
 }
 void rTest_invalidPrecision() {
 	const char *bad = "precision superhighp float; void main(){}";
@@ -2952,7 +4933,9 @@ void rTest_invalidPrecision() {
 	glCompileShader(s);
 	GLint status;
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
-	assert(status == GL_FALSE);
+	EXPECT_GL_ERROR(status, (status == GL_FALSE),
+			"rTest_invalidPrecision failed. Invalid precision "
+			"compiled successfully.");
 }
 
 // draw pipeline robustness
@@ -2963,14 +4946,14 @@ void rTest_drawWOProgram() {
 
 	EXPECT_GL_ERROR(err, (err != GL_NO_ERROR),
 			"rTest_drawWOProgram failed.");
-	//	assert(err != GL_NO_ERROR);
 }
 void rTest_missingAttrib() {
 	GLuint prog = glCreateProgram();
 	glUseProgram(prog);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	GLenum err = glGetError();
-	assert(err != GL_NO_ERROR);
+	EXPECT_GL_ERROR(err, (err != GL_NO_ERROR),
+			"rTest_missingAttrib failed.");
 }
 
 // limit and capability tests
@@ -2980,7 +4963,8 @@ void rTest_maxTextureLimit() {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, max + 1, max + 1, 0, GL_RGBA,
 		     GL_UNSIGNED_BYTE, NULL);
 	GLenum err = glGetError();
-	assert(err == GL_INVALID_VALUE);
+	EXPECT_GL_ERROR(err, (err == GL_INVALID_VALUE),
+			"rTest_maxTextureLimit failed.");
 }
 
 // error handling robustness
@@ -2990,7 +4974,7 @@ void rTest_errorFlood() {
 	}
 
 	GLenum err = glGetError();
-	assert(err != GL_NO_ERROR);
+	EXPECT_GL_ERROR(err, (err != GL_NO_ERROR), "rTest_errorFlood failed.");
 }
 
 // degenerate geometry/number handling
@@ -3008,5 +4992,5 @@ void rTest_NaNVertices() {
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	GLenum err = glGetError();
-	assert(err == GL_NO_ERROR);
+	EXPECT_GL_ERROR(err, (err == GL_NO_ERROR), "rTest_NaNVertices failed.");
 }

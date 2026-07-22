@@ -39,3 +39,6 @@ target_link_libraries(glGenTextures_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIB
 
 add_executable(glBindTexture_tests tests/glBindTexture_tests.c)
 target_link_libraries(glBindTexture_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+
+add_executable(glGenerateMipmap_tests tests/glGenerateMipmap_tests.c)
+target_link_libraries(glGenerateMipmap_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

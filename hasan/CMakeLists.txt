@@ -42,3 +42,6 @@ target_link_libraries(glBindTexture_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIB
 
 add_executable(glGenerateMipmap_tests tests/glGenerateMipmap_tests.c)
 target_link_libraries(glGenerateMipmap_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+
+add_executable(texSubImage2D_visual_test tests/texSubImage2D_visual_test.c)
+target_link_libraries(texSubImage2D_visual_test PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

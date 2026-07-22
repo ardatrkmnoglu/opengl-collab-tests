@@ -2,10 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
+
 
 
 // void glBindFramebuffer(GLenum target, GLuint framebuffer);

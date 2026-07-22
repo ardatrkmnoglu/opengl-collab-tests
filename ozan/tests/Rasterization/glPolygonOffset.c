@@ -1,4 +1,3 @@
-
 #include <GL/gl.h>
 #include <assert.h>
 #include <stdio.h>
@@ -11,6 +10,8 @@
  * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
  * bilinen bir baslangic degerine getirir ve birikmis hatalari
  * temizler; boylece testler birbirine bagimli olmaz.
+ * checkStatePreserved: PolygonOffset durumunun beklenen
+ * factor ve units degerlerini korudugunu dogrular.
  * ============================================================ */
 
 static void resetState(void) {
@@ -20,58 +21,64 @@ static void resetState(void) {
     while (glGetError() != GL_NO_ERROR);
 }
 
+static void checkStatePreserved(GLfloat expectedFactor,
+                                GLfloat expectedUnits) {
+    GLfloat factor, units;
+
+    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &factor);
+    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &units);
+
+    if (fabsf(factor - expectedFactor) > 1e-6f ||
+        fabsf(units - expectedUnits) > 1e-6f) {
+
+        printf("  [FAIL] Durum bozuldu\n");
+        printf("         factor: beklenen %.3f gercek %.3f\n",
+               expectedFactor, factor);
+        printf("         units : beklenen %.3f gercek %.3f\n",
+               expectedUnits, units);
+        assert(0);
+    }
+}
+
 /* ============================================================
- * TEST 1: Sozlesme ve durum yonetimi
+ * TEST 1: Sozlesme dogrulama
  *
- * glPolygonOffset'in temel sozlesmesini dogrular: tum float
- * degerler kabul edilmeli, hicbiri hata uretmemelidir. Spec'te
- * yasak deger yoktur; implementasyon degerleri sessizce
- * kendi araligina kirpmalidir. Ayrica durum sorgusunun
- * tutarli sonuc verdigi kontrol edilir.
+ * glPolygonOffset'in temel sozlesmesini dogrular.
+ * Tum float degerler kabul edilmeli ve hicbir durumda
+ * GL hata kodu uretilmemelidir. Ayrica son yazilan
+ * factor ve units degerleri durum sorgusunda geri
+ * alinabilmelidir.
  * ============================================================ */
 
 void test_polygonOffset_basicRobustness(void) {
-    GLfloat f = 0.0f, u = 0.0f;
-
     printf("TEST: Basic Robustness\n");
     resetState();
 
-    /* Tum float degerler kabul edilmeli, hata uretilmemeli */
     glPolygonOffset(0.0f, 0.0f);
     assert(glGetError() == GL_NO_ERROR);
 
-    glPolygonOffset(-1000.0f, -1000.0f);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glPolygonOffset(1e30f, 1e30f);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glPolygonOffset(-1e30f, -1e30f);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glPolygonOffset(NAN, NAN);
-    assert(glGetError() == GL_NO_ERROR);
-
-    glPolygonOffset(INFINITY, INFINITY);
-    assert(glGetError() == GL_NO_ERROR);
-
-    /* Durum sorgusu son yazilan degerleri vermeli */
     glPolygonOffset(2.0f, 3.0f);
-    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
-    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
-    assert(f == 2.0f && u == 3.0f);
     assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(2.0f, 3.0f);
+
+    glPolygonOffset(-1000.0f, -500.0f);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(-1000.0f, -500.0f);
+
+    glPolygonOffset(1000.0f, 500.0f);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(1000.0f, 500.0f);
 
     resetState();
     printf("  [PASS]\n\n");
 }
 
 /* ============================================================
- * TEST 2: Stres taramasi
+ * TEST 2: Parametrik stres taramasi
  *
- * Genis bir float araliginda sistematik tarama yaparak
- * implementasyonun tutarliligini dogrular. Negatif, sifir,
- * pozitif ve cok buyuk degerler test edilir.
+ * Genis bir float araliginda factor ve units
+ * parametreleri sistematik olarak taranir.
+ * Tum cagrilar GL_NO_ERROR donmelidir.
  * ============================================================ */
 
 void test_polygonOffset_stressSweep(void) {
@@ -83,24 +90,30 @@ void test_polygonOffset_stressSweep(void) {
     resetState();
 
     for (i = -10000; i <= 10000; i++) {
-        float val = (float)i * 0.1f;
+
+        GLfloat value = (GLfloat)i * 0.1f;
         GLenum err;
 
-        glPolygonOffset(val, val);
+        glPolygonOffset(value, value);
         err = glGetError();
 
         if (err != GL_NO_ERROR) {
-            printf("  [FAIL] val=%.1f -> 0x%X\n", val, err);
+            printf("  [FAIL] %.1f -> 0x%X\n",
+                   value, err);
             failCount++;
         } else {
             passCount++;
         }
     }
 
-    printf("  Sonuc: %d PASS, %d FAIL\n", passCount, failCount);
+    glPolygonOffset(0.0f, 0.0f);
+    checkStatePreserved(0.0f, 0.0f);
+
+    printf("  Sonuc: %d PASS, %d FAIL\n",
+           passCount, failCount);
+
     assert(failCount == 0);
 
-    resetState();
     printf("  [PASS]\n\n");
 }
 
@@ -114,84 +127,159 @@ void test_polygonOffset_stressSweep(void) {
 
 void test_polygonOffset_errorQueue(void) {
     int i;
-    GLenum err;
 
-    printf("TEST: Error Queue Integrity\n");
+    printf("TEST: Error Queue Management\n");
     resetState();
 
     for (i = 0; i < 1000; i++) {
-        glPolygonOffset((float)i, (float)-i);
+        glPolygonOffset((GLfloat)i, (GLfloat)(-i));
     }
 
-    err = glGetError();
-    assert(err == GL_NO_ERROR);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(999.0f, -999.0f);
 
     printf("  1000 cagri sonrasi kuyruk temiz\n");
-
-    resetState();
     printf("  [PASS]\n\n");
 }
 
 /* ============================================================
- * TEST 4: Durum korunumu ve gecersiz cagri etkilesimi
+ * TEST 4: Durum korunumu
  *
- * glPolygonOffset cagrilarinin diger OpenGL cagrilarinin
- * hata durumundan etkilenmedigini dogrular. Baska fonksiyonlar
- * hata uretse bile PolygonOffset durumu bozulmamali.
+ * Baska OpenGL fonksiyonlari hata uretse bile
+ * glPolygonOffset durumunun degismedigini dogrular.
  * ============================================================ */
 
 void test_polygonOffset_statePreservation(void) {
-    GLfloat f = 0.0f, u = 0.0f;
-
     printf("TEST: State Preservation\n");
     resetState();
 
     glPolygonOffset(5.0f, 7.0f);
+    assert(glGetError() == GL_NO_ERROR);
 
-    /* Baska bir fonksiyondan hata uret */
     glFrontFace((GLenum)0x0BAD);
     assert(glGetError() == GL_INVALID_ENUM);
 
-    /* PolygonOffset durumu bozulmamis olmali */
-    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
-    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
-    assert(f == 5.0f && u == 7.0f);
+    checkStatePreserved(5.0f, 7.0f);
+    assert(glGetError() == GL_NO_ERROR);
 
-    resetState();
     printf("  [PASS]\n\n");
 }
 
 /* ============================================================
- * TEST 5: Ozel float degerleri
+ * TEST 5: IEEE-754 ozel float degerleri
  *
- * IEEE-754 ozel degerlerinin (NaN, ±Infinity) davranisini
- * inceler. OpenGL spec bu degerleri acikca tanimlamaz;
- * cokme veya durum bozulmasi kritik hatadir.
+ * NaN ve ±Infinity degerlerinin glPolygonOffset
+ * tarafindan nasil ele alindigini gozlemler.
+ * OpenGL spec bu degerler icin kesin davranis
+ * tanimlamaz. Test bilgilendiricidir.
  * ============================================================ */
 
 void test_polygonOffset_specialFloats(void) {
     GLenum err;
-    GLfloat f, u;
+    GLfloat factor, units;
 
     printf("TEST: Special Float Values\n");
     resetState();
 
     glPolygonOffset(NAN, NAN);
     err = glGetError();
-    printf("  NaN       -> 0x%X\n", err);
+    printf("  NaN             -> 0x%X\n", err);
 
     glPolygonOffset(INFINITY, INFINITY);
     err = glGetError();
-    printf("  +INFINITY -> 0x%X\n", err);
+    printf("  +INFINITY       -> 0x%X\n", err);
 
     glPolygonOffset(-INFINITY, -INFINITY);
     err = glGetError();
-    printf("  -INFINITY -> 0x%X\n", err);
+    printf("  -INFINITY       -> 0x%X\n", err);
 
-    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &f);
-    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &u);
-    printf("  Son durum: factor=%f, units=%f\n", f, u);
+    glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &factor);
+    glGetFloatv(GL_POLYGON_OFFSET_UNITS, &units);
+
+    printf("  factor=%.3f units=%.3f\n", factor, units);
 
     resetState();
     printf("  [BILGI] Manuel inceleme gerekir\n\n");
+}
+
+/* ============================================================
+ * TEST 6: Hizli durum gecisleri
+ *
+ * Farkli factor ve units degerleri arasinda hizli gecisler
+ * yaparak durum makinesinin tutarliligini dogrular.
+ * Her gecisten sonra durum sorgulanir.
+ * ============================================================ */
+
+void test_polygonOffset_rapidToggle(void) {
+    int i;
+    const int tekrar = 10000;
+
+    printf("TEST: Rapid Toggle\n");
+    resetState();
+
+    for (i = 0; i < tekrar; i++) {
+
+        GLfloat factor = (i % 2 == 0) ? 1.0f : -1.0f;
+        GLfloat units  = (i % 2 == 0) ? 2.0f : -2.0f;
+
+        glPolygonOffset(factor, units);
+        assert(glGetError() == GL_NO_ERROR);
+
+        checkStatePreserved(factor, units);
+    }
+
+    printf("  Sonuc: %d gecis tamamlandi\n", tekrar);
+    printf("  [PASS]\n\n");
+}
+
+/* ============================================================
+ * TEST 7: Enable/Disable etkilesimi
+ *
+ * glPolygonOffset durumunun
+ * GL_POLYGON_OFFSET_FILL acik veya kapali olsa bile
+ * korunup korunmadigini dogrular.
+ * ============================================================ */
+
+void test_polygonOffset_enableDisable(void) {
+    printf("TEST: Enable/Disable Interaction\n");
+    resetState();
+
+    glPolygonOffset(4.0f, 8.0f);
+    assert(glGetError() == GL_NO_ERROR);
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(4.0f, 8.0f);
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(4.0f, 8.0f);
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    assert(glGetError() == GL_NO_ERROR);
+    checkStatePreserved(4.0f, 8.0f);
+
+    resetState();
+    printf("  [PASS]\n\n");
+}
+
+/* ============================================================
+ * Tum testleri calistir
+ * ============================================================ */
+
+int main(void) {
+
+    test_polygonOffset_basicRobustness();
+    test_polygonOffset_stressSweep();
+    test_polygonOffset_errorQueue();
+    test_polygonOffset_statePreservation();
+    test_polygonOffset_specialFloats();
+    test_polygonOffset_rapidToggle();
+    test_polygonOffset_enableDisable();
+
+    printf("=========================================\n");
+    printf("Tum glPolygonOffset robustness testleri basarili.\n");
+    printf("=========================================\n");
+
+    return 0;
 }

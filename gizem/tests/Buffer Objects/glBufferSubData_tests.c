@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
@@ -6,7 +6,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <GL/gl.h>  // veya kullandığınız platforma uygun GL başlığı
 
 // void glBufferSubData (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid * data);
 // Daha önceden oluşturulmuş bir buffer’ın içindeki belirli bir kısmı günceller

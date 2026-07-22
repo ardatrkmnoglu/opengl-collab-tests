@@ -14,8 +14,8 @@ FetchContent_MakeAvailable(glfw)
 
 # GLAD için klasör yolunu tanıt
 include_directories(external/glad/include)
-file(GLOB TEST_SOURCES tests/*.c)
-add_executable(untitled main.c ${TEST_SOURCES} external/glad/src/glad.c)
+file(GLOB_RECURSE TEST_SOURCES tests/*.c)
+add_executable(untitled main.c ${TEST_SOURCES} external/glad/src/gles2.c)
 
 # Kütüphaneleri bağla
 target_link_libraries(untitled PRIVATE glfw)

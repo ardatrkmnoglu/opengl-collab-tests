@@ -1,7 +1,8 @@
 #include <stdio.h>
-#include <glad/glad.h>
+#include <glad/gles2.h>
 #include <GLFW/glfw3.h>
-#include "tests/tests.h"
+#include "tests/Buffer Objects/tests.h"
+#include "tests/Framebuffer Objects/frameBuffer_tests.h"
 
 const char* vertexShaderSource = "#version 100\n"
 "attribute vec3 aPos;\n"
@@ -56,7 +57,7 @@ int main(void)
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    if (!gladLoadGLES2((GLADloadfunc)glfwGetProcAddress))
     {
         printf("GLAD yuklenemedi!\n");
         glfwTerminate();
@@ -83,6 +84,21 @@ int main(void)
 void init(void)
 {
     /* TESTLER */
+
+    printf("glBindFrameBuffer = %p\n", glBindFramebuffer);
+
+    // rTest_glBindFramebuffer_invalid_enum();
+    // rTest_glBindFramebuffer_invalid_target();
+    // rTest_glBindFramebuffer_arbitrary_unused_name();
+    // rTest_glBindFramebuffer_initial_attachment_state();
+    // rTest_glBindFramebuffer_zero_bound_query_rejected();
+    // rTest_glBindFramebuffer_binding_reverts_after_delete();
+    // rTest_glBindFramebuffer_repeated_rebind_same_name();
+    // rTest_glBindFramebuffer_extreme_name_value();
+    // rTest_glBindFramebuffer_type_confusion_with_other_object();
+    // rTest_glBindFramebuffer_bind_unbind_stress();
+    // rTest_glBindFramebuffer_previous_binding_broken_on_switch();
+    // rTest_glBindFramebuffer_self_rebind_preserves_state();
 
 
     // --------------- glGetBufferParameteriv ---------------

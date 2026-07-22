@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <assert.h>
@@ -112,7 +112,7 @@ void rTest_glGetBufferParameteriv_invalid_value()
     glBindBuffer(GL_ARRAY_BUFFER, buf);
     glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
 
-    GLenum bogusValues[] = { GL_BUFFER_ACCESS, 0, 0xFFFFFFFF, GL_ARRAY_BUFFER, 0xDEADBEEF };
+    GLenum bogusValues[] = { GL_FRAMEBUFFER, 0, 0xFFFFFFFF, GL_ARRAY_BUFFER, 0xDEADBEEF };
     int n = sizeof(bogusValues) / sizeof(bogusValues[0]);
     int allCorrect = 1;
 
@@ -295,7 +295,7 @@ void rTest_glGetBufferParameteriv_both_invalid()
     printf("[START] rTest_glGetBufferParameteriv_both_invalid()\n");
 
     GLint data = 0x1234;
-    glGetBufferParameteriv(GL_TEXTURE_2D, GL_TEXTURE_WIDTH, &data);
+    glGetBufferParameteriv(0xFFFFFFFF, 0xDEADBEEF, &data);
     GLenum err = glGetError();
 
     printf("[INFO] Both target and value invalid => err=0x%X (data=%d)\n", err, data);

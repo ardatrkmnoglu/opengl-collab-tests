@@ -33,10 +33,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/glGetBufferParameteriv_tests.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/frameBuffer_tests.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/glBindFramebuffer_tests.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/external/glad/include/glad/glad.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/external/glad/src/glad.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/tests.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/glBindBuffer_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glBindBuffer_tests.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/glBufferData_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glBufferData_tests.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/glBufferSubData_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glBufferSubData_tests.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/glGenBuffers_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glGenBuffers_tests.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/glGetBufferParameteriv_tests.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/glGetBufferParameteriv_tests.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Buffer Objects/tests.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,6 +102,11 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\stj.gredif\Desktop\opengl-collab-tests\gizem\tests\Buffer Objects" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
@@ -119,7 +133,7 @@
       <workItem from="1784612181830" duration="25000" />
       <workItem from="1784612537374" duration="4404000" />
       <workItem from="1784618082017" duration="242000" />
-      <workItem from="1784618876610" duration="10701000" />
+      <workItem from="1784618876610" duration="20574000" />
     </task>
     <servers />
   </component>

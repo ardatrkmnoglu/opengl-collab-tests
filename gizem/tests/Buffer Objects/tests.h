@@ -1,6 +1,7 @@
 #ifndef TESTS_H
 #define TESTS_H
 
+
 /* --------------- glGetBufferParameteriv --------------- */
 void rTest_glGetBufferParameteriv_invalid_enum_target();
 void rTest_glGetBufferParameteriv_invalid_enum_value();

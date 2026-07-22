@@ -194,6 +194,7 @@ void rTest_glGetBufferParameteriv_null_data_pointer()
 }
 
 // data, gecersiz/erisilemez (dangling) bir bellek adresi oldugunda implementasyonun bellek koruma ihlaline karsi davranisini test eder.
+// test, başta geçmiş görünüyor ancak kısa süre sonra çöküyor. Sorunu bulamadım.
 void rTest_glGetBufferParameteriv_dangling_data_pointer()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -211,6 +212,7 @@ void rTest_glGetBufferParameteriv_dangling_data_pointer()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, freedPtr);
 
     GLenum err = glGetError();
+
     printf("[INFO] Dangling data pointer call completed. err=0x%X\n", err);
     printf("[PASS] Implementation did not crash on dangling pointer (best-effort check).\n");
 

@@ -1,4 +1,4 @@
-#include <stdio.h>
+git add g,#include <stdio.h>
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include "tests/Buffer Objects/tests.h"
@@ -85,8 +85,24 @@ void init(void)
 {
     /* TESTLER */
 
-    printf("glBindFrameBuffer = %p\n", glBindFramebuffer);
+    // rTest_glGenFramebuffers_invalid_value();
+    // rTest_glGenFramebuffers_negative_n();
+    // rTest_glGenFramebuffers_extreme_negative_n();
+    // rTest_glGenFramebuffers_zero_n_null_pointer();
+    // rTest_glGenFramebuffers_null_pointer_nonzero_n();
+    rTest_glGenFramebuffers_invalid_memory_pointer();
+    rTest_glGenFramebuffers_buffer_overflow_canary();
+    rTest_glGenFramebuffers_huge_n();
+    rTest_glGenFramebuffers_stack_smash_small_array();
+    rTest_glGenFramebuffers_exhaustion();
+    rTest_glGenFramebuffers_unbound_name_lifecycle();
+    rTest_glGenFramebuffers_name_reuse_after_delete();
+    rTest_glGenFramebuffers_unaligned_pointer();
+    rTest_glGenFramebuffers_varying_n_stability();
+    rTest_glGenFramebuffers_namespace_isolation_from_renderbuffers();
 
+
+    // --------------- glBindFramebuffer ---------------
     // rTest_glBindFramebuffer_invalid_enum();
     // rTest_glBindFramebuffer_invalid_target();
     // rTest_glBindFramebuffer_arbitrary_unused_name();
@@ -100,7 +116,6 @@ void init(void)
     // rTest_glBindFramebuffer_previous_binding_broken_on_switch();
     // rTest_glBindFramebuffer_self_rebind_preserves_state();
 
-
     // --------------- glGetBufferParameteriv ---------------
     // rTest_glGetBufferParameteriv_invalid_enum_target();
     // rTest_glGetBufferParameteriv_invalid_enum_value();
@@ -110,7 +125,7 @@ void init(void)
     // rTest_glGetBufferParameteriv_reserved_name_zero_bound();
     // rTest_glGetBufferParameteriv_element_array_zero_bound();
     // rTest_glGetBufferParameteriv_null_data_pointer();
-    // rTest_glGetBufferParameteriv_dangling_data_pointer();
+    // rTest_glGetBufferParameteriv_dangling_data_pointer(); // test, başta geçmiş görünüyor ancak kısa süre sonra çöküyor. Sorunu bulamadım.
     // rTest_glGetBufferParameteriv_size_consistency();
     // rTest_glGetBufferParameteriv_usage_initial_and_updates();
     // rTest_glGetBufferParameteriv_both_invalid();

@@ -1,0 +1,11 @@
+# CLion / JetBrains IDE settings
+.idea/
+
+# CMake build directories
+cmake-build-debug/
+cmake-build-release/
+build/
+
+# Object files & Executables
+*.o
+*.out

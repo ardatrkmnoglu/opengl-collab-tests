@@ -4,6 +4,12 @@
 #include <GLES2/gl2ext.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../include/macro.h"
+
+static const char* test_case1 = "ReadingPixels_ReadnPixels_TC_001";
+static const char* test_case2 = "ReadingPixels_ReadnPixels_TC_002";
+static const char* test_case3 = "ReadingPixels_ReadnPixels_TC_003";
+static const char* test_case4 = "ReadingPixels_ReadnPixels_TC_004";
 
 static const char* test_procedure = "ReadingPixels_ReadnPixels_TP_001";
 
@@ -30,15 +36,9 @@ void init(void);
 void draw(void);
 void clean(void);
 
-static void hatalariTemizle(void) {
-    while (glGetError() != GL_NO_ERROR);
-}
-
 // --- TEST 1: YETERSİZ KUTU BOYUTU (Buffer Overflow) ---
-static void ReadingPixels_ReadnPixels_TC_001(void) {
-    static const char* test_case = "ReadingPixels_ReadnPixels_TC_001";
-    printf("[TEST][%s][%s] Yetersiz Kutu Boyutu Testi Basliyor...\n", test_procedure, test_case);
-    hatalariTemizle();
+void ReadingPixels_ReadnPixels_TC_001(void) {
+    while (glGetError() != GL_NO_ERROR);
 
     unsigned char kucukKutu[3];
     int kutuBoyutu = sizeof(kucukKutu); // Sadece 3 byte
@@ -48,18 +48,16 @@ static void ReadingPixels_ReadnPixels_TC_001(void) {
 
     GLenum err = glGetError();
     if (err == GL_INVALID_OPERATION) {
-        printf(" -> BASARILI (PASSED): GL_INVALID_OPERATION hatasi yakalandi.\n\n");
+        TEST_LOG_SUCCESS(test_case1, test_procedure);
     } else {
-        printf(" -> BASARISIZ (FAILED): Beklenen GL_INVALID_OPERATION alinmadi (Kod: 0x%X)!\n\n", err);
+        TEST_LOG_FAIL(test_case1, test_procedure, "Expected GL_INVALID_OPERATION (0x502), but got 0x%X", err);
         g_tests_failed = 1;
     }
 }
 
 // --- TEST 2: NEGATİF BOYUT VERME (Boundary) ---
-static void ReadingPixels_ReadnPixels_TC_002(void) {
-    static const char* test_case = "ReadingPixels_ReadnPixels_TC_002";
-    printf("[TEST][%s][%s] Negatif Boyut Testi Basliyor...\n", test_procedure, test_case);
-    hatalariTemizle();
+void ReadingPixels_ReadnPixels_TC_002(void) {
+    while (glGetError() != GL_NO_ERROR);
 
     unsigned char kutu[300];
     int kutuBoyutu = sizeof(kutu);
@@ -69,18 +67,16 @@ static void ReadingPixels_ReadnPixels_TC_002(void) {
 
     GLenum err = glGetError();
     if (err == GL_INVALID_VALUE) {
-        printf(" -> BASARILI (PASSED): GL_INVALID_VALUE hatasi yakalandi.\n\n");
+        TEST_LOG_SUCCESS(test_case2, test_procedure);
     } else {
-        printf(" -> BASARISIZ (FAILED): Beklenen GL_INVALID_VALUE alinmadi (Kod: 0x%X)!\n\n", err);
+        TEST_LOG_FAIL(test_case2, test_procedure, "Expected GL_INVALID_VALUE (0x501), but got 0x%X", err);
         g_tests_failed = 1;
     }
 }
 
 // --- TEST 3: GEÇERSİZ PARAMETRE (Fuzzing) ---
-static void ReadingPixels_ReadnPixels_TC_003(void) {
-    static const char* test_case = "ReadingPixels_ReadnPixels_TC_003";
-    printf("[TEST][%s][%s] Gecersiz Parametre (Enum) Testi Basliyor...\n", test_procedure, test_case);
-    hatalariTemizle();
+void ReadingPixels_ReadnPixels_TC_003(void) {
+    while (glGetError() != GL_NO_ERROR);
 
     unsigned char kutu[3];
     int kutuBoyutu = sizeof(kutu);
@@ -90,30 +86,29 @@ static void ReadingPixels_ReadnPixels_TC_003(void) {
 
     GLenum err = glGetError();
     if (err == GL_INVALID_ENUM) {
-        printf(" -> BASARILI (PASSED): GL_INVALID_ENUM hatasi yakalandi.\n\n");
+        TEST_LOG_SUCCESS(test_case3, test_procedure);
     } else {
-        printf(" -> BASARISIZ (FAILED): Beklenen GL_INVALID_ENUM alinmadi (Kod: 0x%X)!\n\n", err);
+        TEST_LOG_FAIL(test_case3, test_procedure, "Expected GL_INVALID_ENUM (0x500), but got 0x%X", err);
         g_tests_failed = 1;
     }
 }
 
 // --- TEST 4: EKRAN DIŞI KOORDİNAT (Out of Bounds) ---
-static void ReadingPixels_ReadnPixels_TC_004(void) {
-    static const char* test_case = "ReadingPixels_ReadnPixels_TC_004";
-    printf("[TEST][%s][%s] Ekran Disi Koordinat Testi Basliyor...\n", test_procedure, test_case);
-    hatalariTemizle();
+void ReadingPixels_ReadnPixels_TC_004(void) {
+    while (glGetError() != GL_NO_ERROR);
 
     unsigned char kutu[3];
     int kutuBoyutu = sizeof(kutu);
 
-    // x ve y koordinatlarını ekranın çok dışına taşııyoruz (-50, -50)
+    // x ve y koordinatlarını ekranın çok dışına taşıyoruz (-50, -50)
     glReadnPixels(-50, -50, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, kutuBoyutu, kutu);
 
     GLenum err = glGetError();
     if (err == GL_NO_ERROR) {
-        printf(" -> BASARILI (PASSED): Program cokmedi, hata firlatilmadan islem gormezden gelindi.\n\n");
+        TEST_LOG_SUCCESS(test_case4, test_procedure);
     } else {
-        printf(" -> DIKKAT: Beklenmeyen bir hata kodu dondu: 0x%X\n\n", err);
+        TEST_LOG_FAIL(test_case4, test_procedure, "Unexpected error for out of bounds coordinates: 0x%X", err);
+        g_tests_failed = 1;
     }
 }
 
@@ -128,22 +123,10 @@ void init(void) {
         return;
     }
 
-    printf("=========================================\n");
-    printf("  %s SAĞLAMLIK TESTLERİ\n", test_procedure);
-    printf("=========================================\n\n");
-
     ReadingPixels_ReadnPixels_TC_001();
     ReadingPixels_ReadnPixels_TC_002();
     ReadingPixels_ReadnPixels_TC_003();
     ReadingPixels_ReadnPixels_TC_004();
-
-    printf("=========================================\n");
-    if (g_tests_failed) {
-        printf("        BAZI TESTLER BASARISIZ OLDU!\n");
-    } else {
-        printf("        TÜM TESTLER TAMAMLANDI\n");
-    }
-    printf("=========================================\n");
 }
 
 void draw(void) {
@@ -156,7 +139,6 @@ void draw(void) {
 }
 
 void clean(void) {
-    // Clean up resources if necessary
 }
 
 int main(void) {

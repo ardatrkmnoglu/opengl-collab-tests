@@ -22,29 +22,27 @@ include_directories(
 )
 
 # Executables for each test file in tests/
-add_executable(getTexParameter_tests tests/getTexParameter_tests.c)
-target_link_libraries(getTexParameter_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(readNPixels_tests tests/readNPixels_tests.c)
-target_link_libraries(readNPixels_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
+add_executable(ReadingPixels_ReadnPixels_TP_001 tests/ReadingPixels_ReadnPixels_TP_001.c)
+target_link_libraries(ReadingPixels_ReadnPixels_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
 
-add_executable(texStorage2D_tests tests/texStorage2D_tests.c)
-target_link_libraries(texStorage2D_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_TexStorage2D_TP_001 tests/Texturing_TexStorage2D_TP_001.c)
+target_link_libraries(Texturing_TexStorage2D_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(texSubImage2D_tests tests/TexSubImage2D.c)
-target_link_libraries(texSubImage2D_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_TexSubImage2D_TP_001 tests/Texturing_TexSubImage2D_TP_001.c)
+target_link_libraries(Texturing_TexSubImage2D_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(glGenTextures_tests tests/glGenTextures_tests.c)
-target_link_libraries(glGenTextures_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_GenTextures_TP_001 tests/Texturing_GenTextures_TP_001.c)
+target_link_libraries(Texturing_GenTextures_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(glBindTexture_tests tests/glBindTexture_tests.c)
-target_link_libraries(glBindTexture_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_BindTexture_TP_001 tests/Texturing_BindTexture_TP_001.c)
+target_link_libraries(Texturing_BindTexture_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(glGenerateMipmap_tests tests/glGenerateMipmap_tests.c)
-target_link_libraries(glGenerateMipmap_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_GenerateMipmap_TP_001 tests/Texturing_GenerateMipmap_TP_001.c)
+target_link_libraries(Texturing_GenerateMipmap_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(texSubImage2D_visual_test tests/texSubImage2D_visual_test.c)
-target_link_libraries(texSubImage2D_visual_test PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Texturing_TexSubImage2D_TP_002 tests/Texturing_TexSubImage2D_TP_002.c)
+target_link_libraries(Texturing_TexSubImage2D_TP_002 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
-add_executable(glScissor_tests tests/glScissor_tests.c)
-target_link_libraries(glScissor_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+add_executable(Per-FragmentOperations_Scissor_TP_001 tests/Per-FragmentOperations_Scissor_TP_001.c)
+target_link_libraries(Per-FragmentOperations_Scissor_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

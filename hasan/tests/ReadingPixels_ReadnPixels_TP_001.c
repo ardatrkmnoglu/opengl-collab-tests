@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static const char* test_procedure = "ReadingPixels_ReadnPixels_TP_001";
+
 #ifndef APIENTRYP
 #ifdef APIENTRY
 #define APIENTRYP APIENTRY *
@@ -33,8 +35,9 @@ static void hatalariTemizle(void) {
 }
 
 // --- TEST 1: YETERSİZ KUTU BOYUTU (Buffer Overflow) ---
-static void test_YetersizKutuBoyutu(void) {
-    printf("[TEST 1] Yetersiz Kutu Boyutu Testi Basliyor...\n");
+static void ReadingPixels_ReadnPixels_TC_001(void) {
+    static const char* test_case = "ReadingPixels_ReadnPixels_TC_001";
+    printf("[TEST][%s][%s] Yetersiz Kutu Boyutu Testi Basliyor...\n", test_procedure, test_case);
     hatalariTemizle();
 
     unsigned char kucukKutu[3];
@@ -53,8 +56,9 @@ static void test_YetersizKutuBoyutu(void) {
 }
 
 // --- TEST 2: NEGATİF BOYUT VERME (Boundary) ---
-static void test_NegatifBoyut(void) {
-    printf("[TEST 2] Negatif Boyut Testi Basliyor...\n");
+static void ReadingPixels_ReadnPixels_TC_002(void) {
+    static const char* test_case = "ReadingPixels_ReadnPixels_TC_002";
+    printf("[TEST][%s][%s] Negatif Boyut Testi Basliyor...\n", test_procedure, test_case);
     hatalariTemizle();
 
     unsigned char kutu[300];
@@ -73,8 +77,9 @@ static void test_NegatifBoyut(void) {
 }
 
 // --- TEST 3: GEÇERSİZ PARAMETRE (Fuzzing) ---
-static void test_GecersizEnum(void) {
-    printf("[TEST 3] Gecersiz Parametre (Enum) Testi Basliyor...\n");
+static void ReadingPixels_ReadnPixels_TC_003(void) {
+    static const char* test_case = "ReadingPixels_ReadnPixels_TC_003";
+    printf("[TEST][%s][%s] Gecersiz Parametre (Enum) Testi Basliyor...\n", test_procedure, test_case);
     hatalariTemizle();
 
     unsigned char kutu[3];
@@ -93,14 +98,15 @@ static void test_GecersizEnum(void) {
 }
 
 // --- TEST 4: EKRAN DIŞI KOORDİNAT (Out of Bounds) ---
-static void test_HedefDisiKoordinat(void) {
-    printf("[TEST 4] Ekran Disi Koordinat Testi Basliyor...\n");
+static void ReadingPixels_ReadnPixels_TC_004(void) {
+    static const char* test_case = "ReadingPixels_ReadnPixels_TC_004";
+    printf("[TEST][%s][%s] Ekran Disi Koordinat Testi Basliyor...\n", test_procedure, test_case);
     hatalariTemizle();
 
     unsigned char kutu[3];
     int kutuBoyutu = sizeof(kutu);
 
-    // x ve y koordinatlarını ekranın çok dışına taşıyoruz (-50, -50)
+    // x ve y koordinatlarını ekranın çok dışına taşııyoruz (-50, -50)
     glReadnPixels(-50, -50, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, kutuBoyutu, kutu);
 
     GLenum err = glGetError();
@@ -123,13 +129,13 @@ void init(void) {
     }
 
     printf("=========================================\n");
-    printf("   GLREADNPIXELS SAĞLAMLIK TESTLERİ\n");
+    printf("  %s SAĞLAMLIK TESTLERİ\n", test_procedure);
     printf("=========================================\n\n");
 
-    test_YetersizKutuBoyutu();
-    test_NegatifBoyut();
-    test_GecersizEnum();
-    test_HedefDisiKoordinat();
+    ReadingPixels_ReadnPixels_TC_001();
+    ReadingPixels_ReadnPixels_TC_002();
+    ReadingPixels_ReadnPixels_TC_003();
+    ReadingPixels_ReadnPixels_TC_004();
 
     printf("=========================================\n");
     if (g_tests_failed) {

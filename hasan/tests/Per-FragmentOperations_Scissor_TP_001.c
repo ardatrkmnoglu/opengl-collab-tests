@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <limits.h>
 
+static const char* test_procedure = "Per-FragmentOperations_Scissor_TP_001";
+
 /*
  * ============================================================================
  * glScissor & GL_SCISSOR_TEST Robustness Test Suite
@@ -20,10 +22,11 @@
 // TEST 1: Negatif Genislik ve Yukseklik (Spec Hatasi)
 // Spec'e gore width veya height 0'dan kucukse GL_INVALID_VALUE uretilmelidir.
 // ---------------------------------------------------------------
-void test_scissor_negative_dimensions(void)
+void PerFragmentOperations_Scissor_TC_001(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_001";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_negative_dimensions\n");
+    printf("[TEST][%s][%s] test_scissor_negative_dimensions\n", test_procedure, test_case);
 
     glScissor(0, 0, -1, 100);
     GLenum err1 = glGetError();
@@ -49,10 +52,11 @@ void test_scissor_negative_dimensions(void)
 // Spec'e gore x (left) ve y (bottom) degerleri negatif OLABILIR.
 // Bu durumda kutunun bir kismi ekran disinda kalir. Hata VERILMEMELIDIR.
 // ---------------------------------------------------------------
-void test_scissor_negative_coordinates(void)
+void PerFragmentOperations_Scissor_TC_002(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_002";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_negative_coordinates\n");
+    printf("[TEST][%s][%s] test_scissor_negative_coordinates\n", test_procedure, test_case);
 
     glScissor(-100, -50, 200, 200);
     GLenum err = glGetError();
@@ -74,10 +78,11 @@ void test_scissor_negative_coordinates(void)
 // Tamsayi tasmasi (integer overflow) yaratip surucunun cokup
 // cokmedigini kontrol ederiz.
 // ---------------------------------------------------------------
-void test_scissor_extreme_limits(void)
+void PerFragmentOperations_Scissor_TC_003(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_003";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_extreme_limits\n");
+    printf("[TEST][%s][%s] test_scissor_extreme_limits\n", test_procedure, test_case);
 
     // Boyutlar (w, h) negatif olamaz, bu yuzden onlara INT_MAX veriyoruz.
     // Koordinatlar (x, y) negatif olabilir.
@@ -103,10 +108,11 @@ void test_scissor_extreme_limits(void)
 // Genislik veya yuksekligin tam 0 olmasi yasaldir.
 // Hata vermemesi ve basariyla kaydedilmesi gerekir.
 // ---------------------------------------------------------------
-void test_scissor_zero_dimensions(void)
+void PerFragmentOperations_Scissor_TC_004(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_004";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_zero_dimensions\n");
+    printf("[TEST][%s][%s] test_scissor_zero_dimensions\n", test_procedure, test_case);
 
     glScissor(10, 10, 0, 0);
     GLenum err = glGetError();
@@ -125,10 +131,11 @@ void test_scissor_zero_dimensions(void)
 // GL_SCISSOR_TEST ozelligini binlerce kez ard arda acip kapatarak
 // surucunun durum (state) makinesinin bozulup bozulmadigini test eder.
 // ---------------------------------------------------------------
-void test_scissor_enable_disable_thrash(void)
+void PerFragmentOperations_Scissor_TC_005(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_005";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_enable_disable_thrash\n");
+    printf("[TEST][%s][%s] test_scissor_enable_disable_thrash\n", test_procedure, test_case);
 
     int err_count = 0;
     for (int i = 0; i < 10000; i++) {
@@ -152,13 +159,13 @@ void test_scissor_enable_disable_thrash(void)
 // Cok sayida tamamen rastgele (mantikli ve mantiksiz) glScissor cagirilarak
 // bellek veya state bozulmasi tespiti yapilir.
 // ---------------------------------------------------------------
-void test_scissor_random_fuzzing(void)
+void PerFragmentOperations_Scissor_TC_006(void)
 {
+    static const char* test_case = "PerFragmentOperations_Scissor_TC_006";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_scissor_random_fuzzing\n");
+    printf("[TEST][%s][%s] test_scissor_random_fuzzing\n", test_procedure, test_case);
 
     srand(12345); // Sabit seed (tekrar edilebilirlik)
-    int crash = 0;
 
     for (int i = 0; i < 50000; i++) {
         GLint x = (rand() % 4000) - 2000; // -2000 ile 2000 arasi
@@ -196,15 +203,15 @@ void clean(void);
 void init(void)
 {
     printf("=====================================================\n");
-    printf("  GLSCISSOR ROBUSTNESS SUITE - HASAN\n");
+    printf("  %s ROBUSTNESS SUITE - HASAN\n", test_procedure);
     printf("=====================================================\n\n");
 
-    test_scissor_negative_dimensions();
-    test_scissor_negative_coordinates();
-    test_scissor_extreme_limits();
-    test_scissor_zero_dimensions();
-    test_scissor_enable_disable_thrash();
-    test_scissor_random_fuzzing();
+    PerFragmentOperations_Scissor_TC_001();
+    PerFragmentOperations_Scissor_TC_002();
+    PerFragmentOperations_Scissor_TC_003();
+    PerFragmentOperations_Scissor_TC_004();
+    PerFragmentOperations_Scissor_TC_005();
+    PerFragmentOperations_Scissor_TC_006();
 
     printf("=====================================================\n");
     printf("  TUM TESTLER TAMAMLANDI\n");

@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+static const char* test_procedure = "Texturing_TexSubImage2D_TP_001";
+
 // --- GLOBAL DEĞİŞKENLER (draw ve cleanup için) ---
 GLFWwindow* window;
 GLuint shaderProgram;
@@ -58,21 +60,27 @@ void check_gl_error(const char* test_name) {
 
 // --- ROBUSTNESS TEST FONKSİYONLARI ---
 
-void test_negative_dimensions() {
+void Texturing_TexSubImage2D_TC_001(void) {
+    static const char* test_case = "Texturing_TexSubImage2D_TC_001";
+    printf("[TEST][%s][%s] Negatif Boyut Testi Basliyor...\n", test_procedure, test_case);
     uint8_t dummy_data[4] = {0};
     // Genişlik ve yükseklik negatif olamaz
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, -10, -10, GL_RGBA, GL_UNSIGNED_BYTE, dummy_data);
     check_gl_error("Negatif Boyut Testi");
 }
 
-void test_out_of_bounds() {
+void Texturing_TexSubImage2D_TC_002(void) {
+    static const char* test_case = "Texturing_TexSubImage2D_TC_002";
+    printf("[TEST][%s][%s] Sinir Asimi (Out of Bounds) Testi Basliyor...\n", test_procedure, test_case);
     uint8_t dummy_data[4] = {0};
     // xoffset (200) + width (100) = 300. Bu değer ana dokunun (256) dışına taşıyor.
     glTexSubImage2D(GL_TEXTURE_2D, 0, 200, 0, 100, 10, GL_RGBA, GL_UNSIGNED_BYTE, dummy_data);
     check_gl_error("Sinir Asimi (Out of Bounds) Testi");
 }
 
-void test_format_mismatch() {
+void Texturing_TexSubImage2D_TC_003(void) {
+    static const char* test_case = "Texturing_TexSubImage2D_TC_003";
+    printf("[TEST][%s][%s] Format Uyusmazligi Testi Basliyor...\n", test_procedure, test_case);
     uint8_t dummy_data[4] = {0};
     // Ana doku GL_RGBA ve GL_UNSIGNED_BYTE olarak oluşturuldu.
     // Biz burada GL_RGB formatı göndererek uyuşmazlık yaratıyoruz.
@@ -80,7 +88,9 @@ void test_format_mismatch() {
     check_gl_error("Format Uyusmazligi Testi");
 }
 
-void test_invalid_target_enum() {
+void Texturing_TexSubImage2D_TC_004(void) {
+    static const char* test_case = "Texturing_TexSubImage2D_TC_004";
+    printf("[TEST][%s][%s] Gecersiz Hedef (Enum) Testi Basliyor...\n", test_procedure, test_case);
     uint8_t dummy_data[4] = {0};
     // Geçersiz bir target gönderiyoruz (GL_TEXTURE_2D yerine GL_POINTS)
     glTexSubImage2D(GL_POINTS, 0, 0, 0, 10, 10, GL_RGBA, GL_UNSIGNED_BYTE, dummy_data);
@@ -89,7 +99,7 @@ void test_invalid_target_enum() {
 
 // --- TEMEL DÖNGÜ FONKSİYONLARI ---
 
-int init() {
+int init(void) {
     // Çevre değişkenlerini ayarlama (Ubuntu vm için)
     setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
     setenv("GALLIUM_DRIVER", "llvmpipe", 1);
@@ -147,16 +157,15 @@ int init() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, BASE_TEX_WIDTH, BASE_TEX_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, base_data);
     free(base_data);
 
-    printf("--- ROBUSTNESS TESTLERI BASLIYOR ---\n");
+    printf("--- ROBUSTNESS TESTLERI BASLIYOR (%s) ---\n", test_procedure);
     // Hata tamponunu temizlemek için öylesine bir glGetError çağırıyoruz
     glGetError();
 
     // Testleri Çağırma
-    test_negative_dimensions();
-    test_out_of_bounds();
-    test_format_mismatch();
-    test_invalid_target_enum();
-
+    Texturing_TexSubImage2D_TC_001();
+    Texturing_TexSubImage2D_TC_002();
+    Texturing_TexSubImage2D_TC_003();
+    Texturing_TexSubImage2D_TC_004();
 
     printf("--- TESTLER TAMAMLANDI ---\n\n");
 
@@ -171,15 +180,13 @@ int init() {
     return 0;
 }
 
-void draw() {
-
+void draw(void) {
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void cleanup() {
+void cleanup(void) {
     printf("Temizlik islemleri yapiliyor...\n");
     glDeleteBuffers(1, &vbo);
     glDeleteTextures(1, &texture_id);
@@ -189,25 +196,18 @@ void cleanup() {
     glfwTerminate();
 }
 
-int main() {
+int main(void) {
     if (init() != 0) {
         printf("Baslatma (Init) hatasi!\n");
         return -1;
     }
 
-
     while (!glfwWindowShouldClose(window)) {
         draw();
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-
-
     cleanup();
-
     return 0;
 }
-
-

@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <string.h>
 
+static const char* test_procedure = "Texturing_BindTexture_TP_001";
+
 /*
  * glBindTexture Robustness Test Suite
  * Hasan - OpenGL ES 2.0
@@ -20,10 +22,11 @@
 // TEXTURE_2D ve TEXTURE_CUBE_MAP disindaki hedeflere texture
 // baglamaya calismanin GL_INVALID_ENUM uretip uretmedigi test edilir.
 // ---------------------------------------------------------------
-void test_bind_invalid_target_enum(void)
+void Texturing_BindTexture_TC_001(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_001";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_invalid_target_enum\n");
+    printf("[TEST][%s][%s] test_bind_invalid_target_enum\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -56,10 +59,11 @@ void test_bind_invalid_target_enum(void)
 // glGenTextures ile olusturulmamis rastgele bir ID'nin bind
 // edilmesi. ES 2.0'da bu gecerli bir islemdir ve yeni bir texture olusturur.
 // ---------------------------------------------------------------
-void test_bind_name_adoption(void)
+void Texturing_BindTexture_TC_002(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_002";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_name_adoption\n");
+    printf("[TEST][%s][%s] test_bind_name_adoption\n", test_procedure, test_case);
 
     // Rastgele, buyuk ihtimalle kullanilmayan bir ID
     GLuint random_id = 987654;
@@ -92,10 +96,11 @@ void test_bind_name_adoption(void)
 // bir ID'nin TEXTURE_CUBE_MAP'e bind edilmeye calisilmasi durumu.
 // GL_INVALID_OPERATION firlatilmalidir.
 // ---------------------------------------------------------------
-void test_bind_cross_target_conflict(void)
+void Texturing_BindTexture_TC_003(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_003";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_cross_target_conflict\n");
+    printf("[TEST][%s][%s] test_bind_cross_target_conflict\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -124,10 +129,11 @@ void test_bind_cross_target_conflict(void)
 // Texture0 ve Texture1 unitlerine ayri ID'ler bind edildiginde
 // birbirlerini etkileyip etkilemediklerini kontrol eder.
 // ---------------------------------------------------------------
-void test_bind_active_texture_isolation(void)
+void Texturing_BindTexture_TC_004(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_004";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_active_texture_isolation\n");
+    printf("[TEST][%s][%s] test_bind_active_texture_isolation\n", test_procedure, test_case);
 
     GLuint tex[2];
     glGenTextures(2, tex);
@@ -166,10 +172,11 @@ void test_bind_active_texture_isolation(void)
 // Bir texture silindikten sonra ayni isim tekrar bind edilebilir mi?
 // ES 2.0'a gore bu, o isimle 'yeni' bir texture olusturmalidir.
 // ---------------------------------------------------------------
-void test_bind_deleted_texture_reanimation(void)
+void Texturing_BindTexture_TC_005(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_005";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_deleted_texture_reanimation\n");
+    printf("[TEST][%s][%s] test_bind_deleted_texture_reanimation\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -207,10 +214,11 @@ void test_bind_deleted_texture_reanimation(void)
 // 0 ID'sini bind etmek, aktif texture'i deaktif etmeli ve varsayilan
 // texture state'ine dondurmelidir. Sifir bind etmek hata uretmez.
 // ---------------------------------------------------------------
-void test_bind_zero_default(void)
+void Texturing_BindTexture_TC_006(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_006";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_zero_default\n");
+    printf("[TEST][%s][%s] test_bind_zero_default\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -236,10 +244,11 @@ void test_bind_zero_default(void)
 // Performans kritik kodlarda ayni texture ust uste bind edilebilir.
 // Surucunun state degisikligi olmadigini anlayip cokmeden calismasi test edilir.
 // ---------------------------------------------------------------
-void test_bind_repeatedly_noop_stress(void)
+void Texturing_BindTexture_TC_007(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_007";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_repeatedly_noop_stress\n");
+    printf("[TEST][%s][%s] test_bind_repeatedly_noop_stress\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -265,10 +274,11 @@ void test_bind_repeatedly_noop_stress(void)
 // degerleriyle (UINT_MAX) kullanilmasi. Surucunun bunlari
 // handle edebildigini veya reddebildigini izleriz.
 // ---------------------------------------------------------------
-void test_bind_extreme_ids(void)
+void Texturing_BindTexture_TC_008(void)
 {
+    static const char* test_case = "Texturing_BindTexture_TC_008";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST] test_bind_extreme_ids\n");
+    printf("[TEST][%s][%s] test_bind_extreme_ids\n", test_procedure, test_case);
 
     GLuint extreme_ids[] = {
         0xFFFFFFFF,  // UINT_MAX
@@ -317,17 +327,17 @@ void clean(void);
 void init(void)
 {
     printf("=====================================================\n");
-    printf("  GLBINDTEXTURE ROBUSTNESS SUITE - HASAN\n");
+    printf("  %s ROBUSTNESS SUITE - HASAN\n", test_procedure);
     printf("=====================================================\n\n");
 
-    test_bind_invalid_target_enum();
-    test_bind_name_adoption();
-    test_bind_cross_target_conflict();
-    test_bind_active_texture_isolation();
-    test_bind_deleted_texture_reanimation();
-    test_bind_zero_default();
-    test_bind_repeatedly_noop_stress();
-    test_bind_extreme_ids();
+    Texturing_BindTexture_TC_001();
+    Texturing_BindTexture_TC_002();
+    Texturing_BindTexture_TC_003();
+    Texturing_BindTexture_TC_004();
+    Texturing_BindTexture_TC_005();
+    Texturing_BindTexture_TC_006();
+    Texturing_BindTexture_TC_007();
+    Texturing_BindTexture_TC_008();
 
     printf("=====================================================\n");
     printf("  TUM TESTLER TAMAMLANDI\n");

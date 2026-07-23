@@ -6,6 +6,8 @@
 #include <math.h>
 #include <time.h>
 
+static const char* test_procedure = "Texturing_TexSubImage2D_TP_002";
+
 /*
  * ============================================================================
  * glTexSubImage2D Visual Robustness Test
@@ -65,6 +67,7 @@ void fillRandomColors(GLubyte* data, int width, int height) {
 
 int main(void)
 {
+    static const char* test_case = "Texturing_TexSubImage2D_TC_005";
     // Cihazin gercek gucunu test etmek istenirse asagidaki iki satir kaldirilabilir.
     // Ancak macOS gibi ortamlarda sorun yasamamak icin llvmpipe aktif birakildi.
     setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
@@ -137,9 +140,8 @@ int main(void)
     GLubyte* subData = (GLubyte*)malloc(subSize * subSize * 4);
 
     double lastTime = glfwGetTime();
-    int frames = 0;
 
-    printf("Gorsel test basladi. Pencerde gri arka plan uzerinde rastgele renkli bir karenin surekli guncellendigini gormelisiniz.\n");
+    printf("Gorsel test basladi (%s / %s). Pencerde gri arka plan uzerinde rastgele renkli bir karenin surekli guncellendigini gormelisiniz.\n", test_procedure, test_case);
 
     while (!glfwWindowShouldClose(window))
     {

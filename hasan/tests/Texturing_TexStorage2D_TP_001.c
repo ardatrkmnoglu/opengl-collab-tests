@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static const char* test_procedure = "Texturing_TexStorage2D_TP_001";
+
 #ifndef GL_RGBA8_OES
 #define GL_RGBA8_OES 0x8058
 #endif
@@ -26,7 +28,8 @@ static void clearGLErrors(void) {
 }
 
 // Test 1: Negatif Boyut Testi (Invalid Value)
-static void test_NegativeDimensions(void) {
+static void Texturing_TexStorage2D_TC_001(void) {
+    static const char* test_case = "Texturing_TexStorage2D_TC_001";
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -36,7 +39,7 @@ static void test_NegativeDimensions(void) {
     pglTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8_OES, -256, 256);
 
     GLenum err = glGetError();
-    printf("[TEST 1] Negatif Boyut Testi: ");
+    printf("[TEST][%s][%s] Negatif Boyut Testi: ", test_procedure, test_case);
     if (err == GL_INVALID_VALUE) {
         printf("BASARILI (Beklenen GL_INVALID_VALUE hatasi alindi)\n");
     } else {
@@ -48,7 +51,8 @@ static void test_NegativeDimensions(void) {
 }
 
 // Test 2: Geçersiz İç Format Testi (Invalid Enum)
-static void test_InvalidInternalFormat(void) {
+static void Texturing_TexStorage2D_TC_002(void) {
+    static const char* test_case = "Texturing_TexStorage2D_TC_002";
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -58,7 +62,7 @@ static void test_InvalidInternalFormat(void) {
     pglTexStorage2D(GL_TEXTURE_2D, 1, 0x9999, 256, 256);
 
     GLenum err = glGetError();
-    printf("[TEST 2] Gecersiz Format Testi: ");
+    printf("[TEST][%s][%s] Gecersiz Format Testi: ", test_procedure, test_case);
     if (err == GL_INVALID_ENUM) {
         printf("BASARILI (Beklenen GL_INVALID_ENUM hatasi alindi)\n");
     } else {
@@ -70,7 +74,8 @@ static void test_InvalidInternalFormat(void) {
 }
 
 // Test 3: Değiştirilemezlik (Immutability) Testi (Invalid Operation)
-static void test_Immutability(void) {
+static void Texturing_TexStorage2D_TC_003(void) {
+    static const char* test_case = "Texturing_TexStorage2D_TC_003";
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -84,7 +89,7 @@ static void test_Immutability(void) {
     pglTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8_OES, 512, 512);
 
     GLenum err = glGetError();
-    printf("[TEST 3] Degistirilemezlik (Immutability) Testi: ");
+    printf("[TEST][%s][%s] Degistirilemezlik (Immutability) Testi: ", test_procedure, test_case);
 
     if (err == GL_INVALID_OPERATION) {
         printf("BASARILI (Sistem ikinci ayirma islemini GL_INVALID_OPERATION ile reddetti)\n");
@@ -97,7 +102,8 @@ static void test_Immutability(void) {
 }
 
 // Test 4 : level ile boyut ilişkisini test etme
-static void test_level_width_heigth(void) {
+static void Texturing_TexStorage2D_TC_004(void) {
+    static const char* test_case = "Texturing_TexStorage2D_TC_004";
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -106,7 +112,7 @@ static void test_level_width_heigth(void) {
     pglTexStorage2D(GL_TEXTURE_2D, 2, GL_RGBA8_OES, 500, 500);
 
     GLenum err = glGetError();
-    printf("[TEST 4] Level > 1 heigth-width testi: ");
+    printf("[TEST][%s][%s] Level > 1 heigth-width testi: ", test_procedure, test_case);
 
     if (err == GL_INVALID_OPERATION) {
         printf("BASARILI (Sistem spesifikasyona uydu ve GL_INVALID_OPERATION döndürdü)\n");
@@ -122,7 +128,8 @@ static void test_level_width_heigth(void) {
 }
 
 // Test 5 : max level'i aşmaya çalışmak
-static void test_max_levels_exceeded(void) {
+static void Texturing_TexStorage2D_TC_005(void) {
+    static const char* test_case = "Texturing_TexStorage2D_TC_005";
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -135,7 +142,7 @@ static void test_max_levels_exceeded(void) {
     pglTexStorage2D(GL_TEXTURE_2D, levels, GL_RGBA8_OES, w, h);
 
     GLenum err = glGetError();
-    printf("[TEST 5] Maksimum Mipmap Seviyesi Asimi Testi: ");
+    printf("[TEST][%s][%s] Maksimum Mipmap Seviyesi Asimi Testi: ", test_procedure, test_case);
 
     if (err == GL_INVALID_OPERATION) {
         printf("BASARILI (Sistem formüle uydu ve GL_INVALID_OPERATION döndürdü)\n");
@@ -160,13 +167,13 @@ void init(void) {
         return;
     }
 
-    printf("=== TexStorage2D Robustness Testleri Basliyor ===\n\n");
+    printf("=== %s Testleri Basliyor ===\n\n", test_procedure);
 
-    test_NegativeDimensions();
-    test_InvalidInternalFormat();
-    test_Immutability();
-    test_level_width_heigth();
-    test_max_levels_exceeded();
+    Texturing_TexStorage2D_TC_001();
+    Texturing_TexStorage2D_TC_002();
+    Texturing_TexStorage2D_TC_003();
+    Texturing_TexStorage2D_TC_004();
+    Texturing_TexStorage2D_TC_005();
 
     printf("\n=== Testler Tamamlandi ===\n");
 }

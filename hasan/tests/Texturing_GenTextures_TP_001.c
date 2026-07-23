@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+static const char* test_procedure = "Texturing_GenTextures_TP_001";
+
 /*
  * glGenTextures Robustness Test Suite
  * Hasan - OpenGL ES 2.0
@@ -19,10 +21,11 @@
 // Bir texture ID'sinin yasam dongusundeki her asamada
 // glIsTexture'in dogru sonuc dondurup dondurmedigini kontrol eder.
 // ---------------------------------------------------------------
-void test_isTexture_state_chain(void) {
+void Texturing_GenTextures_TC_001(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_001";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_isTexture_state_chain\n");
+  printf("[TEST][%s][%s] test_isTexture_state_chain\n", test_procedure, test_case);
 
   GLuint tex;
   glGenTextures(1, &tex);
@@ -58,10 +61,11 @@ void test_isTexture_state_chain(void) {
 // Bir texture aktif olarak bind edilmis iken yeni texture'lar
 // uretmenin mevcut baglantiyı bozup bozmadigini kontrol eder.
 // ---------------------------------------------------------------
-void test_gen_while_texture_bound(void) {
+void Texturing_GenTextures_TC_002(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_002";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_gen_while_texture_bound\n");
+  printf("[TEST][%s][%s] test_gen_while_texture_bound\n", test_procedure, test_case);
 
   GLuint first;
   glGenTextures(1, &first);
@@ -94,10 +98,11 @@ void test_gen_while_texture_bound(void) {
 // Ayni buffer'a art arda glGenTextures cagrildiginda eski
 // isimlerin gecersiz kalip kalmadigini gozlemler.
 // ---------------------------------------------------------------
-void test_overwrite_same_array(void) {
+void Texturing_GenTextures_TC_003(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_003";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_overwrite_same_array\n");
+  printf("[TEST][%s][%s] test_overwrite_same_array\n", test_procedure, test_case);
 
   GLuint names[5];
 
@@ -131,10 +136,11 @@ void test_overwrite_same_array(void) {
 // Ayni batch'te uretilen ID'lerden bazilari 2D, bazilari CUBE_MAP
 // olarak bind edildiginde birbirlerini etkileyip etkilemedigini test eder.
 // ---------------------------------------------------------------
-void test_mixed_target_batch(void) {
+void Texturing_GenTextures_TC_004(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_004";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_mixed_target_batch\n");
+  printf("[TEST][%s][%s] test_mixed_target_batch\n", test_procedure, test_case);
 
   GLuint tex_ids[4];
   glGenTextures(4, tex_ids);
@@ -170,10 +176,11 @@ void test_mixed_target_batch(void) {
 // Onceden var olan bir GL hata bayragi uzerinde glGenTextures
 // cagrisinin hata durumunu temizleyip temizledigini kontrol eder.
 // ---------------------------------------------------------------
-void test_error_flag_preservation(void) {
+void Texturing_GenTextures_TC_005(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_005";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_error_flag_preservation\n");
+  printf("[TEST][%s][%s] test_error_flag_preservation\n", test_procedure, test_case);
 
   // Kasitli olarak bir hata uret
   glBindTexture(0xDEAD, 0); // GL_INVALID_ENUM uretir
@@ -204,25 +211,23 @@ void test_error_flag_preservation(void) {
 
 // ---------------------------------------------------------------
 // TEST 6: Tekli vs Toplu Uretim Tutarliligi
-// Tek tek uretilen ID'ler ile toplu uretilen ID'lerin ayni
-// kurallara (sifir olmama, benzersizlik) uyup uymadigini karsilastirir.
+// 5 adet tek tek uretilmis ve 5 adet toplu uretilmis ID'nin
+// birbirleriyle veya 0 ile cakismadigini kontrol eder.
 // ---------------------------------------------------------------
-void test_single_vs_batch_consistency(void) {
+void Texturing_GenTextures_TC_006(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_006";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_single_vs_batch_consistency\n");
+  printf("[TEST][%s][%s] test_single_vs_batch_consistency\n", test_procedure, test_case);
 
-  // 5 adet tekli uretim
   GLuint singles[5];
   for (int i = 0; i < 5; i++) {
     glGenTextures(1, &singles[i]);
   }
 
-  // 5 adet toplu uretim
   GLuint batch[5];
   glGenTextures(5, batch);
 
-  // Hicbiri sifir olmamali ve 10 ID'nin tamami benzersiz olmali
   GLuint all[10];
   memcpy(all, singles, 5 * sizeof(GLuint));
   memcpy(all + 5, batch, 5 * sizeof(GLuint));
@@ -258,15 +263,15 @@ void test_single_vs_batch_consistency(void) {
 
 // ---------------------------------------------------------------
 // TEST 7: TexImage2D ile Uretim Arasi Etkilesim
-// Texture ID uretimi ile veri yukleme (glTexImage2D) islemlerinin
-// birbirine karisip karismadini kontrol eder.
+// Aktif bir texture'a glTexImage2D ile veri yuklenirken araya
+// glGenTextures girmesinin VRAM/state durumunu bozmadigini test eder.
 // ---------------------------------------------------------------
-void test_gen_interleaved_with_teximage(void) {
+void Texturing_GenTextures_TC_007(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_007";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_gen_interleaved_with_teximage\n");
+  printf("[TEST][%s][%s] test_gen_interleaved_with_teximage\n", test_procedure, test_case);
 
-  // 1. texture olustur, bind et, 2x2 veri yukle
   GLuint tex_a;
   glGenTextures(1, &tex_a);
   glBindTexture(GL_TEXTURE_2D, tex_a);
@@ -277,11 +282,11 @@ void test_gen_interleaved_with_teximage(void) {
                red_pixels);
   GLenum err1 = glGetError();
 
-  // 2. Arada yeni texture uret (veri yukleme ortasinda)
+  // Veri yuklendi, simdi araya gen giriyor
   GLuint tex_b;
   glGenTextures(1, &tex_b);
 
-  // 3. tex_a hala aktif mi kontrol et
+  // tex_a hala aktif bind olmali
   GLint bound_now = -1;
   glGetIntegerv(GL_TEXTURE_BINDING_2D, &bound_now);
 
@@ -303,10 +308,11 @@ void test_gen_interleaved_with_teximage(void) {
 // ---------------------------------------------------------------
 // TEST 8: Negatif n Degeri (Spec Tanimi: GL_INVALID_VALUE)
 // ---------------------------------------------------------------
-void test_negative_n_spec_error(void) {
+void Texturing_GenTextures_TC_008(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_008";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_negative_n_spec_error\n");
+  printf("[TEST][%s][%s] test_negative_n_spec_error\n", test_procedure, test_case);
 
   GLuint dummy = 0;
   glGenTextures(-1, &dummy);
@@ -323,10 +329,11 @@ void test_negative_n_spec_error(void) {
 // Yeni uretilip bind edilen bir texture'in varsayilan filtre
 // parametrelerinin dogru olup olmadigini kontrol eder.
 // ---------------------------------------------------------------
-void test_default_texture_parameters(void) {
+void Texturing_GenTextures_TC_009(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_009";
   while (glGetError() != GL_NO_ERROR)
     ;
-  printf("[TEST] test_default_texture_parameters\n");
+  printf("[TEST][%s][%s] test_default_texture_parameters\n", test_procedure, test_case);
 
   GLuint tex;
   glGenTextures(1, &tex);
@@ -340,11 +347,6 @@ void test_default_texture_parameters(void) {
 
   GLenum err = glGetError();
 
-  // Varsayilan degerler (OpenGL ES 2.0 spec):
-  // MIN_FILTER = GL_NEAREST_MIPMAP_LINEAR (0x2702)
-  // MAG_FILTER = GL_LINEAR (0x2601)
-  // WRAP_S = GL_REPEAT (0x2901)
-  // WRAP_T = GL_REPEAT (0x2901)
   printf("  MIN_FILTER = 0x%X (beklenen: 0x2702)\n", min_filter);
   printf("  MAG_FILTER = 0x%X (beklenen: 0x2601)\n", mag_filter);
   printf("  WRAP_S     = 0x%X (beklenen: 0x2901)\n", wrap_s);
@@ -360,10 +362,11 @@ void test_default_texture_parameters(void) {
 }
 
 // TEST 10 : n<0 ise Beklenen hata: GL_INVALID_VALUE
-void test_glGenTextures_invalid_value() {
-  while (glGetError() != GL_NO_ERROR) {
-  }
-  printf("[START] rTest_glGenTextures_invalid_value()\n");
+void Texturing_GenTextures_TC_010(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_010";
+  while (glGetError() != GL_NO_ERROR)
+    ;
+  printf("[TEST][%s][%s] Texturing_GenTextures_TC_010()\n", test_procedure, test_case);
 
   GLuint texture = 0;
   glGenTextures(-1, &texture);
@@ -371,36 +374,33 @@ void test_glGenTextures_invalid_value() {
   if (err != GL_INVALID_VALUE) {
     printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
   } else {
-    printf("[PASS] rTest_glGenTextures_invalid_value()\n");
+    printf("[PASS] Texturing_GenTextures_TC_010()\n");
   }
 }
 
-// TEST 11 :
-// textures = NULL, n > 0 (negative robustness)
-// null adrese veri yazdırma -> segmentation fault
-void test_glGenTextures_null_textures() {
-  while (glGetError() != GL_NO_ERROR) {
-  }
-  printf("[START] rTest_glGenTextures_null_textures()\n");
+// TEST 11 : textures = NULL, n > 0 (negative robustness)
+void Texturing_GenTextures_TC_011(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_011";
+  while (glGetError() != GL_NO_ERROR)
+    ;
+  printf("[TEST][%s][%s] Texturing_GenTextures_TC_011()\n", test_procedure, test_case);
 
   glGenTextures(5, NULL);
   GLenum err = glGetError();
   printf("[INFO] glGenTextures(textures=nullptr, n=5): error=0x%X\n", err);
 }
 
-// TEST 12 :
-// Cok sayida texture adi ureterek dondurulen isimlerin benzersiz oldugunu ve
-// reserved 0 isminin uretilmedigini dogrular.
-void test_glGenTextures_unique_names() {
-  while (glGetError() != GL_NO_ERROR) {
-  }
-  printf("[START] rTest_glGenTextures_unique_names()\n");
+// TEST 12 : Unique Names Test
+void Texturing_GenTextures_TC_012(void) {
+  static const char* test_case = "Texturing_GenTextures_TC_012";
+  while (glGetError() != GL_NO_ERROR)
+    ;
+  printf("[TEST][%s][%s] Texturing_GenTextures_TC_012()\n", test_procedure, test_case);
 
   const GLsizei COUNT = 1000;
   GLuint textures[1000];
   glGenTextures(COUNT, textures);
 
-  // 0 ismi uretilmemeli
   for (int i = 0; i < COUNT; i++) {
     if (textures[i] == 0) {
       printf("[FAIL] glGenTextures returned reserved name 0.\n");
@@ -409,7 +409,6 @@ void test_glGenTextures_unique_names() {
     }
   }
 
-  // Ayni isim iki kez uretilmemeli
   for (int i = 0; i < COUNT; i++) {
     for (int j = i + 1; j < COUNT; j++) {
       if (textures[i] == textures[j]) {
@@ -429,10 +428,6 @@ void test_glGenTextures_unique_names() {
   glDeleteTextures(COUNT, textures);
 }
 
-// =========================================================
-// ANA YAPI: init, draw, clean
-// =========================================================
-
 static GLFWwindow *window = NULL;
 static int width = 640, height = 480;
 static const char *windowTitle = "glGenTextures Robustness Tests - Hasan";
@@ -443,21 +438,21 @@ void clean(void);
 
 void init(void) {
   printf("=====================================================\n");
-  printf("  GLGENTEXTURES ROBUSTNESS SUITE - HASAN\n");
+  printf("  %s ROBUSTNESS SUITE - HASAN\n", test_procedure);
   printf("=====================================================\n\n");
 
-  test_isTexture_state_chain();
-  test_gen_while_texture_bound();
-  test_overwrite_same_array();
-  test_mixed_target_batch();
-  test_error_flag_preservation();
-  test_single_vs_batch_consistency();
-  test_gen_interleaved_with_teximage();
-  test_negative_n_spec_error();
-  test_default_texture_parameters();
-  test_glGenTextures_invalid_value();
-  test_glGenTextures_null_textures();
-  test_glGenTextures_unique_names();
+  Texturing_GenTextures_TC_001();
+  Texturing_GenTextures_TC_002();
+  Texturing_GenTextures_TC_003();
+  Texturing_GenTextures_TC_004();
+  Texturing_GenTextures_TC_005();
+  Texturing_GenTextures_TC_006();
+  Texturing_GenTextures_TC_007();
+  Texturing_GenTextures_TC_008();
+  Texturing_GenTextures_TC_009();
+  Texturing_GenTextures_TC_010();
+  Texturing_GenTextures_TC_011();
+  Texturing_GenTextures_TC_012();
 
   printf("=====================================================\n");
   printf("  TUM TESTLER TAMAMLANDI\n");
@@ -470,7 +465,6 @@ void draw(void) {
 }
 
 void clean(void) {
-  // Temizlik
 }
 
 int main(void) {

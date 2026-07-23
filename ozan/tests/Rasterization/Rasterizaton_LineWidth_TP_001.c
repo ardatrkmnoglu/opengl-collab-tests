@@ -65,7 +65,7 @@ void Rasterizaton_LineWidth_TC_001(void)
         return;
     }
 
-    if (!checkFloatState(test_case_1, 2.0f))
+    if (!checkFloatState(test_case_1, test_procedure, GL_LINE_WIDTH, 2.0f, 1e-6f))
         return;
 
     err = glGetError();
@@ -126,7 +126,7 @@ void Rasterizaton_LineWidth_TC_002(void)
         return;
     }
 
-    if (!checkFloatState(test_case_2, 1.0f))
+    if (!checkFloatState(test_case_2, test_procedure, GL_LINE_WIDTH, 1.0f, 1e-6f))
         return;
 
     TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL", passCount, failCount);
@@ -168,19 +168,19 @@ void Rasterizaton_LineWidth_TC_003(void)
     glLineWidth(NAN);
     err=glGetError();
     TEST_LOG_INFO("NaN       -> 0x%X",err);
-    if(!checkFloatState(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, test_procedure, GL_LINE_WIDTH, 3.0f, 1e-6f))
         return;
 
     glLineWidth(INFINITY);
     err=glGetError();
     TEST_LOG_INFO("+Infinity -> 0x%X",err);
-    if(!checkFloatState(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, test_procedure, GL_LINE_WIDTH, 3.0f, 1e-6f))
         return;
 
     glLineWidth(-INFINITY);
     err=glGetError();
     TEST_LOG_INFO("-Infinity -> 0x%X",err);
-    if(!checkFloatState(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, test_procedure, GL_LINE_WIDTH, 3.0f, 1e-6f))
         return;
 
     resetState_LineWidth();
@@ -236,7 +236,7 @@ void Rasterizaton_LineWidth_TC_004(void)
         return;
     }
 
-    if(!checkFloatState(test_case_4, 4.0f))
+    if(!checkFloatState(test_case_4, test_procedure, GL_LINE_WIDTH, 4.0f, 1e-6f))
         return;
 
     resetState_LineWidth();
@@ -326,7 +326,7 @@ void Rasterizaton_LineWidth_TC_005(void)
         return;
     }
 
-    if(!checkFloatState(test_case_5, range[0]))
+    if(!(test_case_5, test_procedure, GL_LINE_WIDTH, range[0], 1e-6f))
         return;
 
     resetState_LineWidth();
@@ -362,7 +362,7 @@ void Rasterizaton_LineWidth_TC_006(void)
             return;
         }
 
-        if(!checkFloatState(test_case_6, width))
+        if(!checkFloatState(test_case_6, test_procedure, GL_LINE_WIDTH, width, 1e-6f))
             return;
     }
 
@@ -402,7 +402,7 @@ void Rasterizaton_LineWidth_TC_007(void)
         return;
     }
 
-    if(!checkFloatState(test_case_7, 5.0f))
+    if(!checkFloatState(test_case_7, test_procedure, GL_LINE_WIDTH, 5.0f, 1e-6f))
         return;
 
     resetState_LineWidth();
@@ -453,7 +453,7 @@ void Rasterizaton_LineWidth_TC_008(void)
             lastValid=width;
         else
         {
-            if(!checkFloatState(test_case_8, lastValid))
+            if(!checkFloatState(test_case_8, test_procedure, GL_LINE_WIDTH, lastValid, 1e-6f))
                 return;
         }
     }

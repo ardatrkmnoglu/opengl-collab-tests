@@ -99,7 +99,7 @@ void SpecialFunctions_Finish_TC_002(void)
         return;
     }
 
-    if(!checkViewport(test_case_2,10,20,320,240))
+    if(!checkViewport(test_case_2, test_procedure, 10,20,320,240))
         return;
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);

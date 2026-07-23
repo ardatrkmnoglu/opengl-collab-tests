@@ -61,7 +61,7 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkViewport(test_case_1,10,20,640,480))
+    if(!checkViewport(test_case_1, test_procedure, 10,20,640,480))
         return;
 
     glViewport(10,20,640,-1);
@@ -74,9 +74,8 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkViewport(test_case_1,10,20,640,480))
+    if(!checkViewport(test_case_1, test_procedure, 10,20,640,480))
         return;
-
     resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
@@ -279,7 +278,7 @@ void ViewportandClipping_Viewport_TC_005(void) {
         return;
     }
 
-    if (!checkViewport(test_case_5, 50, 50, 400, 300))
+    if (!checkViewport(test_case_5, test_procedure, 50, 50, 400, 300))
         return;
 
     glViewport(0, 0, 640, 480);

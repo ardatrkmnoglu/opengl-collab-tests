@@ -62,7 +62,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkIntState(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
+        if(!checkIntState(test_case_1, test_procedure, GL_UNPACK_ALIGNMENT, validValues[i]))
             return;
 
         glPixelStorei(GL_UNPACK_ALIGNMENT,validValues[i]);
@@ -75,7 +75,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkIntState(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
+        if(!checkIntState(test_case_1, test_procedure, GL_UNPACK_ALIGNMENT, validValues[i]))
             return;
     }
 
@@ -148,7 +148,7 @@ void PixelRectangles_PixelStorei_TC_002(void)
             return;
         }
 
-        if(!checkIntState(test_case_2,GL_PACK_ALIGNMENT,4))
+        if(!checkIntState(test_case_2, test_procedure, GL_PACK_ALIGNMENT, 4))
             return;
     }
 
@@ -188,7 +188,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
     /* Bilinen geçerli durum */
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
-    if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
+    if(!checkIntState(test_case_3, test_procedure, GL_PACK_ALIGNMENT, 4)
         return;
 
     /* Çok sayıda geçersiz enum değeri dene */
@@ -206,7 +206,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
         if(err==GL_INVALID_ENUM)
         {
             /* Beklenen durum */
-            if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkIntState(test_case_3, test_procedure, GL_PACK_ALIGNMENT, 4)
                 return;
         }
         else if(err==GL_NO_ERROR)
@@ -216,7 +216,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
              * kabul edebilir. Bu durumda state'in yine de
              * bozulmadığını doğrula.
              */
-            if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkIntState(test_case_3, test_procedure, GL_PACK_ALIGNMENT, 4)
                 return;
         }
         else
@@ -409,7 +409,7 @@ void PixelRectangles_PixelStorei_TC_005(void)
         return;
     }
 
-    if(!checkIntState(test_case_5,GL_UNPACK_ALIGNMENT,8))
+    if(!checkIntState(test_case_5, test_procedure, GL_UNPACK_ALIGNMENT, 8))
         return;
 
     resetState_PixelStorei();

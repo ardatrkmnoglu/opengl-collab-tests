@@ -41,4 +41,18 @@ void Texturing_TexSubImage2D_TC_003(void);
 void Texturing_TexSubImage2D_TC_004(void);
 void Texturing_TexSubImage2D_TC_005(void);
 
+/* --------------- Texturing - GenTextures --------------- */
+void Texturing_GenTextures_TC_001(void);
+void Texturing_GenTextures_TC_002(void);
+void Texturing_GenTextures_TC_003(void);
+void Texturing_GenTextures_TC_004(void);
+void Texturing_GenTextures_TC_005(void);
+void Texturing_GenTextures_TC_006(void);
+void Texturing_GenTextures_TC_007(void);
+void Texturing_GenTextures_TC_008(void);
+void Texturing_GenTextures_TC_009(void);
+void Texturing_GenTextures_TC_010(void);
+void Texturing_GenTextures_TC_011(void);
+void Texturing_GenTextures_TC_012(void);
+
 #endif

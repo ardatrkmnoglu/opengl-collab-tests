@@ -82,6 +82,20 @@ void init(void) {
     Texturing_TexSubImage2D_TC_003();
     Texturing_TexSubImage2D_TC_004();
     Texturing_TexSubImage2D_TC_005();
+
+    /* --------------- Texturing - GenTextures --------------- */
+    Texturing_GenTextures_TC_001();
+    Texturing_GenTextures_TC_002();
+    Texturing_GenTextures_TC_003();
+    Texturing_GenTextures_TC_004();
+    Texturing_GenTextures_TC_005();
+    Texturing_GenTextures_TC_006();
+    Texturing_GenTextures_TC_007();
+    Texturing_GenTextures_TC_008();
+    Texturing_GenTextures_TC_009();
+    Texturing_GenTextures_TC_010();
+    Texturing_GenTextures_TC_011();
+    Texturing_GenTextures_TC_012();
 }
 
 void draw(void) {

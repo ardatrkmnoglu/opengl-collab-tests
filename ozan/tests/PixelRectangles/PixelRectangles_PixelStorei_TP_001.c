@@ -27,14 +27,14 @@ static const char* test_case_6 = "PixelRectangles_PixelStorei_TC_006";
  *   OpenGL state'inin değişmediğini doğrular.
  * ============================================================ */
 
-static void resetState(void)
+static void resetState_PixelStorei(void)
 {
     glPixelStorei(GL_PACK_ALIGNMENT,4);
     glPixelStorei(GL_UNPACK_ALIGNMENT,4);
     while(glGetError()!=GL_NO_ERROR);
 }
 
-static int checkStatePreserved(const char* test_case,
+static int checkStatePreserved_PixelStorei(const char* test_case,
                                GLenum pname, GLint expectedValue)
 {
     GLint value;
@@ -85,7 +85,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
         8
     };
 
-    resetState();
+    resetState_PixelStorei();
 
     for(i=0;i<4;i++)
     {
@@ -99,7 +99,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkStatePreserved(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
+        if(!checkStatePreserved_PixelStorei(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
             return;
 
         glPixelStorei(GL_UNPACK_ALIGNMENT,validValues[i]);
@@ -112,11 +112,11 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkStatePreserved(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
+        if(!checkStatePreserved_PixelStorei(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
             return;
     }
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
@@ -168,7 +168,7 @@ void PixelRectangles_PixelStorei_TC_002(void)
 
     count=sizeof(invalidValues)/sizeof(invalidValues[0]);
 
-    resetState();
+    resetState_PixelStorei();
 
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
@@ -185,11 +185,11 @@ void PixelRectangles_PixelStorei_TC_002(void)
             return;
         }
 
-        if(!checkStatePreserved(test_case_2,GL_PACK_ALIGNMENT,4))
+        if(!checkStatePreserved_PixelStorei(test_case_2,GL_PACK_ALIGNMENT,4))
             return;
     }
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
@@ -220,12 +220,12 @@ void PixelRectangles_PixelStorei_TC_003(void)
     GLenum err;
     GLenum pname;
 
-    resetState();
+    resetState_PixelStorei();
 
     /* Bilinen geçerli durum */
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
-    if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+    if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
         return;
 
     /* Çok sayıda geçersiz enum değeri dene */
@@ -243,7 +243,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
         if(err==GL_INVALID_ENUM)
         {
             /* Beklenen durum */
-            if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
                 return;
         }
         else if(err==GL_NO_ERROR)
@@ -253,7 +253,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
              * kabul edebilir. Bu durumda state'in yine de
              * bozulmadığını doğrula.
              */
-            if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
                 return;
         }
         else
@@ -264,7 +264,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
         }
     }
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
@@ -291,7 +291,7 @@ void PixelRectangles_PixelStorei_TC_004(void)
     GLenum err;
     GLint value;
 
-    resetState();
+    resetState_PixelStorei();
 
     /*--------------------------------------------*/
     /* PACK_ALIGNMENT                             */
@@ -372,7 +372,7 @@ void PixelRectangles_PixelStorei_TC_004(void)
         return;
     }
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
@@ -400,7 +400,7 @@ void PixelRectangles_PixelStorei_TC_005(void)
 {
     GLenum err;
 
-    resetState();
+    resetState_PixelStorei();
 
     /* Geçerli çağrı */
     glPixelStorei(GL_PACK_ALIGNMENT,4);
@@ -446,10 +446,10 @@ void PixelRectangles_PixelStorei_TC_005(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_5,GL_UNPACK_ALIGNMENT,8))
+    if(!checkStatePreserved_PixelStorei(test_case_5,GL_UNPACK_ALIGNMENT,8))
         return;
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -490,7 +490,7 @@ void PixelRectangles_PixelStorei_TC_006(void)
         GL_UNPACK_ALIGNMENT
     };
 
-    resetState();
+    resetState_PixelStorei();
 
     srand(12345);
 
@@ -522,7 +522,7 @@ void PixelRectangles_PixelStorei_TC_006(void)
         }
     }
 
-    resetState();
+    resetState_PixelStorei();
 
     TEST_LOG_INFO("1,000,000 rastgele test basariyla tamamlandi.");
     TEST_LOG_SUCCESS(test_case_6, test_procedure);

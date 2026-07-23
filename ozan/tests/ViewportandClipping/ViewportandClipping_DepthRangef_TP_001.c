@@ -14,44 +14,6 @@ static const char* test_case_3 = "ViewportandClipping_DepthRangef_TC_003";
 static const char* test_case_4 = "ViewportandClipping_DepthRangef_TC_004";
 static const char* test_case_5 = "ViewportandClipping_DepthRangef_TC_005";
 static const char* test_case_6 = "ViewportandClipping_DepthRangef_TC_006";
-
-/* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi/sonrasi OpenGL durumunu varsayilan
- * hale getirir ve hata kuyrugunu temizler.
- *
- * checkStatePreserved: Beklenen depth range durumunun
- * bozulmadigini dogrular.
- * ============================================================ */
-
-static void resetState(void)
-{
-    glDepthRange(0.0,1.0);
-
-    while(glGetError()!=GL_NO_ERROR);
-}
-
-static int checkStatePreserved(const char* test_case,
-                               GLdouble expectedNear,GLdouble expectedFar)
-{
-    GLdouble depthRange[2];
-
-    glGetDoublev(GL_DEPTH_RANGE,depthRange);
-
-    if(fabs(depthRange[0]-expectedNear)>1e-6 ||
-       fabs(depthRange[1]-expectedFar)>1e-6)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "Depth range durumu bozuldu. Beklenen: (%lf,%lf) Gercek: (%lf,%lf)",
-                      expectedNear,expectedFar,depthRange[0],depthRange[1]);
-        return 0;
-    }
-
-    return 1;
-}
-
 /* ============================================================
  * TEST 1: Sozlesme dogrulama
  * ============================================================ */
@@ -68,7 +30,7 @@ void ViewportandClipping_DepthRangef_TC_001(void)
     GLdouble depthRange[2];
     GLenum err;
 
-    resetState();
+    resetState_DepthRange();
 
     glDepthRange(0.0,1.0);
 
@@ -114,7 +76,7 @@ void ViewportandClipping_DepthRangef_TC_001(void)
         return;
     }
 
-    resetState();
+    resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
@@ -137,7 +99,7 @@ void ViewportandClipping_DepthRangef_TC_002(void)
     int passCount=0;
     int failCount=0;
 
-    resetState();
+    resetState_DepthRange();
 
     for(nearStep=-10;nearStep<=20;nearStep++)
     {
@@ -174,7 +136,7 @@ void ViewportandClipping_DepthRangef_TC_002(void)
         return;
     }
 
-    resetState();
+    resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
@@ -211,7 +173,7 @@ void ViewportandClipping_DepthRangef_TC_003(void)
     int count=sizeof(tests)/sizeof(tests[0]);
     int i;
 
-    resetState();
+    resetState_DepthRange();
 
     for(i=0;i<count;i++)
     {
@@ -230,7 +192,7 @@ void ViewportandClipping_DepthRangef_TC_003(void)
         }
     }
 
-    resetState();
+    resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
@@ -263,7 +225,7 @@ void ViewportandClipping_DepthRangef_TC_004(void)
     int count=sizeof(values)/sizeof(values[0]);
     int i;
 
-    resetState();
+    resetState_DepthRange();
 
     for(i=0;i<count;i++)
     {
@@ -295,10 +257,10 @@ void ViewportandClipping_DepthRangef_TC_004(void)
         }
     }
 
-    if(!checkStatePreserved(test_case_4,0.0,1.0))
+    if(!checkStatePreserved_DepthRange(test_case_4,0.0,1.0))
         return;
 
-    resetState();
+    resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
@@ -318,7 +280,7 @@ void ViewportandClipping_DepthRangef_TC_005(void)
     GLdouble depthRange[2];
     GLenum err;
 
-    resetState();
+    resetState_DepthRange();
 
     glDepthRange(0.20,0.80);
 
@@ -364,7 +326,7 @@ void ViewportandClipping_DepthRangef_TC_005(void)
         return;
     }
 
-    resetState();
+    resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -382,7 +344,7 @@ void ViewportandClipping_DepthRangef_TC_006(void)
 {
     unsigned int i;
 
-    resetState();
+    resetState_DepthRange();
 
     srand(12345);
 
@@ -406,7 +368,7 @@ void ViewportandClipping_DepthRangef_TC_006(void)
         }
     }
 
-    resetState();
+    resetState_DepthRange();
     TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
 

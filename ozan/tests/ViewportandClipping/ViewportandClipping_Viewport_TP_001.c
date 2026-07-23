@@ -13,65 +13,6 @@ static const char* test_case_3 = "ViewportandClipping_Viewport_TC_003";
 static const char* test_case_4 = "ViewportandClipping_Viewport_TC_004";
 static const char* test_case_5 = "ViewportandClipping_Viewport_TC_005";
 static const char* test_case_6 = "ViewportandClipping_Viewport_TC_006";
-
-/* ============================================================
- * Test altyapisi
- *
- * resetState:
- * Her test oncesi viewport varsayilan degerlere dondurulur
- * ve hata kuyrugu temizlenir.
- *
- * checkStatePreserved:
- * Gecersiz glViewport cagrilarindan sonra viewport state'inin
- * degismedigini dogrular.
- *
- * randInt32:
- * rand() fonksiyonu bazi platformlarda yalnizca 15 bit
- * uretir. Tam 32-bit aralikta rastgele deger elde etmek
- * icin birden fazla cagri birlestirilir.
- * ============================================================ */
-
-static void resetState(void)
-{
-    glViewport(0,0,640,480);
-
-    while(glGetError()!=GL_NO_ERROR);
-}
-
-static int checkStatePreserved(const char* test_case,
-                               GLint x,GLint y,
-                               GLsizei width,GLsizei height)
-{
-    GLint viewport[4];
-
-    glGetIntegerv(GL_VIEWPORT,viewport);
-
-    if(viewport[0]!=x ||
-       viewport[1]!=y ||
-       viewport[2]!=width ||
-       viewport[3]!=height)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "Viewport durumu bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                      x,y,width,height,
-                      viewport[0],viewport[1],viewport[2],viewport[3]);
-        return 0;
-    }
-
-    return 1;
-}
-
-static GLint randInt32(void)
-{
-    unsigned int value;
-
-    value = ((unsigned int)rand() & 0x7FFFu);
-    value = (value << 15) | ((unsigned int)rand() & 0x7FFFu);
-    value = (value << 2)  | ((unsigned int)rand() & 0x3u);
-
-    return (GLint)value;
-}
-
 /* ============================================================
  * TEST 1: Temel Robustness Dogrulamasi
  * ============================================================ */
@@ -86,7 +27,7 @@ void ViewportandClipping_Viewport_TC_001(void)
 {
     GLint viewport[4];
     GLenum err;
-    resetState();
+    resetState_Viewport();
 
     glViewport(10,20,640,480);
 
@@ -119,7 +60,7 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_1,10,20,640,480))
+    if(!checkStatePreserved_Viewport(test_case_1,10,20,640,480))
         return;
 
     glViewport(10,20,640,-1);
@@ -132,10 +73,10 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_1,10,20,640,480))
+    if(!checkStatePreserved_Viewport(test_case_1,10,20,640,480))
         return;
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
@@ -158,7 +99,7 @@ void ViewportandClipping_Viewport_TC_002(void)
     int passCount=0;
     int failCount=0;
 
-    resetState();
+    resetState_Viewport();
 
     for(w=-100;w<=100;w++)
     {
@@ -193,7 +134,7 @@ void ViewportandClipping_Viewport_TC_002(void)
         return;
     }
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
 
@@ -230,7 +171,7 @@ void ViewportandClipping_Viewport_TC_003(void)
     int i;
     int count = sizeof(coordinates) / sizeof(coordinates[0]);
 
-    resetState();
+    resetState_Viewport();
 
     for (i = 0; i < count; i++) {
 
@@ -254,7 +195,7 @@ void ViewportandClipping_Viewport_TC_003(void)
             }
     }
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
@@ -272,7 +213,7 @@ void ViewportandClipping_Viewport_TC_004(void)
     GLint maxViewport[2];
     GLenum err;
 
-    resetState();
+    resetState_Viewport();
 
     glGetIntegerv(GL_MAX_VIEWPORT_DIMS, maxViewport);
 
@@ -304,7 +245,7 @@ void ViewportandClipping_Viewport_TC_004(void)
     if (err != GL_NO_ERROR)
         TEST_LOG_INFO("INT_MAX viewport -> 0x%X", err);
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
@@ -320,7 +261,7 @@ void ViewportandClipping_Viewport_TC_004(void)
 void ViewportandClipping_Viewport_TC_005(void) {
     GLenum err;
 
-    resetState();
+    resetState_Viewport();
 
     glViewport(50, 50, 400, 300);
     if (glGetError() != GL_NO_ERROR) {
@@ -337,7 +278,7 @@ void ViewportandClipping_Viewport_TC_005(void) {
         return;
     }
 
-    if (!checkStatePreserved(test_case_5, 50, 50, 400, 300))
+    if (!checkStatePreserved_Viewport(test_case_5, 50, 50, 400, 300))
         return;
 
     glViewport(0, 0, 640, 480);
@@ -346,7 +287,7 @@ void ViewportandClipping_Viewport_TC_005(void) {
         return;
     }
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -368,15 +309,15 @@ void ViewportandClipping_Viewport_TC_006(void) {
     unsigned int validCount = 0;
     unsigned int invalidCount = 0;
 
-    resetState();
+    resetState_Viewport();
 
     srand(12345);
 
     for (i = 0; i < 1000000; i++) {
-        GLint x = randInt32();
-        GLint y = randInt32();
-        GLsizei width  = (GLsizei)(randInt32() % 4096);
-        GLsizei height = (GLsizei)(randInt32() % 4096);
+        GLint x = randInt32_Viewport();
+        GLint y = randInt32_Viewport();
+        GLsizei width  = (GLsizei)(randInt32_Viewport() % 4096);
+        GLsizei height = (GLsizei)(randInt32_Viewport() % 4096);
 
         GLenum expected;
         GLenum err;
@@ -401,7 +342,7 @@ void ViewportandClipping_Viewport_TC_006(void) {
         }
     }
 
-    resetState();
+    resetState_Viewport();
 
     TEST_LOG_INFO("1000000 rastgele cagri tamamlandi (gecerli: %u, gecersiz: %u)",
                   validCount, invalidCount);

@@ -16,13 +16,13 @@ static const char* test_case_6 = "Rasterizaton_LineWidth_TC_006";
 static const char* test_case_7 = "Rasterizaton_LineWidth_TC_007";
 static const char* test_case_8 = "Rasterizaton_LineWidth_TC_008";
 
-static void resetState(void)
+static void resetState_LineWidth(void)
 {
     glLineWidth(1.0f);
     while (glGetError() != GL_NO_ERROR);
 }
 
-static int checkStatePreserved(const char* test_case, GLfloat expected)
+static int checkStatePreserved_GetError(const char* test_case, GLfloat expected)
 {
     GLfloat actual;
     glGetFloatv(GL_LINE_WIDTH, &actual);
@@ -53,7 +53,7 @@ void Rasterizaton_LineWidth_TC_001(void)
     GLfloat width;
     GLenum err;
 
-    resetState();
+    resetState_LineWidth();
 
     glLineWidth(2.0f);
     err = glGetError();
@@ -86,7 +86,7 @@ void Rasterizaton_LineWidth_TC_001(void)
         return;
     }
 
-    if (!checkStatePreserved(test_case_1, 2.0f))
+    if (!checkStatePreserved_GetError(test_case_1, 2.0f))
         return;
 
     err = glGetError();
@@ -96,7 +96,7 @@ void Rasterizaton_LineWidth_TC_001(void)
         return;
     }
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
@@ -116,7 +116,7 @@ void Rasterizaton_LineWidth_TC_002(void)
     int passCount = 0;
     int failCount = 0;
 
-    resetState();
+    resetState_LineWidth();
 
     for(i = -10000; i <= 10000; i++)
     {
@@ -147,7 +147,7 @@ void Rasterizaton_LineWidth_TC_002(void)
         return;
     }
 
-    if (!checkStatePreserved(test_case_2, 1.0f))
+    if (!checkStatePreserved_GetError(test_case_2, 1.0f))
         return;
 
     TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL", passCount, failCount);
@@ -176,7 +176,7 @@ void Rasterizaton_LineWidth_TC_003(void)
 {
     GLenum err;
 
-    resetState();
+    resetState_LineWidth();
 
     glLineWidth(3.0f);
     err=glGetError();
@@ -189,22 +189,22 @@ void Rasterizaton_LineWidth_TC_003(void)
     glLineWidth(NAN);
     err=glGetError();
     TEST_LOG_INFO("NaN       -> 0x%X",err);
-    if(!checkStatePreserved(test_case_3, 3.0f))
+    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
         return;
 
     glLineWidth(INFINITY);
     err=glGetError();
     TEST_LOG_INFO("+Infinity -> 0x%X",err);
-    if(!checkStatePreserved(test_case_3, 3.0f))
+    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
         return;
 
     glLineWidth(-INFINITY);
     err=glGetError();
     TEST_LOG_INFO("-Infinity -> 0x%X",err);
-    if(!checkStatePreserved(test_case_3, 3.0f))
+    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
         return;
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
@@ -224,7 +224,7 @@ void Rasterizaton_LineWidth_TC_004(void)
     GLenum err;
     int errorCount=0;
 
-    resetState();
+    resetState_LineWidth();
 
     for(i=0;i<100;i++)
         glLineWidth(-(GLfloat)(i+1));
@@ -257,10 +257,10 @@ void Rasterizaton_LineWidth_TC_004(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_4, 4.0f))
+    if(!checkStatePreserved_GetError(test_case_4, 4.0f))
         return;
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
@@ -286,7 +286,7 @@ void Rasterizaton_LineWidth_TC_005(void)
     GLfloat request;
     GLenum err;
 
-    resetState();
+    resetState_LineWidth();
 
     glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE,range);
 
@@ -347,10 +347,10 @@ void Rasterizaton_LineWidth_TC_005(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_5, range[0]))
+    if(!checkStatePreserved_GetError(test_case_5, range[0]))
         return;
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -369,7 +369,7 @@ void Rasterizaton_LineWidth_TC_006(void)
     int i;
     const int tekrar=100000;
 
-    resetState();
+    resetState_LineWidth();
 
     for(i=0;i<tekrar;i++)
     {
@@ -383,11 +383,11 @@ void Rasterizaton_LineWidth_TC_006(void)
             return;
         }
 
-        if(!checkStatePreserved(test_case_6, width))
+        if(!checkStatePreserved_GetError(test_case_6, width))
             return;
     }
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_INFO("Sonuc: %d gecis tamamlandi",tekrar);
 
@@ -408,7 +408,7 @@ void Rasterizaton_LineWidth_TC_007(void)
     int i;
     const int tekrar=1000000;
 
-    resetState();
+    resetState_LineWidth();
 
     for(i=0;i<tekrar;i++)
     {
@@ -423,10 +423,10 @@ void Rasterizaton_LineWidth_TC_007(void)
         return;
     }
 
-    if(!checkStatePreserved(test_case_7, 5.0f))
+    if(!checkStatePreserved_GetError(test_case_7, 5.0f))
         return;
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_INFO("Sonuc: %d cagri tamamlandi",tekrar*3);
 
@@ -448,7 +448,7 @@ void Rasterizaton_LineWidth_TC_008(void)
     int i;
     GLfloat lastValid=1.0f;
 
-    resetState();
+    resetState_LineWidth();
 
     srand(12345);
 
@@ -474,12 +474,12 @@ void Rasterizaton_LineWidth_TC_008(void)
             lastValid=width;
         else
         {
-            if(!checkStatePreserved(test_case_8, lastValid))
+            if(!checkStatePreserved_GetError(test_case_8, lastValid))
                 return;
         }
     }
 
-    resetState();
+    resetState_LineWidth();
 
     TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }

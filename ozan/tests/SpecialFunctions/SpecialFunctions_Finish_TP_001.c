@@ -14,38 +14,6 @@ static const char* test_case_6 = "SpecialFunctions_Finish_TC_006";
 static const char* test_case_7 = "SpecialFunctions_Finish_TC_007";
 
 /* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   Her testten önce OpenGL hata kuyruğu temizlenir.
- *
- * checkViewportPreserved:
- *   glFinish() çağrısından sonra OpenGL state'inin
- *   değişmediğini doğrular.
- * ============================================================
- */
-
-static int checkViewportPreserved(const char* test_case,
-                                  GLint x,GLint y,GLsizei width,GLsizei height)
-{
-    GLint viewport[4];
-
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    if(viewport[0] != x || viewport[1] != y || viewport[2] != width || viewport[3] != height)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                      x, y, width, height,
-                      viewport[0], viewport[1], viewport[2], viewport[3]);
-        return 0;
-    }
-
-    return 1;
-}
-
-
-/* ============================================================
  * TEST 1 : Basic Robustness
  * ============================================================
  */
@@ -131,7 +99,7 @@ void SpecialFunctions_Finish_TC_002(void)
         return;
     }
 
-    if(!checkViewportPreserved(test_case_2,10,20,320,240))
+    if(!checkViewportPreserved_Finish(test_case_2,10,20,320,240))
         return;
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);

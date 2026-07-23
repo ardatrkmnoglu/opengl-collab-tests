@@ -27,13 +27,13 @@ static const char* test_case_8 = "Rasterizaton_FrontFace_TC_008";
  * Geçersiz çağrılar sonrasında state değişmemelidir.
  * ============================================================ */
 
-static void resetState(void)
+static void resetState_FrontFace(void)
 {
     glFrontFace(GL_CCW);
     while(glGetError()!=GL_NO_ERROR);
 }
 
-static int checkStatePreserved(const char* test_case, GLint expected)
+static int checkStatePreserved_FrontFace(const char* test_case, GLint expected)
 {
     GLint actual;
     glGetIntegerv(GL_FRONT_FACE,&actual);
@@ -68,7 +68,7 @@ void Rasterizaton_FrontFace_TC_001(void)
     int errorCount=0;
     int i;
 
-    resetState();
+    resetState_FrontFace();
     for(i=0;i<100;i++)
     {
         glFrontFace((GLenum)(0x5000+i));
@@ -95,10 +95,10 @@ void Rasterizaton_FrontFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkStatePreserved(test_case_1,GL_CW))
+    if(!checkStatePreserved_FrontFace(test_case_1,GL_CW))
         return;
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
@@ -121,7 +121,7 @@ void Rasterizaton_FrontFace_TC_002(void)
     const int repeat=100000;
     int i;
 
-    resetState();
+    resetState_FrontFace();
     for(i=0;i<repeat;i++)
     {
         GLenum expected=
@@ -145,7 +145,7 @@ void Rasterizaton_FrontFace_TC_002(void)
         }
     }
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
@@ -185,7 +185,7 @@ void Rasterizaton_FrontFace_TC_003(void)
 
     int i;
 
-    resetState();
+    resetState_FrontFace();
 
     for(i=0;i<count;i++)
     {
@@ -208,17 +208,17 @@ void Rasterizaton_FrontFace_TC_003(void)
         }
         if(value==GL_CW)
         {
-            if(!checkStatePreserved(test_case_3,GL_CW))
+            if(!checkStatePreserved_FrontFace(test_case_3,GL_CW))
                 return;
         }
         if(value==GL_CCW)
         {
-            if(!checkStatePreserved(test_case_3,GL_CCW))
+            if(!checkStatePreserved_FrontFace(test_case_3,GL_CCW))
                 return;
         }
     }
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
@@ -255,7 +255,7 @@ void Rasterizaton_FrontFace_TC_004(void)
     int count=sizeof(invalidEnums)/sizeof(invalidEnums[0]);
     int i;
 
-    resetState();
+    resetState_FrontFace();
     glFrontFace(GL_CW);
     err=glGetError();
     if(err!=GL_NO_ERROR)
@@ -263,7 +263,7 @@ void Rasterizaton_FrontFace_TC_004(void)
         TEST_LOG_FAIL(test_case_4, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkStatePreserved(test_case_4,GL_CW))
+    if(!checkStatePreserved_FrontFace(test_case_4,GL_CW))
         return;
 
     for(i=0;i<count;i++)
@@ -279,11 +279,11 @@ void Rasterizaton_FrontFace_TC_004(void)
                           err);
             return;
         }
-        if(!checkStatePreserved(test_case_4,GL_CW))
+        if(!checkStatePreserved_FrontFace(test_case_4,GL_CW))
             return;
     }
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
@@ -320,7 +320,7 @@ void Rasterizaton_FrontFace_TC_005(void)
     int i;
     int j;
 
-    resetState();
+    resetState_FrontFace();
     glEnable(GL_CULL_FACE);
     for(i=0;i<2;i++)
     {
@@ -371,7 +371,7 @@ void Rasterizaton_FrontFace_TC_005(void)
     }
 
     glDisable(GL_CULL_FACE);
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -404,7 +404,7 @@ void Rasterizaton_FrontFace_TC_006(void)
     int count=sizeof(values)/sizeof(values[0]);
     int i;
 
-    resetState();
+    resetState_FrontFace();
 
     for(i=0;i<count;i++)
     {
@@ -420,11 +420,11 @@ void Rasterizaton_FrontFace_TC_006(void)
                           err);
             return;
         }
-        if(!checkStatePreserved(test_case_6,GL_CCW))
+        if(!checkStatePreserved_FrontFace(test_case_6,GL_CCW))
             return;
     }
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
@@ -448,7 +448,7 @@ void Rasterizaton_FrontFace_TC_007(void)
     const unsigned int repeat = 1000000;
     unsigned int i;
 
-    resetState();
+    resetState_FrontFace();
 
     for(i = 0; i < repeat; i++)
     {
@@ -461,10 +461,10 @@ void Rasterizaton_FrontFace_TC_007(void)
         TEST_LOG_FAIL(test_case_7, test_procedure, "Yogun kullanim sonrasi hata olustu.");
         return;
     }
-    if(!checkStatePreserved(test_case_7,GL_CCW))
+    if(!checkStatePreserved_FrontFace(test_case_7,GL_CCW))
         return;
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_INFO("%u cift cagri tamamlandi.", repeat);
     TEST_LOG_SUCCESS(test_case_7, test_procedure);
@@ -494,7 +494,7 @@ void Rasterizaton_FrontFace_TC_008(void)
 {
     unsigned int i;
 
-    resetState();
+    resetState_FrontFace();
     srand(12345);
 
     for(i = 0; i < 1000000; i++)
@@ -526,7 +526,7 @@ void Rasterizaton_FrontFace_TC_008(void)
         }
     }
 
-    resetState();
+    resetState_FrontFace();
 
     TEST_LOG_INFO("1,000,000 rastgele test tamamlandi.");
     TEST_LOG_SUCCESS(test_case_8, test_procedure);

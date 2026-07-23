@@ -12,7 +12,6 @@ static const char* test_case_4 = "SpecialFunctions_Flush_TC_004";
 static const char* test_case_5 = "SpecialFunctions_Flush_TC_005";
 static const char* test_case_6 = "SpecialFunctions_Flush_TC_006";
 static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
-
 /* ============================================================
  * Test altyapısı
  *
@@ -25,7 +24,7 @@ static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
  * ============================================================
  */
 
-static int checkViewportPreserved(const char* test_case,
+static int checkViewportPreserved_Flush(const char* test_case_8,
                                   GLint x,GLint y,GLsizei width,GLsizei height)
 {
     GLint viewport[4];
@@ -34,7 +33,7 @@ static int checkViewportPreserved(const char* test_case,
 
     if(viewport[0] != x || viewport[1] != y || viewport[2] != width ||viewport[3] != height)
     {
-        TEST_LOG_FAIL(test_case, test_procedure,
+        TEST_LOG_FAIL(test_case_8, test_procedure,
                       "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
                       x, y, width, height,
                       viewport[0], viewport[1], viewport[2], viewport[3]);
@@ -122,7 +121,7 @@ void test_flush_statePreservation(void)
         return;
     }
 
-    if(!checkViewportPreserved(test_case_2,10,20,320,240))
+    if(!checkViewportPreserved_Flush(test_case_2,10,20,320,240))
         return;
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);

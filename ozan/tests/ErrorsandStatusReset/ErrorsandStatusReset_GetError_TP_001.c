@@ -25,7 +25,7 @@ static const char* test_case_7 = "ErrorsandStatusReset_GetError_TC_007";
  * ============================================================
  */
 
-static int checkStatePreserved(const char* test_case, GLfloat expectedWidth)
+static int checkStatePreserved_GetError(const char* test_case, GLfloat expectedWidth)
 {
     GLfloat width=0.0f;
 
@@ -263,7 +263,7 @@ void ErrorsandStatusReset_GetError_TC_005(void)
         }
     }
 
-    if(!checkStatePreserved(test_case_5, 3.0f))
+    if(!checkStatePreserved_GetError(test_case_5, 3.0f))
         return;
 
     glLineWidth(1.0f);

@@ -22,6 +22,19 @@ static const char* test_case12 = "Texturing_GenTextures_TC_012";
 
 static const char* test_procedure = "Texturing_GenTextures_TP_001";
 
+// Static variables for cleanup in close()
+static GLuint g_tex2_first = 0;
+static GLuint g_tex2_batch[10] = {0};
+static GLuint g_tex3_names[5] = {0};
+static GLuint g_tex4_ids[4] = {0};
+static GLuint g_tex5 = 0;
+static GLuint g_tex6_singles[5] = {0};
+static GLuint g_tex6_batch[5] = {0};
+static GLuint g_tex7_a = 0;
+static GLuint g_tex7_b = 0;
+static GLuint g_tex9 = 0;
+static GLuint g_tex12[1000] = {0};
+
 /*
  * glGenTextures Robustness Test Suite
  * Hasan - OpenGL ES 2.0
@@ -34,6 +47,7 @@ static const char* test_procedure = "Texturing_GenTextures_TP_001";
 // TEST 1: glIsTexture Durum Zinciri
 // Bir texture ID'sinin yasam dongusundeki her asamada
 // glIsTexture'in dogru sonuc dondurup dondurmedigini kontrol eder.
+// (Not: Bu test adimlarindan biri glDeleteTextures davranisini test eder)
 // ---------------------------------------------------------------
 void Texturing_GenTextures_TC_001(void) {
   while (glGetError() != GL_NO_ERROR);
@@ -48,7 +62,7 @@ void Texturing_GenTextures_TC_001(void) {
   glBindTexture(GL_TEXTURE_2D, tex);
   GLboolean after_bind = glIsTexture(tex);
 
-  // Asama 3: Silindi -> GL_FALSE olmali
+  // Asama 3: Silindi -> GL_FALSE olmali (glDeleteTextures testi)
   glDeleteTextures(1, &tex);
   GLboolean after_delete = glIsTexture(tex);
 
@@ -68,13 +82,11 @@ void Texturing_GenTextures_TC_001(void) {
 void Texturing_GenTextures_TC_002(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint first;
-  glGenTextures(1, &first);
-  glBindTexture(GL_TEXTURE_2D, first);
+  glGenTextures(1, &g_tex2_first);
+  glBindTexture(GL_TEXTURE_2D, g_tex2_first);
 
   // Binding aktifken yeni texture'lar uret
-  GLuint batch[10];
-  glGenTextures(10, batch);
+  glGenTextures(10, g_tex2_batch);
 
   // Mevcut binding bozulmamis olmali
   GLint current_binding = -1;
@@ -82,13 +94,10 @@ void Texturing_GenTextures_TC_002(void) {
 
   GLenum err = glGetError();
 
-  if ((GLuint)current_binding == first && err == GL_NO_ERROR)
+  if ((GLuint)current_binding == g_tex2_first && err == GL_NO_ERROR)
     TEST_LOG_SUCCESS(test_case2, test_procedure);
   else
-    TEST_LOG_FAIL(test_case2, test_procedure, "Binding bozuldu: aktif=%d, beklenen=%u, err=0x%X", current_binding, first, err);
-
-  glDeleteTextures(10, batch);
-  glDeleteTextures(1, &first);
+    TEST_LOG_FAIL(test_case2, test_procedure, "Binding bozuldu: aktif=%d, beklenen=%u, err=0x%X", current_binding, g_tex2_first, err);
 }
 
 // ---------------------------------------------------------------
@@ -99,24 +108,18 @@ void Texturing_GenTextures_TC_002(void) {
 void Texturing_GenTextures_TC_003(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint names[5];
-
   // Ilk uretim
-  glGenTextures(5, names);
+  glGenTextures(5, g_tex3_names);
 
   // Ayni array'e ikinci uretim (eski isimler kaybolur)
-  glGenTextures(5, names);
+  glGenTextures(5, g_tex3_names);
 
-  // Ilk uretilen isimler artik sahipsiz: bind edilmemis ve kimsenin
-  // referansi yok. Spec'e gore leak olur ama crash olmamali.
   GLenum err = glGetError();
 
   if (err == GL_NO_ERROR)
     TEST_LOG_SUCCESS(test_case3, test_procedure);
   else
     TEST_LOG_FAIL(test_case3, test_procedure, "Ust uste yazmada hata: 0x%X", err);
-
-  glDeleteTextures(5, names);
 }
 
 // ---------------------------------------------------------------
@@ -127,29 +130,26 @@ void Texturing_GenTextures_TC_003(void) {
 void Texturing_GenTextures_TC_004(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint tex_ids[4];
-  glGenTextures(4, tex_ids);
+  glGenTextures(4, g_tex4_ids);
 
   // 0 ve 1 -> TEXTURE_2D
-  glBindTexture(GL_TEXTURE_2D, tex_ids[0]);
-  glBindTexture(GL_TEXTURE_2D, tex_ids[1]);
+  glBindTexture(GL_TEXTURE_2D, g_tex4_ids[0]);
+  glBindTexture(GL_TEXTURE_2D, g_tex4_ids[1]);
 
   // 2 ve 3 -> TEXTURE_CUBE_MAP
-  glBindTexture(GL_TEXTURE_CUBE_MAP, tex_ids[2]);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, tex_ids[3]);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, g_tex4_ids[2]);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, g_tex4_ids[3]);
 
   GLenum err = glGetError();
 
   // Simdi 0'i CUBE_MAP'e bind etmeye calis -> GL_INVALID_OPERATION
-  glBindTexture(GL_TEXTURE_CUBE_MAP, tex_ids[0]);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, g_tex4_ids[0]);
   GLenum cross_err = glGetError();
 
   if (err == GL_NO_ERROR && cross_err == GL_INVALID_OPERATION)
     TEST_LOG_SUCCESS(test_case4, test_procedure);
   else
     TEST_LOG_FAIL(test_case4, test_procedure, "Capraz hedef hatasi: err=0x%X, cross_err=0x%X (0x502 beklenir)", err, cross_err);
-
-  glDeleteTextures(4, tex_ids);
 }
 
 // ---------------------------------------------------------------
@@ -164,13 +164,10 @@ void Texturing_GenTextures_TC_005(void) {
   glBindTexture(0xDEAD, 0); // GL_INVALID_ENUM uretir
   GLenum planted_err = glGetError();
 
-  // Simdi yeni bir hata dikmeden temiz cagri yap
   while (glGetError() != GL_NO_ERROR); // onceki hatayi temizle
   glBindTexture(0xBEEF, 0);            // yeni bir hata dik
   
-  // Bu hatayi OKUMADAN glGenTextures cagir
-  GLuint tex;
-  glGenTextures(1, &tex);
+  glGenTextures(1, &g_tex5);
 
   // Dikilen hata hala mevcut olmali
   GLenum surviving_err = glGetError();
@@ -179,8 +176,6 @@ void Texturing_GenTextures_TC_005(void) {
     TEST_LOG_SUCCESS(test_case5, test_procedure);
   else
     TEST_LOG_FAIL(test_case5, test_procedure, "Onceki hata korunamadi: planted=0x%X, surviving=0x%X", planted_err, surviving_err);
-
-  glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -191,17 +186,15 @@ void Texturing_GenTextures_TC_005(void) {
 void Texturing_GenTextures_TC_006(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint singles[5];
   for (int i = 0; i < 5; i++) {
-    glGenTextures(1, &singles[i]);
+    glGenTextures(1, &g_tex6_singles[i]);
   }
 
-  GLuint batch[5];
-  glGenTextures(5, batch);
+  glGenTextures(5, g_tex6_batch);
 
   GLuint all[10];
-  memcpy(all, singles, 5 * sizeof(GLuint));
-  memcpy(all + 5, batch, 5 * sizeof(GLuint));
+  memcpy(all, g_tex6_singles, 5 * sizeof(GLuint));
+  memcpy(all + 5, g_tex6_batch, 5 * sizeof(GLuint));
 
   int ok = 1;
   for (int i = 0; i < 10; i++) {
@@ -224,9 +217,6 @@ void Texturing_GenTextures_TC_006(void) {
     TEST_LOG_SUCCESS(test_case6, test_procedure);
   else
     TEST_LOG_FAIL(test_case6, test_procedure, "Tekli ve toplu uretim tutarsiz veya 0 ID: err=0x%X", err);
-
-  glDeleteTextures(5, singles);
-  glDeleteTextures(5, batch);
 }
 
 // ---------------------------------------------------------------
@@ -237,9 +227,8 @@ void Texturing_GenTextures_TC_006(void) {
 void Texturing_GenTextures_TC_007(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint tex_a;
-  glGenTextures(1, &tex_a);
-  glBindTexture(GL_TEXTURE_2D, tex_a);
+  glGenTextures(1, &g_tex7_a);
+  glBindTexture(GL_TEXTURE_2D, g_tex7_a);
 
   GLubyte red_pixels[16] = {255, 0, 0, 255, 255, 0, 0, 255,
                             255, 0, 0, 255, 255, 0, 0, 255};
@@ -247,8 +236,7 @@ void Texturing_GenTextures_TC_007(void) {
   GLenum err1 = glGetError();
 
   // Veri yuklendi, simdi araya gen giriyor
-  GLuint tex_b;
-  glGenTextures(1, &tex_b);
+  glGenTextures(1, &g_tex7_b);
 
   // tex_a hala aktif bind olmali
   GLint bound_now = -1;
@@ -256,13 +244,10 @@ void Texturing_GenTextures_TC_007(void) {
 
   GLenum err2 = glGetError();
 
-  if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR && (GLuint)bound_now == tex_a)
+  if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR && (GLuint)bound_now == g_tex7_a)
     TEST_LOG_SUCCESS(test_case7, test_procedure);
   else
-    TEST_LOG_FAIL(test_case7, test_procedure, "Etkilesim hatasi: err1=0x%X, err2=0x%X, bound=%d (beklenen %u)", err1, err2, bound_now, tex_a);
-
-  glDeleteTextures(1, &tex_a);
-  glDeleteTextures(1, &tex_b);
+    TEST_LOG_FAIL(test_case7, test_procedure, "Etkilesim hatasi: err1=0x%X, err2=0x%X, bound=%d (beklenen %u)", err1, err2, bound_now, g_tex7_a);
 }
 
 // ---------------------------------------------------------------
@@ -289,9 +274,8 @@ void Texturing_GenTextures_TC_008(void) {
 void Texturing_GenTextures_TC_009(void) {
   while (glGetError() != GL_NO_ERROR);
 
-  GLuint tex;
-  glGenTextures(1, &tex);
-  glBindTexture(GL_TEXTURE_2D, tex);
+  glGenTextures(1, &g_tex9);
+  glBindTexture(GL_TEXTURE_2D, g_tex9);
 
   GLint min_filter = 0, mag_filter = 0, wrap_s = 0, wrap_t = 0;
   glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, &min_filter);
@@ -306,8 +290,6 @@ void Texturing_GenTextures_TC_009(void) {
     TEST_LOG_SUCCESS(test_case9, test_procedure);
   else
     TEST_LOG_FAIL(test_case9, test_procedure, "Varsayilan parametreler hatali: min=0x%X, mag=0x%X, s=0x%X, t=0x%X, err=0x%X", min_filter, mag_filter, wrap_s, wrap_t, err);
-
-  glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -348,13 +330,12 @@ void Texturing_GenTextures_TC_012(void) {
   while (glGetError() != GL_NO_ERROR);
 
   const GLsizei COUNT = 1000;
-  GLuint textures[1000];
-  glGenTextures(COUNT, textures);
+  glGenTextures(COUNT, g_tex12);
 
   int duplicate_or_zero = 0;
 
   for (int i = 0; i < COUNT; i++) {
-    if (textures[i] == 0) {
+    if (g_tex12[i] == 0) {
       duplicate_or_zero = 1;
       break;
     }
@@ -363,7 +344,7 @@ void Texturing_GenTextures_TC_012(void) {
   if (!duplicate_or_zero) {
     for (int i = 0; i < COUNT; i++) {
       for (int j = i + 1; j < COUNT; j++) {
-        if (textures[i] == textures[j]) {
+        if (g_tex12[i] == g_tex12[j]) {
           duplicate_or_zero = 1;
           break;
         }
@@ -377,6 +358,21 @@ void Texturing_GenTextures_TC_012(void) {
     TEST_LOG_SUCCESS(test_case12, test_procedure);
   else
     TEST_LOG_FAIL(test_case12, test_procedure, "Cift veya 0 ID saptandi veya hata: 0x%X", err);
+}
 
-  glDeleteTextures(COUNT, textures);
+/* Cleanup */
+void Texturing_GenTextures_close(void) {
+#ifdef __ubuntu__
+  if (g_tex2_first) glDeleteTextures(1, &g_tex2_first);
+  glDeleteTextures(10, g_tex2_batch);
+  glDeleteTextures(5, g_tex3_names);
+  glDeleteTextures(4, g_tex4_ids);
+  if (g_tex5) glDeleteTextures(1, &g_tex5);
+  glDeleteTextures(5, g_tex6_singles);
+  glDeleteTextures(5, g_tex6_batch);
+  if (g_tex7_a) glDeleteTextures(1, &g_tex7_a);
+  if (g_tex7_b) glDeleteTextures(1, &g_tex7_b);
+  if (g_tex9) glDeleteTextures(1, &g_tex9);
+  glDeleteTextures(1000, g_tex12);
+#endif
 }

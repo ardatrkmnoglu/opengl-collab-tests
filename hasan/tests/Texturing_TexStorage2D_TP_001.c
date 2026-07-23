@@ -14,6 +14,12 @@ static const char* test_case5 = "Texturing_TexStorage2D_TC_005";
 
 static const char* test_procedure = "Texturing_TexStorage2D_TP_001";
 
+static GLuint g_tex1 = 0;
+static GLuint g_tex2 = 0;
+static GLuint g_tex3 = 0;
+static GLuint g_tex4 = 0;
+static GLuint g_tex5 = 0;
+
 #ifndef GL_RGBA8_OES
 #define GL_RGBA8_OES 0x8058
 #endif
@@ -34,9 +40,8 @@ void Texturing_TexStorage2D_init(void) {
 void Texturing_TexStorage2D_TC_001(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &g_tex1);
+    glBindTexture(GL_TEXTURE_2D, g_tex1);
     while (glGetError() != GL_NO_ERROR);
 
     // Genişlik olarak kasten negatif bir değer (-256) veriyoruz
@@ -50,17 +55,14 @@ void Texturing_TexStorage2D_TC_001(void) {
     } else {
         TEST_LOG_FAIL(test_case1, test_procedure, "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &textureID);
 }
 
 // Test 2: Geçersiz İç Format Testi (Invalid Enum)
 void Texturing_TexStorage2D_TC_002(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &g_tex2);
+    glBindTexture(GL_TEXTURE_2D, g_tex2);
     while (glGetError() != GL_NO_ERROR);
 
     // internalformat parametresine geçersiz/uydurma bir enum (0x9999) veriyoruz
@@ -74,17 +76,14 @@ void Texturing_TexStorage2D_TC_002(void) {
     } else {
         TEST_LOG_FAIL(test_case2, test_procedure, "Beklenen GL_INVALID_ENUM (0x500), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &textureID);
 }
 
 // Test 3: Değiştirilemezlik (Immutability) Testi (Invalid Operation)
 void Texturing_TexStorage2D_TC_003(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &g_tex3);
+    glBindTexture(GL_TEXTURE_2D, g_tex3);
     while (glGetError() != GL_NO_ERROR);
 
     if (pglTexStorage2D) {
@@ -102,17 +101,14 @@ void Texturing_TexStorage2D_TC_003(void) {
     } else {
         TEST_LOG_FAIL(test_case3, test_procedure, "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &textureID);
 }
 
 // Test 4 : level ile boyut ilişkisini test etme
 void Texturing_TexStorage2D_TC_004(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &g_tex4);
+    glBindTexture(GL_TEXTURE_2D, g_tex4);
     while (glGetError() != GL_NO_ERROR);
 
     if (pglTexStorage2D) {
@@ -125,17 +121,14 @@ void Texturing_TexStorage2D_TC_004(void) {
     } else {
         TEST_LOG_FAIL(test_case4, test_procedure, "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &textureID);
 }
 
 // Test 5 : max level'i aşmaya çalışmak
 void Texturing_TexStorage2D_TC_005(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glGenTextures(1, &g_tex5);
+    glBindTexture(GL_TEXTURE_2D, g_tex5);
     while (glGetError() != GL_NO_ERROR);
 
     GLsizei w = 64;
@@ -152,6 +145,15 @@ void Texturing_TexStorage2D_TC_005(void) {
     } else {
         TEST_LOG_FAIL(test_case5, test_procedure, "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
     }
+}
 
-    glDeleteTextures(1, &textureID);
+/* Cleanup */
+void Texturing_TexStorage2D_close(void) {
+#ifdef __ubuntu__
+    if (g_tex1) glDeleteTextures(1, &g_tex1);
+    if (g_tex2) glDeleteTextures(1, &g_tex2);
+    if (g_tex3) glDeleteTextures(1, &g_tex3);
+    if (g_tex4) glDeleteTextures(1, &g_tex4);
+    if (g_tex5) glDeleteTextures(1, &g_tex5);
+#endif
 }

@@ -119,4 +119,9 @@ void draw(void) {
 }
 
 void cleanup(void) {
+    Texturing_BindTexture_close();
+    Texturing_TexStorage2D_close();
+    Texturing_TexSubImage2D_close();
+    Texturing_GenTextures_close();
+    Texturing_GenerateMipmap_close();
 }

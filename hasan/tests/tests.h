@@ -72,4 +72,11 @@ void Texturing_GenerateMipmap_TC_013(void);
 void Texturing_GenerateMipmap_TC_014(void);
 void Texturing_GenerateMipmap_TC_015(void);
 
+/* --------------- Cleanup / Close --------------- */
+void Texturing_BindTexture_close(void);
+void Texturing_TexStorage2D_close(void);
+void Texturing_TexSubImage2D_close(void);
+void Texturing_GenTextures_close(void);
+void Texturing_GenerateMipmap_close(void);
+
 #endif

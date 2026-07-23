@@ -26,6 +26,17 @@ static const char* test_case15 = "Texturing_GenerateMipmap_TC_015";
 
 static const char* test_procedure = "Texturing_GenerateMipmap_TP_001";
 
+static GLuint g_tex1 = 0;
+static GLuint g_tex2 = 0;
+static GLuint g_tex4_1 = 0;
+static GLuint g_tex4_2 = 0;
+static GLuint g_tex6 = 0;
+static GLuint g_tex7 = 0;
+static GLuint g_tex11 = 0;
+static GLuint g_tex13 = 0;
+static GLuint g_tex14 = 0;
+static GLuint g_tex15 = 0;
+
 /*
  * ============================================================================
  * glGenerateMipmap Robustness Test Suite
@@ -107,9 +118,8 @@ void Texturing_GenerateMipmap_TC_001(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex1);
+    glBindTexture(GL_TEXTURE_2D, g_tex1);
 
     GLubyte* data = create_solid_color_data(256, 256, 255, 0, 0, 255);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -122,8 +132,6 @@ void Texturing_GenerateMipmap_TC_001(void)
         TEST_LOG_SUCCESS(test_case1, test_procedure);
     else
         TEST_LOG_FAIL(test_case1, test_procedure, "256x256 POT mipmap uretiminde hata: 0x%X", err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -135,9 +143,8 @@ void Texturing_GenerateMipmap_TC_002(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex2);
+    glBindTexture(GL_TEXTURE_2D, g_tex2);
 
     GLubyte pixel[4] = {0, 255, 0, 255}; // yesil
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
@@ -149,8 +156,6 @@ void Texturing_GenerateMipmap_TC_002(void)
         TEST_LOG_SUCCESS(test_case2, test_procedure);
     else
         TEST_LOG_FAIL(test_case2, test_procedure, "1x1 mipmap uretiminde hata: 0x%X", err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -210,9 +215,8 @@ void Texturing_GenerateMipmap_TC_004(void)
 
     GLsizei test_size = (max_size > 4096) ? 4096 : max_size;
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex4_1);
+    glBindTexture(GL_TEXTURE_2D, g_tex4_1);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, test_size, test_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     GLenum alloc_err = glGetError();
@@ -222,13 +226,10 @@ void Texturing_GenerateMipmap_TC_004(void)
         glGetError();
     }
 
-    glDeleteTextures(1, &tex);
-
     // Sinir + 1 deneriz (ekran karti desteklememeli)
     while (glGetError() != GL_NO_ERROR);
-    GLuint tex2;
-    glGenTextures(1, &tex2);
-    glBindTexture(GL_TEXTURE_2D, tex2);
+    glGenTextures(1, &g_tex4_2);
+    glBindTexture(GL_TEXTURE_2D, g_tex4_2);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, max_size + 1, max_size + 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     GLenum over_err = glGetError();
@@ -237,8 +238,6 @@ void Texturing_GenerateMipmap_TC_004(void)
         TEST_LOG_SUCCESS(test_case4, test_procedure);
     else
         TEST_LOG_FAIL(test_case4, test_procedure, "MAX+1 boyutta beklenmeyen hata: 0x%X", over_err);
-
-    glDeleteTextures(1, &tex2);
 }
 
 // ---------------------------------------------------------------
@@ -278,9 +277,8 @@ void Texturing_GenerateMipmap_TC_006(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex6);
+    glBindTexture(GL_TEXTURE_2D, g_tex6);
 
     // Level 0 verisi hic yuklenmedi!
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -290,8 +288,6 @@ void Texturing_GenerateMipmap_TC_006(void)
         TEST_LOG_SUCCESS(test_case6, test_procedure);
     else
         TEST_LOG_FAIL(test_case6, test_procedure, "Bos texture uzerinde mipmap hatasi: 0x%X", err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -303,9 +299,8 @@ void Texturing_GenerateMipmap_TC_007(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex7);
+    glBindTexture(GL_TEXTURE_2D, g_tex7);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glGetError();
@@ -317,8 +312,6 @@ void Texturing_GenerateMipmap_TC_007(void)
         TEST_LOG_SUCCESS(test_case7, test_procedure);
     else
         TEST_LOG_FAIL(test_case7, test_procedure, "0x0 texture mipmap hatasi: 0x%X", mip_err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -461,9 +454,8 @@ void Texturing_GenerateMipmap_TC_011(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex11);
+    glBindTexture(GL_TEXTURE_2D, g_tex11);
 
     GLubyte* data = create_solid_color_data(128, 128, 255, 255, 0, 255);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 128, 128, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -483,8 +475,6 @@ void Texturing_GenerateMipmap_TC_011(void)
         TEST_LOG_SUCCESS(test_case11, test_procedure);
     else
         TEST_LOG_FAIL(test_case11, test_procedure, "100 kez ardisik mipmap uretimi basarisiz");
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -579,9 +569,8 @@ void Texturing_GenerateMipmap_TC_013(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+    glGenTextures(1, &g_tex13);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, g_tex13);
 
     GLenum faces[] = {
         GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
@@ -602,8 +591,6 @@ void Texturing_GenerateMipmap_TC_013(void)
         TEST_LOG_SUCCESS(test_case13, test_procedure);
     else
         TEST_LOG_FAIL(test_case13, test_procedure, "CubeMap mipmap uretimi hatali: 0x%X", err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -615,9 +602,8 @@ void Texturing_GenerateMipmap_TC_014(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, tex);
+    glGenTextures(1, &g_tex14);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, g_tex14);
 
     GLubyte* data = create_solid_color_data(32, 32, 255, 128, 0, 255);
     // Sadece 3 yuzeyi dolduruyoruz (eksik!)
@@ -633,8 +619,6 @@ void Texturing_GenerateMipmap_TC_014(void)
         TEST_LOG_SUCCESS(test_case14, test_procedure);
     else
         TEST_LOG_FAIL(test_case14, test_procedure, "Eksik cubemap mipmap hatasi: 0x%X", err);
-
-    glDeleteTextures(1, &tex);
 }
 
 // ---------------------------------------------------------------
@@ -646,9 +630,8 @@ void Texturing_GenerateMipmap_TC_015(void)
 {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex15);
+    glBindTexture(GL_TEXTURE_2D, g_tex15);
 
     // Ilk veri (kirmizi)
     GLubyte* red = create_solid_color_data(64, 64, 255, 0, 0, 255);
@@ -668,6 +651,21 @@ void Texturing_GenerateMipmap_TC_015(void)
         TEST_LOG_SUCCESS(test_case15, test_procedure);
     else
         TEST_LOG_FAIL(test_case15, test_procedure, "Mipmap yenileme hatali: err1=0x%X, err2=0x%X", err1, err2);
+}
 
-    glDeleteTextures(1, &tex);
+/* Cleanup */
+void Texturing_GenerateMipmap_close(void)
+{
+#ifdef __ubuntu__
+    if (g_tex1) glDeleteTextures(1, &g_tex1);
+    if (g_tex2) glDeleteTextures(1, &g_tex2);
+    if (g_tex4_1) glDeleteTextures(1, &g_tex4_1);
+    if (g_tex4_2) glDeleteTextures(1, &g_tex4_2);
+    if (g_tex6) glDeleteTextures(1, &g_tex6);
+    if (g_tex7) glDeleteTextures(1, &g_tex7);
+    if (g_tex11) glDeleteTextures(1, &g_tex11);
+    if (g_tex13) glDeleteTextures(1, &g_tex13);
+    if (g_tex14) glDeleteTextures(1, &g_tex14);
+    if (g_tex15) glDeleteTextures(1, &g_tex15);
+#endif
 }

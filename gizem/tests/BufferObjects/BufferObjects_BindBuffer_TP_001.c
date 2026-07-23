@@ -1,14 +1,26 @@
 #include <glad/gles2.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdbool.h>
-
+#include "../../../include/macro.h"
 
 // void glBindBuffer(GLenum target, GLuint buffer);
 // Bir buffer nesnesini belirli bir target'a bağlar
 // Bağlandıktan sonra o hedef üzerinde yapılan işlemler artık bu buffer üzerinde gerçekleştirilir
+
+
+static const char* test_procedure = "BufferObjects_BindBuffer_TP_001";
+static const char* test_case_1 = "BufferObjects_BindBuffer_TC_001";
+static const char* test_case_2 = "BufferObjects_BindBuffer_TC_002";
+static const char* test_case_3 = "BufferObjects_BindBuffer_TC_003";
+static const char* test_case_4 = "BufferObjects_BindBuffer_TC_004";
+static const char* test_case_5 = "BufferObjects_BindBuffer_TC_005";
+static const char* test_case_6 = "BufferObjects_BindBuffer_TC_006";
+static const char* test_case_7 = "BufferObjects_BindBuffer_TC_007";
+static const char* test_case_8 = "BufferObjects_BindBuffer_TC_008";
+static const char* test_case_9 = "BufferObjects_BindBuffer_TC_009";
+static const char* test_case_10 = "BufferObjects_BindBuffer_TC_010";
+static const char* test_case_11 = "BufferObjects_BindBuffer_TC_011";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not one of the allowable values.
@@ -20,9 +32,9 @@
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%X\n", err);
     }
-    printf("[PASS] rTest_glBindBuffer_invalid_enum()\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 
@@ -36,8 +48,14 @@ void BufferObjects_BindBuffer_TC_002()
 
     GLuint name = 424242;
     glBindBuffer(GL_ARRAY_BUFFER, name);
+
     GLenum err = glGetError();
-    printf("[INFO] glBindBuffer(new name=%u): error=0x%X\n", name, err);
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_2, test_procedure);
+    }
+    else {
+         TEST_LOG_FAIL(test_case_2, test_procedure, "error = 0x%x.", err);
+    }
 }
 
 // Silinen bir buffer isminin tekrar bind edilmesiyle yeni bir buffer
@@ -51,14 +69,19 @@ void BufferObjects_BindBuffer_TC_003()
     glBindBuffer(GL_ARRAY_BUFFER, buf);
     glDeleteBuffers(1, &buf);
     glBindBuffer(GL_ARRAY_BUFFER, buf);
+
     GLenum err = glGetError();
-    printf("[INFO] Bind deleted name: error=0x%X\n", err);
+     if (err == GL_NO_ERROR) {
+         TEST_LOG_SUCCESS(test_case_3, test_procedure);
+     }
+     else {
+         TEST_LOG_FAIL(test_case_3, test_procedure, "error = 0x%x.", err);
+     }
 }
 
 // Büyük/alışılmadık buffer isimlerinin bind edilmesi
 void BufferObjects_BindBuffer_TC_004()
 {
-
     GLuint candidates[] = {
         0xFFFFFFFFu,   // UINT_MAX
         0x80000000u,   // sign-bit sınırı
@@ -66,11 +89,19 @@ void BufferObjects_BindBuffer_TC_004()
         0xDEADBEEFu,
         0xCDCDCDCDu    // tipik uninitialized heap pattern
         };
+
     for (int i = 0; i < 5; ++i) {
         while (glGetError() != GL_NO_ERROR) {}
+
         glBindBuffer(GL_ARRAY_BUFFER, candidates[i]);
+
         GLenum err = glGetError();
-        printf("[INFO] Boundary buffer 0x%08X: glError=0x%X\n", candidates[i], err);    }
+        if (err != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_4, test_procedure, "Error = 0x%x.", err);
+            return;
+        }
+    }
+     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
 // Geçersiz target enum değerlerine karşı implementasyonun hata kontrolünün testi
@@ -80,9 +111,15 @@ void BufferObjects_BindBuffer_TC_005()
 
     GLenum polluted = GL_ARRAY_BUFFER | 0xFFFF0000u;
     glBindBuffer(polluted, 1);
-    GLenum err = glGetError();
+
     // Spec'e göre bu "allowable değil" -> INVALID_ENUM beklenir
-    printf("[INFO] Polluted target=0x%08X : glError=0x%X (expected GL_INVALID_ENUM)\n", polluted, err);
+    GLenum err = glGetError();
+     if (err == GL_INVALID_ENUM) {
+         TEST_LOG_SUCCESS(test_case_5, test_procedure);
+     }
+     else {
+         TEST_LOG_FAIL(test_case_5, test_procedure, "expected GL_INVALID_ENUM but got = 0x%x.", err);
+     }
 }
 
 // Aynı buffer nesnesinin farklı target'lara hızlı ve tekrarlı şekilde
@@ -103,15 +140,12 @@ void BufferObjects_BindBuffer_TC_006()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            printf("[FAIL] Iteration=%d, target=%s, glError=0x%X\n",
-                   i,
-                   target == GL_ARRAY_BUFFER ? "GL_ARRAY_BUFFER" : "GL_ELEMENT_ARRAY_BUFFER",
-                   err);
+            TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
             glDeleteBuffers(1, &buf);
             return;
         }
     }
-    printf("[PASS] Rapid cross-target rebind stress completed without OpenGL errors.\n");
+     TEST_LOG_SUCCESS(test_case_6, test_procedure);
     glDeleteBuffers(1, &buf);
 }
 
@@ -134,7 +168,13 @@ void BufferObjects_BindBuffer_TC_007()
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, 64, NULL);
     GLenum elementErr = glGetError();
 
-    printf("[INFO] After deleting double-bound buffer: ARRAY_BUFFER error=0x%X, ELEMENT_ARRAY_BUFFER error=0x%X\n", arrayErr, elementErr);
+     if (arrayErr == GL_INVALID_OPERATION && elementErr == GL_INVALID_OPERATION){
+         TEST_LOG_SUCCESS(test_case_7, test_procedure);
+     }
+     else {
+         TEST_LOG_FAIL(test_case_7, test_procedure,
+             "(ARRAY_BUFFER=0x%X, ELEMENT_ARRAY_BUFFER=0x%X)\n", arrayErr, elementErr );
+     }
 }
 
 // Buffer'ı tekrar tekrar 0'a bağlayıp bağlama durumunu sorgulayarak
@@ -148,16 +188,18 @@ void BufferObjects_BindBuffer_TC_008()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         GLint binding = -1;
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &binding);
+
         if (binding != 0) {
-            printf("[FAIL] Iteration=%d, GL_ARRAY_BUFFER_BINDING=%d (expected 0)\n", i, binding);
-            return; }
+            TEST_LOG_FAIL(test_case_8, test_procedure, "GL_ARRAY_BUFFER_BINDING=%d (expected 0)", binding);
+            return;
+        }
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
+            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
             return; }
     }
-    printf("[PASS] Zero binding/query thrash completed successfully.\n");
+     TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }
 
 // Çok sayıda buffer ismi üzerinde rastgele bind işlemleri yaparak implementasyonun
@@ -170,14 +212,14 @@ void BufferObjects_BindBuffer_TC_009()
     GLuint *names = (GLuint *)malloc(sizeof(GLuint) * N);
 
     if (names == NULL) {
-        printf("[FAIL] Memory allocation failed.\n");
+        TEST_LOG_FAIL(test_case_9, test_procedure, "Memory allocation failed");
         return;
     }
 
     glGenBuffers(N, names);
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        printf("[FAIL] glGenBuffers failed: glError=0x%X\n", err);
+        TEST_LOG_FAIL(test_case_9, test_procedure, "glGenBuffers failed: error = 0x%x.", err);
         free(names);
         return;
     }
@@ -190,7 +232,6 @@ void BufferObjects_BindBuffer_TC_009()
         seed ^= seed >> 17;
         seed ^= seed << 5;
         GLuint name = names[seed % N];
-
         seed ^= seed << 13;
         seed ^= seed >> 17;
         seed ^= seed << 5;
@@ -201,11 +242,7 @@ void BufferObjects_BindBuffer_TC_009()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            printf("[FAIL] Iteration=%d, buffer=%u, target=%s, glError=0x%X\n",
-                   i, name,
-                   target == GL_ARRAY_BUFFER ? "GL_ARRAY_BUFFER" : "GL_ELEMENT_ARRAY_BUFFER",
-                   err);
-
+            TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
             glDeleteBuffers(N, names);
             free(names);
             return;
@@ -215,7 +252,7 @@ void BufferObjects_BindBuffer_TC_009()
     glDeleteBuffers(N, names);
     free(names);
 
-    printf("[PASS] Massive buffer namespace fuzz completed without OpenGL errors.\n");
+     TEST_LOG_SUCCESS(test_case_9, test_procedure);
 }
 
 // Aynı target üzerinde farklı buffer'lar arasında sürekli geçiş yaparak
@@ -236,16 +273,14 @@ void BufferObjects_BindBuffer_TC_010()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
-
+            TEST_LOG_FAIL(test_case_10, test_procedure, "error = 0x%x.", err);
             glDeleteBuffers(2, buffers);
             return;
         }
     }
 
     glDeleteBuffers(2, buffers);
-
-    printf("[PASS] Binding churn stress completed without OpenGL errors.\n");
+     TEST_LOG_SUCCESS(test_case_10, test_procedure);
 }
 
 // Buffer nesnelerinin oluşturma, bağlama ve silme yaşam döngüsünü tekrarlı
@@ -265,10 +300,10 @@ void BufferObjects_BindBuffer_TC_011()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            printf("[FAIL] Iteration=%d, glError=0x%X\n", i, err);
+            TEST_LOG_FAIL(test_case_11, test_procedure, "Iteration=%d, glError=0x%X",i, err);
             return;
         }
     }
-    printf("[PASS] Buffer lifecycle stress completed without OpenGL errors.\n");
+     TEST_LOG_SUCCESS(test_case_11, test_procedure);
 }
 

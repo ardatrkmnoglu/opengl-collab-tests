@@ -4,6 +4,7 @@
 
 
 
+
 // void glBindFramebuffer(GLenum target, GLuint framebuffer);
 // OpenGL’de hangi framebuffer’a çizim yapılacağını ve hangi framebuffer’dan okunacağını seçmek için kullanılır
 // target: Modern çekirdekte genelde hep GL_FRAMEBUFFER kullanılır.

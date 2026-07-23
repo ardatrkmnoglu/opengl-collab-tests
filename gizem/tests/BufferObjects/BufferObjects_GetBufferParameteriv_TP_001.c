@@ -1,16 +1,33 @@
 #include <glad/gles2.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
+#include "../../../include/macro.h"
 
 // void glGetBufferParameteriv(GLenum target, GLenum value, GLint * data);
 // halihazırda bağlı (bound) olan bir buffer nesnesinin bazı özelliklerini öğrenmek için kullanılır.
 // target: Hangi tür buffer’a bakacağını söyler
 // value: Hangi parametreyi istediğini söyler
 // data: Sonucun yazılacağı adres
+
+
+static const char* test_procedure = "BufferObjects_GetBufferParameteriv_TP_001";
+static const char* test_case_1 = "BufferObjects_GetBufferParameteriv_TC_001";
+static const char* test_case_2 = "BufferObjects_GetBufferParameteriv_TC_002";
+static const char* test_case_3 = "BufferObjects_GetBufferParameteriv_TC_003";
+static const char* test_case_4 = "BufferObjects_GetBufferParameteriv_TC_004";
+static const char* test_case_5 = "BufferObjects_GetBufferParameteriv_TC_005";
+static const char* test_case_6 = "BufferObjects_GetBufferParameteriv_TC_006";
+static const char* test_case_7 = "BufferObjects_GetBufferParameteriv_TC_007";
+static const char* test_case_8 = "BufferObjects_GetBufferParameteriv_TC_008";
+static const char* test_case_9 = "BufferObjects_GetBufferParameteriv_TC_009";
+static const char* test_case_10 = "BufferObjects_GetBufferParameteriv_TC_010";
+static const char* test_case_11 = "BufferObjects_GetBufferParameteriv_TC_011";
+static const char* test_case_12 = "BufferObjects_GetBufferParameteriv_TC_012";
+static const char* test_case_13 = "BufferObjects_GetBufferParameteriv_TC_013";
+static const char* test_case_14 = "BufferObjects_GetBufferParameteriv_TC_014";
+static const char* test_case_15 = "BufferObjects_GetBufferParameteriv_TC_015";
+static const char* test_case_16 = "BufferObjects_GetBufferParameteriv_TC_016";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
@@ -23,16 +40,16 @@ void BufferObjects_GetBufferParameteriv_TC_001()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        return;
     }
-    printf("[PASS] rTest_glGetBufferParameteriv_invalid_enum_target()\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if value is not GL_BUFFER_SIZE or GL_BUFFER_USAGE.
 void BufferObjects_GetBufferParameteriv_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-
 
     GLuint buffer;
     GLint data = -1;
@@ -43,10 +60,9 @@ void BufferObjects_GetBufferParameteriv_TC_002()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM){
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%x.", err);
     }
-    printf("[PASS] rTest_glGetBufferParameteriv_invalid_enum_value()\n");
-
+    TEST_LOG_SUCCESS(test_case_2, test_procedure);
     glDeleteBuffers(1, &buffer);
 }
 
@@ -55,16 +71,15 @@ void BufferObjects_GetBufferParameteriv_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
-
     GLint data = -1;
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
 
     GLenum err = glGetError();
     if (err != GL_INVALID_OPERATION) {
-        printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Expected GL_INVALID_OPERATION, but got 0x%x.", err);
     }
-    printf("[PASS] rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound()\n");
+    TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
 
 
@@ -85,9 +100,15 @@ void BufferObjects_GetBufferParameteriv_TC_004()
     glGetBufferParameteriv(GL_TEXTURE_2D, GL_BUFFER_SIZE, &data);
 
     GLenum err = glGetError();
-    if (err != GL_INVALID_ENUM) {printf("[FAIL] Expected GL_INVALID_ENUM for invalid target, got 0x%X\n", err);}
-    else if (data != sentinel) {printf("[FAIL] data was modified despite GL_INVALID_ENUM (data=%d)\n", data);}
-    else {printf("[PASS] Invalid target correctly rejected, data untouched.\n");}
+    if (err != GL_INVALID_ENUM) {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "Expected GL_INVALID_ENUM for invalid target, got 0x%x.", err);
+    }
+    else if (data != sentinel) {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "data was modified despite GL_INVALID_ENUM (data=%d)\n", data);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_4, test_procedure);;
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -113,12 +134,14 @@ void BufferObjects_GetBufferParameteriv_TC_005()
         GLint data = sentinel;
         glGetBufferParameteriv(GL_ARRAY_BUFFER, bogusValues[i], &data);
         GLenum err = glGetError();
-        printf("[INFO] value=0x%X => err=0x%X, data-modified=%s\n",
-        bogusValues[i], err, (data != sentinel) ? "yes" : "no");
         if (err != GL_INVALID_ENUM || data != sentinel) allCorrect = 0;
     }
-    if (allCorrect) printf("[PASS] All invalid value enums correctly rejected without touching data.\n");
-    else printf("[FAIL] Some invalid value enums not properly rejected.\n");
+    if (allCorrect) {
+        TEST_LOG_SUCCESS(test_case_5, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Some invalid value enums not properly rejected");
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -137,9 +160,15 @@ void BufferObjects_GetBufferParameteriv_TC_006()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
     GLenum err = glGetError();
 
-    if (err != GL_INVALID_OPERATION) {printf("[FAIL] Expected GL_INVALID_OPERATION with reserved name 0 bound, got 0x%X\n", err);}
-    else if (data != sentinel) {printf("[FAIL] data was modified despite GL_INVALID_OPERATION (data=%d)\n", data);}
-    else {printf("[PASS] Correctly rejected query on reserved buffer name 0.\n");}
+    if (err != GL_INVALID_OPERATION) {
+        TEST_LOG_FAIL(test_case_6, test_procedure, "Expected GL_INVALID_OPERATION with reserved name 0 bound, got 0x%X.", err);
+    }
+    else if (data != sentinel) {
+        TEST_LOG_FAIL(test_case_6, test_procedure, "data was modified despite GL_INVALID_OPERATION (data=%d)", data);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_6, test_procedure);
+    }
 }
 
 // GL_ELEMENT_ARRAY_BUFFER hedefi icin de ayni reserved-0 davranisini dogrular (iki farkli target icin de spec ayni sekilde uygulanmali).
@@ -154,8 +183,12 @@ void BufferObjects_GetBufferParameteriv_TC_007()
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_USAGE, &data);
     GLenum err = glGetError();
 
-    if (err != GL_INVALID_OPERATION) {printf("[FAIL] Expected GL_INVALID_OPERATION, got 0x%X\n", err);}
-    else {printf("[PASS] Correctly rejected GL_ELEMENT_ARRAY_BUFFER query with 0 bound.\n");}
+    if (err != GL_INVALID_OPERATION) {
+        TEST_LOG_FAIL(test_case_7, test_procedure, "Expected GL_INVALID_OPERATION, error = 0x%x.", err);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_7, test_procedure);
+    }
 }
 
 // data parametresi NULL iken cagirildiginda (n>0 anlaminda tek bir GLint yazilacak durum)
@@ -174,8 +207,12 @@ void BufferObjects_GetBufferParameteriv_TC_008()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, NULL);
 
     GLenum err = glGetError();
-    printf("[INFO] NULL data pointer => err=0x%X\n", err);
-    printf("[PASS] Implementation did not crash on NULL output pointer.\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_8, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -199,9 +236,12 @@ void BufferObjects_GetBufferParameteriv_TC_009()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, freedPtr);
 
     GLenum err = glGetError();
-
-    printf("[INFO] Dangling data pointer call completed. err=0x%X\n", err);
-    printf("[PASS] Implementation did not crash on dangling pointer (best-effort check).\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_9, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -221,9 +261,6 @@ void BufferObjects_GetBufferParameteriv_TC_010()
     GLint initialSize = -1;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &initialSize);
 
-    GLenum errInitial = glGetError();
-    printf("[INFO] Initial (pre-BufferData) size=%d, err=0x%X\n", initialSize, errInitial);
-
     const GLsizeiptr allocSize = 256;
     glBufferData(GL_ARRAY_BUFFER, allocSize, NULL, GL_STATIC_DRAW);
 
@@ -231,10 +268,18 @@ void BufferObjects_GetBufferParameteriv_TC_010()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
 
     GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {printf("[FAIL] Unexpected error querying size: 0x%X\n", err);}
-    else if (size != (GLint)allocSize) {printf("[FAIL] Size mismatch: expected %ld, got %d\n", (long)allocSize, size);}
-    else if (initialSize != 0) {printf("[FAIL] Initial size before glBufferData was not 0 (got %d)\n", initialSize);}
-    else {printf("[PASS] Buffer size query consistent with allocation, initial value 0.\n");}
+    if (err != GL_NO_ERROR) {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "Unexpected error querying size: 0x%x.", err);
+    }
+    else if (size != (GLint)allocSize) {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "Size mismatch: expected %ld, got %d", (long)allocSize, size);
+    }
+    else if (initialSize != 0) {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "Initial size before glBufferData was not 0 (got %d)", initialSize);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_10, test_procedure);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -252,8 +297,6 @@ void BufferObjects_GetBufferParameteriv_TC_011()
 
     GLint initialUsage = -1;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &initialUsage);
-    printf("[INFO] Initial usage (pre-BufferData) = 0x%X (expected GL_STATIC_DRAW=0x%X)\n",
-    initialUsage, GL_STATIC_DRAW);
 
     GLenum usages[] = { GL_STATIC_DRAW, GL_DYNAMIC_DRAW, GL_STREAM_DRAW };
     int n = sizeof(usages) / sizeof(usages[0]);
@@ -263,12 +306,11 @@ void BufferObjects_GetBufferParameteriv_TC_011()
         glBufferData(GL_ARRAY_BUFFER, 16, NULL, usages[i]);
         GLint got = -1;
         glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_USAGE, &got);
-        printf("[INFO] Set usage=0x%X => queried=0x%X\n", usages[i], got);
         if ((GLenum)got != usages[i]) allCorrect = 0;
     }
 
-    if (allCorrect) printf("[PASS] Usage values consistent across updates.\n");
-    else printf("[FAIL] Usage value mismatch detected.\n");
+    if (allCorrect) TEST_LOG_SUCCESS(test_case_11, test_procedure);
+    else TEST_LOG_FAIL(test_case_11, test_procedure, "Usage value mismatch detected");
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -284,9 +326,12 @@ void BufferObjects_GetBufferParameteriv_TC_012()
     glGetBufferParameteriv(0xFFFFFFFF, 0xDEADBEEF, &data);
     GLenum err = glGetError();
 
-    printf("[INFO] Both target and value invalid => err=0x%X (data=%d)\n", err, data);
-    if (err == GL_INVALID_ENUM) {printf("[PASS] Correctly reported GL_INVALID_ENUM for combined invalid params.\n");}
-    else {printf("[FAIL] Unexpected error for combined invalid target/value.\n");}
+    if (err == GL_INVALID_ENUM) {
+        TEST_LOG_SUCCESS(test_case_12, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_12, test_procedure, "Unexpected error for combined invalid target/value.");
+    }
 }
 
 // Silinmis bir buffer, hala ayni target'a bind edilmis GIBI davranildigi (yani silme sonrasi binding'in 0'a dondugu spesifikasyon davranisini)
@@ -307,10 +352,13 @@ void BufferObjects_GetBufferParameteriv_TC_013()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &data);
 
     GLenum errQuery = glGetError();
-    printf("[INFO] errDelete=0x%X, post-delete query errQuery=0x%X, data=%d\n", errDelete, errQuery, data);
 
-    if (errQuery == GL_INVALID_OPERATION) {printf("[PASS] Correctly reverted to reserved-0 behavior after deleting bound buffer.\n");}
-    else {printf("[FAIL] Expected GL_INVALID_OPERATION after delete (binding should revert to 0).\n");}
+    if (errQuery == GL_INVALID_OPERATION) {
+        TEST_LOG_SUCCESS(test_case_13, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_13, test_procedure, "Expected GL_INVALID_OPERATION after delete (binding should revert to 0)");
+    }
 }
 
 // Ayni buffer nesnesi hem GL_ARRAY_BUFFER hem GL_ELEMENT_ARRAY_BUFFER hedeflerine ayni anda bind edildiginde (OpenGL'de gecerli bir durum,
@@ -330,13 +378,12 @@ void BufferObjects_GetBufferParameteriv_TC_014()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf);
     glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &sizeViaElement);
 
-    printf("[INFO] sizeViaArray=%d, sizeViaElement=%d\n", sizeViaArray, sizeViaElement);
-
     if (sizeViaArray == sizeViaElement && sizeViaArray == 100) {
-        printf("[PASS] Buffer object state consistent across different bind targets.\n");
+        TEST_LOG_SUCCESS(test_case_14, test_procedure);
     }
-    else {printf("[FAIL] Inconsistent buffer state across targets - possible aliasing bug.\n");}
-
+    else {
+        TEST_LOG_FAIL(test_case_14, test_procedure, "Inconsistent buffer state across targets - possible aliasing bug");
+    }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -361,7 +408,12 @@ void BufferObjects_GetBufferParameteriv_TC_015()
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, unaligned);
 
     GLenum err = glGetError();
-    printf("[INFO] Unaligned data pointer => err=0x%X\n", err);
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_15, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_15, test_procedure, "error = 0x%x.", err);
+    }
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDeleteBuffers(1, &buf);
@@ -380,11 +432,11 @@ void BufferObjects_GetBufferParameteriv_TC_016() {
         // OpenGL spesifikasyonu: art arda hatalar sadece "en eski" hatayi tutar, yeni hata bayragi eklenmez.
         GLenum err1 = glGetError();
         GLenum err2 = glGetError(); // ikinci cagri GL_NO_ERROR donmeli
-        printf("[INFO] After %d invalid calls: err1=0x%X, err2=0x%X\n", ITER, err1, err2);
 
-        if (err1 == GL_INVALID_ENUM && err2 == GL_NO_ERROR) {
-            printf("[PASS] Error flag behaves as sticky single-flag per spec.\n");
+        if (err1 != GL_INVALID_ENUM || err2 != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_16, test_procedure, "Unexpected error queue behavior under stress");
+            return;
         }
-        else {printf("[FAIL] Unexpected error queue behavior under stress.\n");}
     }
+    TEST_LOG_SUCCESS(test_case_16, test_procedure);
 }

@@ -96,6 +96,23 @@ void init(void) {
     Texturing_GenTextures_TC_010();
     Texturing_GenTextures_TC_011();
     Texturing_GenTextures_TC_012();
+
+    /* --------------- Texturing - GenerateMipmap --------------- */
+    Texturing_GenerateMipmap_TC_001();
+    Texturing_GenerateMipmap_TC_002();
+    Texturing_GenerateMipmap_TC_003();
+    Texturing_GenerateMipmap_TC_004();
+    Texturing_GenerateMipmap_TC_005();
+    Texturing_GenerateMipmap_TC_006();
+    Texturing_GenerateMipmap_TC_007();
+    Texturing_GenerateMipmap_TC_008();
+    Texturing_GenerateMipmap_TC_009();
+    Texturing_GenerateMipmap_TC_010();
+    Texturing_GenerateMipmap_TC_011();
+    Texturing_GenerateMipmap_TC_012();
+    Texturing_GenerateMipmap_TC_013();
+    Texturing_GenerateMipmap_TC_014();
+    Texturing_GenerateMipmap_TC_015();
 }
 
 void draw(void) {

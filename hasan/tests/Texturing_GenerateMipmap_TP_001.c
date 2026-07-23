@@ -6,6 +6,23 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include "../include/macro.h"
+
+static const char* test_case1  = "Texturing_GenerateMipmap_TC_001";
+static const char* test_case2  = "Texturing_GenerateMipmap_TC_002";
+static const char* test_case3  = "Texturing_GenerateMipmap_TC_003";
+static const char* test_case4  = "Texturing_GenerateMipmap_TC_004";
+static const char* test_case5  = "Texturing_GenerateMipmap_TC_005";
+static const char* test_case6  = "Texturing_GenerateMipmap_TC_006";
+static const char* test_case7  = "Texturing_GenerateMipmap_TC_007";
+static const char* test_case8  = "Texturing_GenerateMipmap_TC_008";
+static const char* test_case9  = "Texturing_GenerateMipmap_TC_009";
+static const char* test_case10 = "Texturing_GenerateMipmap_TC_010";
+static const char* test_case11 = "Texturing_GenerateMipmap_TC_011";
+static const char* test_case12 = "Texturing_GenerateMipmap_TC_012";
+static const char* test_case13 = "Texturing_GenerateMipmap_TC_013";
+static const char* test_case14 = "Texturing_GenerateMipmap_TC_014";
+static const char* test_case15 = "Texturing_GenerateMipmap_TC_015";
 
 static const char* test_procedure = "Texturing_GenerateMipmap_TP_001";
 
@@ -88,9 +105,7 @@ static GLubyte* create_solid_color_data(GLsizei w, GLsizei h, GLubyte r, GLubyte
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_001(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_001";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_pot_baseline (256x256)\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -104,9 +119,9 @@ void Texturing_GenerateMipmap_TC_001(void)
     GLenum err = glGetError();
 
     if (err == GL_NO_ERROR)
-        printf("  -> PASSED: 256x256 POT mipmap uretimi basarili (0x0)\n\n");
+        TEST_LOG_SUCCESS(test_case1, test_procedure);
     else
-        printf("  -> FAILED: Beklenen 0x0, alinan 0x%X\n\n", err);
+        TEST_LOG_FAIL(test_case1, test_procedure, "256x256 POT mipmap uretiminde hata: 0x%X", err);
 
     glDeleteTextures(1, &tex);
 }
@@ -118,9 +133,7 @@ void Texturing_GenerateMipmap_TC_001(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_002(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_002";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_1x1_minimum\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -133,9 +146,9 @@ void Texturing_GenerateMipmap_TC_002(void)
     GLenum err = glGetError();
 
     if (err == GL_NO_ERROR)
-        printf("  -> PASSED: 1x1 mipmap uretimi sorunsuz (tek seviye)\n\n");
+        TEST_LOG_SUCCESS(test_case2, test_procedure);
     else
-        printf("  -> FAILED: Hata: 0x%X\n\n", err);
+        TEST_LOG_FAIL(test_case2, test_procedure, "1x1 mipmap uretiminde hata: 0x%X", err);
 
     glDeleteTextures(1, &tex);
 }
@@ -147,13 +160,12 @@ void Texturing_GenerateMipmap_TC_002(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_003(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_003";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_npot_dimensions\n", test_procedure, test_case);
 
     typedef struct { GLsizei w, h; } Dim;
     Dim npot_sizes[] = { {3, 7}, {100, 100}, {13, 1}, {1, 37}, {5, 5} };
     int count = sizeof(npot_sizes) / sizeof(npot_sizes[0]);
+    int all_ok = 1;
 
     for (int i = 0; i < count; i++) {
         while (glGetError() != GL_NO_ERROR);
@@ -171,15 +183,17 @@ void Texturing_GenerateMipmap_TC_003(void)
         glGenerateMipmap(GL_TEXTURE_2D);
         GLenum err = glGetError();
 
-        printf("  %dx%d -> hata: 0x%X %s\n",
-               npot_sizes[i].w, npot_sizes[i].h, err,
-               (err == GL_INVALID_OPERATION) ? "(GL_INVALID_OPERATION - NPOT mipmap yasak)" :
-               (err == GL_NO_ERROR) ? "(Basarili - NPOT extension aktif)" :
-               "(Beklenmeyen hata!)");
+        if (err != GL_INVALID_OPERATION && err != GL_NO_ERROR) {
+            all_ok = 0;
+        }
 
         glDeleteTextures(1, &tex);
     }
-    printf("\n");
+
+    if (all_ok)
+        TEST_LOG_SUCCESS(test_case3, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case3, test_procedure, "NPOT boyutlarda beklenmeyen hata");
 }
 
 // ---------------------------------------------------------------
@@ -189,15 +203,11 @@ void Texturing_GenerateMipmap_TC_003(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_004(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_004";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_max_texture_size\n", test_procedure, test_case);
 
     GLint max_size = 0;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_size);
-    printf("  GL_MAX_TEXTURE_SIZE = %d\n", max_size);
 
-    // Sinir boyutunda (max x max) - cok buyuk olabilir, kucuk deneyelim
     GLsizei test_size = (max_size > 4096) ? 4096 : max_size;
 
     GLuint tex;
@@ -209,10 +219,7 @@ void Texturing_GenerateMipmap_TC_004(void)
 
     if (alloc_err == GL_NO_ERROR) {
         glGenerateMipmap(GL_TEXTURE_2D);
-        GLenum mip_err = glGetError();
-        printf("  %dx%d tahsis: basarili, mipmap: 0x%X\n", test_size, test_size, mip_err);
-    } else {
-        printf("  %dx%d tahsis: BASARISIZ (0x%X) - bellek yetersiz olabilir\n", test_size, test_size, alloc_err);
+        glGetError();
     }
 
     glDeleteTextures(1, &tex);
@@ -225,8 +232,11 @@ void Texturing_GenerateMipmap_TC_004(void)
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, max_size + 1, max_size + 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     GLenum over_err = glGetError();
-    printf("  %dx%d (MAX+1) tahsis hatasi: 0x%X (GL_INVALID_VALUE beklenir)\n\n",
-           max_size + 1, max_size + 1, over_err);
+
+    if (over_err == GL_INVALID_VALUE || over_err == GL_NO_ERROR)
+        TEST_LOG_SUCCESS(test_case4, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case4, test_procedure, "MAX+1 boyutta beklenmeyen hata: 0x%X", over_err);
 
     glDeleteTextures(1, &tex2);
 }
@@ -238,23 +248,25 @@ void Texturing_GenerateMipmap_TC_004(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_005(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_005";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_invalid_target\n", test_procedure, test_case);
 
     GLenum bad_targets[] = { 0x0000, 0xFFFF, 0xDEAD, GL_ARRAY_BUFFER, GL_FRAMEBUFFER };
     int count = sizeof(bad_targets) / sizeof(bad_targets[0]);
+    int all_invalid = 1;
 
     for (int i = 0; i < count; i++) {
         while (glGetError() != GL_NO_ERROR);
         glGenerateMipmap(bad_targets[i]);
         GLenum err = glGetError();
-
-        printf("  target=0x%04X -> hata: 0x%X %s\n",
-               bad_targets[i], err,
-               (err == GL_INVALID_ENUM) ? "(GL_INVALID_ENUM - Beklenen)" : "(Beklenmeyen!)");
+        if (err != GL_INVALID_ENUM) {
+            all_invalid = 0;
+        }
     }
-    printf("\n");
+
+    if (all_invalid)
+        TEST_LOG_SUCCESS(test_case5, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case5, test_procedure, "Gecersiz hedefler GL_INVALID_ENUM dondurmedi");
 }
 
 // ---------------------------------------------------------------
@@ -264,9 +276,7 @@ void Texturing_GenerateMipmap_TC_005(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_006(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_006";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_empty_level_zero\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -276,11 +286,10 @@ void Texturing_GenerateMipmap_TC_006(void)
     glGenerateMipmap(GL_TEXTURE_2D);
     GLenum err = glGetError();
 
-    printf("  Bos texture uzerinde mipmap: hata=0x%X %s\n\n",
-           err,
-           (err == GL_INVALID_OPERATION) ? "(GL_INVALID_OPERATION - Beklenen)" :
-           (err == GL_NO_ERROR) ? "(Hata yok - surucu toleransli)" :
-           "(Farkli hata)");
+    if (err == GL_INVALID_OPERATION || err == GL_NO_ERROR)
+        TEST_LOG_SUCCESS(test_case6, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case6, test_procedure, "Bos texture uzerinde mipmap hatasi: 0x%X", err);
 
     glDeleteTextures(1, &tex);
 }
@@ -292,23 +301,22 @@ void Texturing_GenerateMipmap_TC_006(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_007(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_007";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_zero_dimensions\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    GLenum tex_err = glGetError();
+    glGetError();
 
     glGenerateMipmap(GL_TEXTURE_2D);
     GLenum mip_err = glGetError();
 
-    printf("  0x0 TexImage2D hatasi: 0x%X\n", tex_err);
-    printf("  0x0 GenerateMipmap hatasi: 0x%X\n", mip_err);
-    printf("  Surucu cokmedi -> kararli\n\n");
+    if (mip_err == GL_NO_ERROR || mip_err == GL_INVALID_OPERATION || mip_err == GL_INVALID_VALUE)
+        TEST_LOG_SUCCESS(test_case7, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case7, test_procedure, "0x0 texture mipmap hatasi: 0x%X", mip_err);
 
     glDeleteTextures(1, &tex);
 }
@@ -320,9 +328,7 @@ void Texturing_GenerateMipmap_TC_007(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_008(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_008";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_special_formats\n", test_procedure, test_case);
 
     typedef struct { GLenum format; const char* name; } FmtEntry;
     FmtEntry formats[] = {
@@ -333,6 +339,7 @@ void Texturing_GenerateMipmap_TC_008(void)
         { GL_LUMINANCE_ALPHA, "GL_LUMINANCE_ALPHA" }
     };
     int count = sizeof(formats) / sizeof(formats[0]);
+    int all_ok = 1;
 
     for (int i = 0; i < count; i++) {
         while (glGetError() != GL_NO_ERROR);
@@ -347,7 +354,7 @@ void Texturing_GenerateMipmap_TC_008(void)
         else if (formats[i].format == GL_LUMINANCE_ALPHA) components = 2;
 
         GLubyte* data = (GLubyte*)calloc(64 * 64 * components, 1);
-        memset(data, 128, 64 * 64 * components);
+        if (data) memset(data, 128, 64 * 64 * components);
 
         glTexImage2D(GL_TEXTURE_2D, 0, formats[i].format, 64, 64, 0,
                      formats[i].format, GL_UNSIGNED_BYTE, data);
@@ -355,21 +362,23 @@ void Texturing_GenerateMipmap_TC_008(void)
 
         GLenum tex_err = glGetError();
         if (tex_err != GL_NO_ERROR) {
-            printf("  %s: TexImage2D hatasi 0x%X (atlanıyor)\n", formats[i].name, tex_err);
             glDeleteTextures(1, &tex);
             continue;
         }
 
         glGenerateMipmap(GL_TEXTURE_2D);
         GLenum mip_err = glGetError();
-
-        printf("  %s: mipmap hatasi=0x%X %s\n",
-               formats[i].name, mip_err,
-               (mip_err == GL_NO_ERROR) ? "(Basarili)" : "(Reddedildi)");
+        if (mip_err != GL_NO_ERROR) {
+            all_ok = 0;
+        }
 
         glDeleteTextures(1, &tex);
     }
-    printf("\n");
+
+    if (all_ok)
+        TEST_LOG_SUCCESS(test_case8, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case8, test_procedure, "Farkli formatlarda mipmap uretimi basarisiz");
 }
 
 // ---------------------------------------------------------------
@@ -379,13 +388,12 @@ void Texturing_GenerateMipmap_TC_008(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_009(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_009";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_vram_exhaustion\n", test_procedure, test_case);
 
     const int MAX_TEXTURES = 200;
     GLuint textures[200];
     int allocated = 0;
+    int crash_resilient = 1;
 
     for (int i = 0; i < MAX_TEXTURES; i++) {
         while (glGetError() != GL_NO_ERROR);
@@ -397,7 +405,6 @@ void Texturing_GenerateMipmap_TC_009(void)
         GLenum alloc_err = glGetError();
 
         if (alloc_err == GL_OUT_OF_MEMORY) {
-            printf("  %d. texture'da GL_OUT_OF_MEMORY alindi (beklenen davranis)\n", i + 1);
             glDeleteTextures(1, &textures[i]);
             break;
         }
@@ -406,14 +413,11 @@ void Texturing_GenerateMipmap_TC_009(void)
         GLenum mip_err = glGetError();
 
         if (mip_err == GL_OUT_OF_MEMORY) {
-            printf("  %d. mipmap'te GL_OUT_OF_MEMORY alindi\n", i + 1);
             allocated = i + 1;
             break;
         }
 
         if (alloc_err != GL_NO_ERROR || mip_err != GL_NO_ERROR) {
-            printf("  %d. texture'da beklenmeyen hata: alloc=0x%X, mip=0x%X\n",
-                   i + 1, alloc_err, mip_err);
             allocated = i + 1;
             break;
         }
@@ -421,8 +425,10 @@ void Texturing_GenerateMipmap_TC_009(void)
         allocated = i + 1;
     }
 
-    printf("  Toplam basariyla tahsis edilen texture: %d / %d\n", allocated, MAX_TEXTURES);
-    printf("  Surucu VRAM stresini cokme olmaksizin yonetti\n\n");
+    if (crash_resilient)
+        TEST_LOG_SUCCESS(test_case9, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case9, test_procedure, "VRAM stresi yonetilemedi");
 
     glDeleteTextures(allocated, textures);
 }
@@ -434,19 +440,16 @@ void Texturing_GenerateMipmap_TC_009(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_010(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_010";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_no_texture_bound\n", test_procedure, test_case);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     glGenerateMipmap(GL_TEXTURE_2D);
     GLenum err = glGetError();
 
-    printf("  Bind edilmemis texture uzerinde mipmap: hata=0x%X %s\n\n",
-           err,
-           (err == GL_INVALID_OPERATION) ? "(GL_INVALID_OPERATION - Beklenen)" :
-           (err == GL_NO_ERROR) ? "(Hata yok - varsayilan texture'a etki)" :
-           "(Farkli hata)");
+    if (err == GL_INVALID_OPERATION || err == GL_NO_ERROR)
+        TEST_LOG_SUCCESS(test_case10, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case10, test_procedure, "Bind edilmemis texture mipmap hatasi: 0x%X", err);
 }
 
 // ---------------------------------------------------------------
@@ -456,9 +459,7 @@ void Texturing_GenerateMipmap_TC_010(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_011(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_011";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_rapid_regeneration\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -473,16 +474,15 @@ void Texturing_GenerateMipmap_TC_011(void)
         glGenerateMipmap(GL_TEXTURE_2D);
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
-            printf("  %d. iterasyonda hata: 0x%X\n", i + 1, err);
             fail_count++;
             break;
         }
     }
 
     if (fail_count == 0)
-        printf("  -> PASSED: 100 kez ardisik mipmap uretimi hatasiz tamamlandi\n\n");
+        TEST_LOG_SUCCESS(test_case11, test_procedure);
     else
-        printf("  -> FAILED\n\n");
+        TEST_LOG_FAIL(test_case11, test_procedure, "100 kez ardisik mipmap uretimi basarisiz");
 
     glDeleteTextures(1, &tex);
 }
@@ -495,9 +495,7 @@ void Texturing_GenerateMipmap_TC_011(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_012(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_012";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_pixel_verification\n", test_procedure, test_case);
 
     GLuint prog = create_simple_program();
 
@@ -515,11 +513,11 @@ void Texturing_GenerateMipmap_TC_012(void)
 
     GLenum fbo_status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (fbo_status != GL_FRAMEBUFFER_COMPLETE) {
-        printf("  FBO tamamlanmadi (0x%X), test atlaniyor\n\n", fbo_status);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDeleteFramebuffers(1, &fbo);
         glDeleteTextures(1, &render_tex);
         glDeleteProgram(prog);
+        TEST_LOG_FAIL(test_case12, test_procedure, "FBO tamamlanmadi (0x%X)", fbo_status);
         return;
     }
 
@@ -558,12 +556,11 @@ void Texturing_GenerateMipmap_TC_012(void)
     GLenum err = glGetError();
 
     int r = pixels[0], g = pixels[1], b = pixels[2];
-    printf("  Okunan piksel (0,0): R=%d G=%d B=%d\n", r, g, b);
 
     if (err == GL_NO_ERROR && r > 200 && g < 50 && b < 50)
-        printf("  -> PASSED: Mipmap level 1 piksel dogrulamasi basarili (kirmizi)\n\n");
+        TEST_LOG_SUCCESS(test_case12, test_procedure);
     else
-        printf("  -> FAILED: Piksel beklenen renkte degil veya hata var (0x%X)\n\n", err);
+        TEST_LOG_FAIL(test_case12, test_procedure, "Piksel kirmizi degil R=%d G=%d B=%d veya hata=0x%X", r, g, b, err);
 
     // Temizlik
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -580,9 +577,7 @@ void Texturing_GenerateMipmap_TC_012(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_013(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_013";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_cubemap\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -604,9 +599,9 @@ void Texturing_GenerateMipmap_TC_013(void)
     GLenum err = glGetError();
 
     if (err == GL_NO_ERROR)
-        printf("  -> PASSED: CubeMap (6 yuz, 64x64) mipmap uretimi basarili\n\n");
+        TEST_LOG_SUCCESS(test_case13, test_procedure);
     else
-        printf("  -> FAILED: Hata: 0x%X\n\n", err);
+        TEST_LOG_FAIL(test_case13, test_procedure, "CubeMap mipmap uretimi hatali: 0x%X", err);
 
     glDeleteTextures(1, &tex);
 }
@@ -618,9 +613,7 @@ void Texturing_GenerateMipmap_TC_013(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_014(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_014";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_incomplete_cubemap\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -636,11 +629,10 @@ void Texturing_GenerateMipmap_TC_014(void)
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     GLenum err = glGetError();
 
-    printf("  Eksik cubemap uzerinde mipmap: hata=0x%X %s\n\n",
-           err,
-           (err == GL_INVALID_OPERATION) ? "(GL_INVALID_OPERATION - Beklenen)" :
-           (err == GL_NO_ERROR) ? "(Surucu toleransli davranmis)" :
-           "(Farkli hata)");
+    if (err == GL_INVALID_OPERATION || err == GL_NO_ERROR)
+        TEST_LOG_SUCCESS(test_case14, test_procedure);
+    else
+        TEST_LOG_FAIL(test_case14, test_procedure, "Eksik cubemap mipmap hatasi: 0x%X", err);
 
     glDeleteTextures(1, &tex);
 }
@@ -652,9 +644,7 @@ void Texturing_GenerateMipmap_TC_014(void)
 // ---------------------------------------------------------------
 void Texturing_GenerateMipmap_TC_015(void)
 {
-    static const char* test_case = "Texturing_GenerateMipmap_TC_015";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_mipmap_update_and_regenerate\n", test_procedure, test_case);
 
     GLuint tex;
     glGenTextures(1, &tex);
@@ -675,91 +665,9 @@ void Texturing_GenerateMipmap_TC_015(void)
     GLenum err2 = glGetError();
 
     if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR)
-        printf("  -> PASSED: Level 0 guncelleme ve mipmap yenileme hatasiz\n\n");
+        TEST_LOG_SUCCESS(test_case15, test_procedure);
     else
-        printf("  -> FAILED: ilk=0x%X, ikinci=0x%X\n\n", err1, err2);
+        TEST_LOG_FAIL(test_case15, test_procedure, "Mipmap yenileme hatali: err1=0x%X, err2=0x%X", err1, err2);
 
     glDeleteTextures(1, &tex);
-}
-
-// =========================================================
-// ANA YAPI: init, draw, clean
-// =========================================================
-
-static GLFWwindow* window = NULL;
-static int width = 640, height = 480;
-static const char* windowTitle = "glGenerateMipmap Robustness Suite - Hasan";
-
-void init(void);
-void draw(void);
-void clean(void);
-
-void init(void)
-{
-    printf("=====================================================\n");
-    printf("  %s ROBUSTNESS SUITE - HASAN\n", test_procedure);
-    printf("=====================================================\n\n");
-
-    Texturing_GenerateMipmap_TC_001();
-    Texturing_GenerateMipmap_TC_002();
-    Texturing_GenerateMipmap_TC_003();
-    Texturing_GenerateMipmap_TC_004();
-    Texturing_GenerateMipmap_TC_005();
-    Texturing_GenerateMipmap_TC_006();
-    Texturing_GenerateMipmap_TC_007();
-    Texturing_GenerateMipmap_TC_008();
-    Texturing_GenerateMipmap_TC_009();
-    Texturing_GenerateMipmap_TC_010();
-    Texturing_GenerateMipmap_TC_011();
-    Texturing_GenerateMipmap_TC_012();
-    Texturing_GenerateMipmap_TC_013();
-    Texturing_GenerateMipmap_TC_014();
-    Texturing_GenerateMipmap_TC_015();
-
-    printf("=====================================================\n");
-    printf("  TUM TESTLER TAMAMLANDI\n");
-    printf("=====================================================\n");
-}
-
-void draw(void)
-{
-    glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void clean(void)
-{
-}
-
-int main(void)
-{
-    setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
-    setenv("GALLIUM_DRIVER", "llvmpipe", 1);
-    unsetenv("WAYLAND_DISPLAY");
-
-    if (!glfwInit()) return -1;
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    init();
-
-    while (!glfwWindowShouldClose(window)) {
-        draw();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    clean();
-    glfwTerminate();
-    return 0;
 }

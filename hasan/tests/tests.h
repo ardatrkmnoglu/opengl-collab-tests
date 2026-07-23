@@ -55,4 +55,21 @@ void Texturing_GenTextures_TC_010(void);
 void Texturing_GenTextures_TC_011(void);
 void Texturing_GenTextures_TC_012(void);
 
+/* --------------- Texturing - GenerateMipmap --------------- */
+void Texturing_GenerateMipmap_TC_001(void);
+void Texturing_GenerateMipmap_TC_002(void);
+void Texturing_GenerateMipmap_TC_003(void);
+void Texturing_GenerateMipmap_TC_004(void);
+void Texturing_GenerateMipmap_TC_005(void);
+void Texturing_GenerateMipmap_TC_006(void);
+void Texturing_GenerateMipmap_TC_007(void);
+void Texturing_GenerateMipmap_TC_008(void);
+void Texturing_GenerateMipmap_TC_009(void);
+void Texturing_GenerateMipmap_TC_010(void);
+void Texturing_GenerateMipmap_TC_011(void);
+void Texturing_GenerateMipmap_TC_012(void);
+void Texturing_GenerateMipmap_TC_013(void);
+void Texturing_GenerateMipmap_TC_014(void);
+void Texturing_GenerateMipmap_TC_015(void);
+
 #endif

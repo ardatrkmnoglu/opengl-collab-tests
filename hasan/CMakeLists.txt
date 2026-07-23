@@ -45,3 +45,6 @@ target_link_libraries(glGenerateMipmap_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_
 
 add_executable(texSubImage2D_visual_test tests/texSubImage2D_visual_test.c)
 target_link_libraries(texSubImage2D_visual_test PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
+
+add_executable(glScissor_tests tests/glScissor_tests.c)
+target_link_libraries(glScissor_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

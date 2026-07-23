@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
-
+#include "../../../include/macro.h"
 
 
 
@@ -10,6 +9,20 @@
 // target: Modern çekirdekte genelde hep GL_FRAMEBUFFER kullanılır.
 // framebuffer = 0: Varsayılan framebuffer
 // framebuffer = 0 olmayan bir id dersen: Senin glGenFramebuffers ile oluşturduğun, “off-screen” (ekran dışında) bir framebuffer’a geçersin.
+
+static const char* test_procedure = "FramebufferObjects_BindFramebuffer_TP_001";
+static const char* test_case_1 = "FramebufferObjects_BindFramebuffer_TC_001";
+static const char* test_case_2 = "FramebufferObjects_BindFramebuffer_TC_002";
+static const char* test_case_3 = "FramebufferObjects_BindFramebuffer_TC_003";
+static const char* test_case_4 = "FramebufferObjects_BindFramebuffer_TC_004";
+static const char* test_case_5 = "FramebufferObjects_BindFramebuffer_TC_005";
+static const char* test_case_6 = "FramebufferObjects_BindFramebuffer_TC_006";
+static const char* test_case_7 = "FramebufferObjects_BindFramebuffer_TC_007";
+static const char* test_case_8 = "FramebufferObjects_BindFramebuffer_TC_008";
+static const char* test_case_9 = "FramebufferObjects_BindFramebuffer_TC_009";
+static const char* test_case_10 = "FramebufferObjects_BindFramebuffer_TC_010";
+static const char* test_case_11 = "FramebufferObjects_BindFramebuffer_TC_011";
+static const char* test_case_12 = "FramebufferObjects_BindFramebuffer_TC_012";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_FRAMEBUFFER.
@@ -21,9 +34,10 @@ void FramebufferObjects_BindFramebuffer_TC_001()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM){
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%x.", err);
+        return;
     }
-    printf("[PASS] rTest_glBindFramebuffer_invalid_enum()\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 // belirtilmeyen hatalar ------------------------------
@@ -45,10 +59,15 @@ void FramebufferObjects_BindFramebuffer_TC_002()
     GLint currentBinding = -1;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentBinding);
 
-    if (err != GL_INVALID_ENUM) {printf("[FAIL] Expected GL_INVALID_ENUM for invalid target, got 0x%X\n", err);}
-    else if ((GLuint)currentBinding != fbo) {printf("[FAIL] Previous binding was altered by invalid call (binding=%d, expected=%u)\n",currentBinding, fbo);}
-    else {printf("[PASS] Invalid target rejected, previous binding preserved.\n");}
-
+    if (err != GL_INVALID_ENUM) {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Expected GL_INVALID_ENUM for invalid target, got 0x%x.", err);
+    }
+    else if ((GLuint)currentBinding != fbo) {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Previous binding was altered by invalid call (binding=%d, expected=%u)\n",currentBinding, fbo);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_2, test_procedure);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
 }
@@ -65,8 +84,12 @@ void FramebufferObjects_BindFramebuffer_TC_003()
 
     GLboolean isFbo = glIsFramebuffer(arbitraryName);
 
-    printf("[INFO] Arbitrary unused name bind => err=0x%X, glIsFramebuffer=%s\n", err, isFbo ? "GL_TRUE" : "GL_FALSE");
-    printf("[PASS] Implementation did not crash with arbitrary/ungenerated name.\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_3, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Implementation did not crash with arbitrary/ungenerated name");
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // Eger implicit olusturulduysa temizlemeyi dene (guvenli, gecersizse etkisi yok)
@@ -90,12 +113,11 @@ void FramebufferObjects_BindFramebuffer_TC_004()
     for (int i = 0; i < 3; i++) {
         GLint objType = -1;
         glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, attachments[i], GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &objType);
-        printf("[INFO] attachment=0x%X objType=0x%X (expect GL_NONE=0x%X)\n", attachments[i], objType, GL_NONE);
         if (objType != GL_NONE) allNone = 0;
     }
 
-    if (allNone) printf("[PASS] All attachment points initialized to GL_NONE on first bind.\n");
-    else printf("[FAIL] One or more attachment points not initialized to GL_NONE.\n");
+    if (allNone) TEST_LOG_SUCCESS(test_case_4, test_procedure);
+    else TEST_LOG_FAIL(test_case_4, test_procedure, "One or more attachment points not initialized to GL_NONE");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
@@ -115,9 +137,12 @@ void FramebufferObjects_BindFramebuffer_TC_005()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, 0);
 
     GLenum err = glGetError();
-    printf("[INFO] Attempt to modify attachment with FBO 0 bound => err=0x%X\n", err);
-    if (err == GL_INVALID_OPERATION) {printf("[PASS] Correctly rejected modification while default FBO bound.\n");}
-    else {printf("[FAIL] Expected GL_INVALID_OPERATION per spec note.\n");}
+    if (err == GL_INVALID_OPERATION) {
+        TEST_LOG_SUCCESS(test_case_5, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Expected GL_INVALID_OPERATION per spec note.");
+    }
 }
 
 // Eğer GL_FRAMEBUFFER hedefine bağlı olan bir FBO (framebuffer nesnesi) glDeleteFramebuffers ile silinirse,
@@ -139,9 +164,13 @@ void FramebufferObjects_BindFramebuffer_TC_006()
     GLint currentBinding = -1;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentBinding);
 
-    printf("[INFO] errDelete=0x%X, binding after delete=%d (expect 0)\n", errDelete, currentBinding);
-    if (currentBinding == 0) {printf("[PASS] Binding correctly reverted to 0 after deleting bound FBO.\n");}
-    else {printf("[FAIL] Binding did not revert to 0 - dangling binding risk.\n");}
+    if (currentBinding == 0) {
+        TEST_LOG_SUCCESS(test_case_6, test_procedure);
+        printf("[PASS] Binding correctly reverted to 0 after deleting bound FBO.\n");
+    }
+    else {
+        TEST_LOG_FAIL(test_case_6, test_procedure, "Binding did not revert to 0 - dangling binding risk.");
+    }
 }
 
 // Ayni framebuffer'in ust uste ayni isimle tekrar tekrar bind edilmesinin (no-op olmasi beklenen durum)
@@ -169,10 +198,12 @@ void FramebufferObjects_BindFramebuffer_TC_007()
     GLint objType = -1;
     glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &objType);
 
-    printf("[INFO] After 1000x rebind: err=0x%X, attachment objType=0x%X (expect GL_RENDERBUFFER)\n", err, objType);
-
-    if (err == GL_NO_ERROR && objType == GL_RENDERBUFFER) {printf("[PASS] Repeated rebinding did not corrupt or reset FBO state.\n");}
-    else {printf("[FAIL] State corrupted or error occurred during repeated rebind.\n");}
+    if (err == GL_NO_ERROR && objType == GL_RENDERBUFFER) {
+        TEST_LOG_SUCCESS(test_case_7, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_7, test_procedure, "State corrupted or error occurred during repeated rebind.");
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);
@@ -195,9 +226,12 @@ void FramebufferObjects_BindFramebuffer_TC_008()
         while (glGetError() != GL_NO_ERROR) {}
         glBindFramebuffer(GL_FRAMEBUFFER, extremeNames[i]);
         GLenum err = glGetError();
-        printf("[INFO] name=0x%X => err=0x%X\n", extremeNames[i], err);
+        if (err != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+            return;
+        }
     }
-    printf("[PASS] Extreme framebuffer name values did not crash the implementation.\n");
+    TEST_LOG_SUCCESS(test_case_8, test_procedure);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -216,7 +250,12 @@ void FramebufferObjects_BindFramebuffer_TC_009()
     glBindFramebuffer(GL_FRAMEBUFFER, rb); // renderbuffer ismini framebuffer olarak kullan
 
     GLenum err = glGetError();
-    printf("[INFO] Using renderbuffer name as framebuffer name => err=0x%X\n", err);
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_9, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteRenderbuffers(1, &rb);
@@ -239,7 +278,12 @@ void FramebufferObjects_BindFramebuffer_TC_010()
     }
 
     GLenum err = glGetError();
-    printf("[INFO] %d bind/unbind cycles completed. err=0x%X\n", ITER, err);
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_10, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "error = 0x%x.", err);
+    }
 
     glDeleteFramebuffers(8, fbos);
 }
@@ -263,9 +307,12 @@ void FramebufferObjects_BindFramebuffer_TC_011()
     GLint b2 = -1;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &b2); //binding == fbo2 olmalı (önceki fbo bırakılmalı)
 
-    printf("[INFO] After bind fbo1: binding=%d (expect %u), after bind fbo2: binding=%d (expect %u)\n", b1, fbo1, b2, fbo2);
-    if ((GLuint)b1 == fbo1 && (GLuint)b2 == fbo2 && b1 != b2) {printf("[PASS] Binding correctly switches, previous binding broken.\n");}
-    else {printf("[FAIL] Binding state inconsistent across switch.\n");}
+    if ((GLuint)b1 == fbo1 && (GLuint)b2 == fbo2 && b1 != b2) {
+        TEST_LOG_SUCCESS(test_case_11, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_11, test_procedure, "Binding state inconsistent across switch");
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo1);
@@ -295,9 +342,12 @@ void FramebufferObjects_BindFramebuffer_TC_012()
     glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
     GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &objType);
 
-    printf("[INFO] Attachment objType after self-rebind=0x%X (expect GL_RENDERBUFFER)\n", objType);
-    if (objType == GL_RENDERBUFFER) {printf("[PASS] Self-rebind preserved existing attachment state correctly.\n");}
-    else {printf("[FAIL] Self-rebind unexpectedly reset attachment state.\n");}
+    if (objType == GL_RENDERBUFFER) {
+        TEST_LOG_SUCCESS(test_case_12, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_12, test_procedure, "Self-rebind unexpectedly reset attachment state.");
+    }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDeleteFramebuffers(1, &fbo);

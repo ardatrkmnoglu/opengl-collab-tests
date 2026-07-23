@@ -33,16 +33,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/tmp.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BindBuffer_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BindBuffer_TP_001.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BufferData_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BufferData_TP_001.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BufferSubData_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BufferSubData_TP_001.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_GenBuffers_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_GenBuffers_TP_001.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_GetBufferParameteriv_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_GetBufferParameteriv_TP_001.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/tests.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_BindFramebuffer_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_BindFramebuffer_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_GenFramebuffers_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_GenFramebuffers_TP_001.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +129,7 @@
       <workItem from="1784618082017" duration="242000" />
       <workItem from="1784618876610" duration="23402000" />
       <workItem from="1784714501159" duration="2238000" />
-      <workItem from="1784783064222" duration="10724000" />
+      <workItem from="1784783064222" duration="12912000" />
     </task>
     <servers />
   </component>

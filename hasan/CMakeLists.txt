@@ -25,10 +25,9 @@ include_directories(
     ${GLEW_INCLUDE_DIRS}
 )
 
-# Executables for each test file in tests/
-
-add_executable(ReadingPixels_ReadnPixels_TP_001 tests/ReadingPixels_ReadnPixels_TP_001.c)
-target_link_libraries(ReadingPixels_ReadnPixels_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
+# Ana executable: main.c + tum test dosyalari
+add_executable(hasan_tests main.c tests/ReadingPixels_ReadnPixels_TP_001.c)
+target_link_libraries(hasan_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
 
 add_executable(Texturing_TexStorage2D_TP_001 tests/Texturing_TexStorage2D_TP_001.c)
 target_link_libraries(Texturing_TexStorage2D_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

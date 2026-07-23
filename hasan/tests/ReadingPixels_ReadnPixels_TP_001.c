@@ -27,14 +27,16 @@ typedef void (APIENTRYP PFNGLREADNPIXELSPROC)(GLint x, GLint y, GLsizei width, G
 static PFNGLREADNPIXELSPROC pglReadnPixels = NULL;
 #define glReadnPixels pglReadnPixels
 
-static GLFWwindow* window = NULL;
-static int width = 640, height = 480;
-static int g_tests_failed = 0;
-static const char* windowTitle = "glReadnPixels Robustness Tests";
+// glReadnPixels fonksiyon isaretcisini yukler
+void ReadingPixels_ReadnPixels_init(void) {
+    pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixels");
+    if (!pglReadnPixels) pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixelsEXT");
+    if (!pglReadnPixels) pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixelsKHR");
 
-void init(void);
-void draw(void);
-void clean(void);
+    if (!pglReadnPixels) {
+        printf("[HATA] glReadnPixels fonksiyon isaretcisi alinamadi!\n");
+    }
+}
 
 // --- TEST 1: YETERSİZ KUTU BOYUTU (Buffer Overflow) ---
 void ReadingPixels_ReadnPixels_TC_001(void) {
@@ -51,7 +53,6 @@ void ReadingPixels_ReadnPixels_TC_001(void) {
         TEST_LOG_SUCCESS(test_case1, test_procedure);
     } else {
         TEST_LOG_FAIL(test_case1, test_procedure, "Expected GL_INVALID_OPERATION (0x502), but got 0x%X", err);
-        g_tests_failed = 1;
     }
 }
 
@@ -70,7 +71,6 @@ void ReadingPixels_ReadnPixels_TC_002(void) {
         TEST_LOG_SUCCESS(test_case2, test_procedure);
     } else {
         TEST_LOG_FAIL(test_case2, test_procedure, "Expected GL_INVALID_VALUE (0x501), but got 0x%X", err);
-        g_tests_failed = 1;
     }
 }
 
@@ -89,7 +89,6 @@ void ReadingPixels_ReadnPixels_TC_003(void) {
         TEST_LOG_SUCCESS(test_case3, test_procedure);
     } else {
         TEST_LOG_FAIL(test_case3, test_procedure, "Expected GL_INVALID_ENUM (0x500), but got 0x%X", err);
-        g_tests_failed = 1;
     }
 }
 
@@ -108,67 +107,5 @@ void ReadingPixels_ReadnPixels_TC_004(void) {
         TEST_LOG_SUCCESS(test_case4, test_procedure);
     } else {
         TEST_LOG_FAIL(test_case4, test_procedure, "Unexpected error for out of bounds coordinates: 0x%X", err);
-        g_tests_failed = 1;
     }
-}
-
-void init(void) {
-    pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixels");
-    if (!pglReadnPixels) pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixelsEXT");
-    if (!pglReadnPixels) pglReadnPixels = (PFNGLREADNPIXELSPROC)glfwGetProcAddress("glReadnPixelsKHR");
-
-    if (!pglReadnPixels) {
-        printf("[HATA] glReadnPixels fonksiyon isaretcisi alinamadi!\n");
-        g_tests_failed = 1;
-        return;
-    }
-
-    ReadingPixels_ReadnPixels_TC_001();
-    ReadingPixels_ReadnPixels_TC_002();
-    ReadingPixels_ReadnPixels_TC_003();
-    ReadingPixels_ReadnPixels_TC_004();
-}
-
-void draw(void) {
-    if (g_tests_failed) {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Siyah
-    } else {
-        glClearColor(0.0f, 0.2f, 0.6f, 1.0f); // Mavi
-    }
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void clean(void) {
-}
-
-int main(void) {
-    setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
-    setenv("GALLIUM_DRIVER", "llvmpipe", 1);
-    unsetenv("WAYLAND_DISPLAY");
-
-    if (!glfwInit()) return -1;
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    init();
-
-    while (!glfwWindowShouldClose(window)) {
-        draw();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    clean();
-    glfwTerminate();
-    return g_tests_failed ? -1 : 0;
 }

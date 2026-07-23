@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <float.h>
 #include <math.h>
-#include "C:/Users/Ozan/Desktop/Workspace/OpenGL_Proje/opengl-collab-tests/include/macro.h"
+#include "../../../include/rtests.h"
+#include "../../../include/helper.h"
+#include "../../../include/macro.h"
 
 static const char* test_procedure = "ViewportandClipping_DepthRangef_TP_001";
 static const char* test_case_1 = "ViewportandClipping_DepthRangef_TC_001";

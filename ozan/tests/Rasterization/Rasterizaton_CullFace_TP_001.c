@@ -1,7 +1,9 @@
 #include <GL/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "C:/Users/Ozan/Desktop/Workspace/OpenGL_Proje/opengl-collab-tests/include/macro.h"
+#include "../../../include/rtests.h"
+#include "../../../include/helper.h"
+#include "../../../include/macro.h"
 
 static const char* test_procedure = "Rasterizaton_CullFace_TP_001";
 static const char* test_case_1 = "Rasterizaton_CullFace_TC_001";

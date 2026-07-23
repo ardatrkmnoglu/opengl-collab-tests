@@ -1,16 +1,30 @@
 #include <glad/gles2.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
+#include "../../../include/macro.h"
 
 // void glBufferData(GLenum target, GLsizeiptr size, const GLvoid * data, GLenum usage);
 // Target parametresiyle bind ettiğin buffer object için ekran kartı (GPU) üzerinde yeni bir data store oluşturur
 // Eski veriyi tamamen siler
 // İstersen verdiğin data pointer’ındaki veriyi bu yeni belleğe kopyalayarak başlatır
 // usage parametresiyle de bu veriyi nasıl kullanacağını sürücüye ipucu olarak bildirirsin (performans optimizasyonu için)
+
+static const char* test_procedure = "BufferObjects_BufferData_TP_001";
+static const char* test_case_1 = "BufferObjects_BufferData_TC_001";
+static const char* test_case_2 = "BufferObjects_BufferData_TC_002";
+static const char* test_case_3 = "BufferObjects_BufferData_TC_003";
+static const char* test_case_4 = "BufferObjects_BufferData_TC_004";
+static const char* test_case_5 = "BufferObjects_BufferData_TC_005";
+static const char* test_case_6 = "BufferObjects_BufferData_TC_006";
+static const char* test_case_7 = "BufferObjects_BufferData_TC_007";
+static const char* test_case_8 = "BufferObjects_BufferData_TC_008";
+static const char* test_case_9 = "BufferObjects_BufferData_TC_009";
+static const char* test_case_10 = "BufferObjects_BufferData_TC_010";
+static const char* test_case_11 = "BufferObjects_BufferData_TC_011";
+static const char* test_case_12 = "BufferObjects_BufferData_TC_012";
+static const char* test_case_13 = "BufferObjects_BufferData_TC_013";
+static const char* test_case_14 = "BufferObjects_BufferData_TC_014";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
@@ -22,9 +36,11 @@ void BufferObjects_BufferData_TC_001()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%X", err);
     }
-    printf("[PASS] rTest_glBufferData_invalid_enum_target()\n");
+    else {
+        TEST_LOG_SUCCESS(test_case_1, test_procedure);
+    }
 }
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if usage is not GL_STREAM_DRAW, GL_STATIC_DRAW, or GL_DYNAMIC_DRAW.
@@ -39,9 +55,10 @@ void BufferObjects_BufferData_TC_002()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
-        printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Expected GL_INVALID_ENUM, but got 0x%x.", err);
+        return;
     }
-    printf("[PASS] rTest_glBufferData_invalid_enum_usage()\n");
+    TEST_LOG_SUCCESS(test_case_2, test_procedure);
 
     glDeleteBuffers(1, &buffer);
 }
@@ -58,10 +75,11 @@ void BufferObjects_BufferData_TC_003()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
-        printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Expected GL_INVALID_VALUE, but got 0x%x.", err);
+        glDeleteBuffers(1, &buffer);
+        return;
     }
-    printf("[PASS] rTest_glBufferData_invalid_value_negative_size()\n");
-
+    TEST_LOG_SUCCESS(test_case_3, test_procedure);
     glDeleteBuffers(1, &buffer);
 }
 
@@ -75,9 +93,11 @@ void BufferObjects_BufferData_TC_004()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_OPERATION) {
-        printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_4, test_procedure, "Expected GL_INVALID_OPERATION, but got = 0x%x.", err);
     }
-    printf("[PASS] rTest_glBufferData_invalid_operation_zero_buffer_bound()\n");
+    else {
+        TEST_LOG_SUCCESS(test_case_4, test_procedure);
+    }
 }
 
 // Belirtilen hata: GL_OUT_OF_MEMORY is generated if the GL is unable to create a data store with the specified size.
@@ -90,11 +110,15 @@ void BufferObjects_BufferData_TC_005()
     glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)INTPTR_MAX, NULL, GL_STATIC_DRAW );
 
     GLenum err = glGetError();
-    if (err == GL_OUT_OF_MEMORY) { printf("[PASS] GL_OUT_OF_MEMORY was generated.\n");}
-    else if (err == GL_NO_ERROR) { printf("[INFO] GL_OUT_OF_MEMORY was not generated. This behavior is implementation-dependent.\n");}
+    if (err == GL_OUT_OF_MEMORY) {
+        TEST_LOG_SUCCESS(test_case_5, test_procedure);
+    }
+    else if (err == GL_NO_ERROR) {
+        TEST_LOG_INFO("GL_OUT_OF_MEMORY was not generated. This behavior is implementation-dependent.");
+    }
     else {
-        printf("[FAIL] Expected GL_OUT_OF_MEMORY or GL_NO_ERROR, but got 0x%X\n", err);
-         }
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Expected GL_OUT_OF_MEMORY or GL_NO_ERROR, but got 0x%x.", err);
+    }
 
     glDeleteBuffers(1, &buffer);
 }
@@ -102,7 +126,8 @@ void BufferObjects_BufferData_TC_005()
 
 // Belirtilmeyen hatalar --------------------------------------------------
 
-// Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API kullanımına karşı implementasyonun dayanıklılığını gözlemler.
+// Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API
+// kullanımına karşı implementasyonun dayanıklılığını gözlemler.
 void BufferObjects_BufferData_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -117,13 +142,18 @@ void BufferObjects_BufferData_TC_006()
     glBufferData(GL_ARRAY_BUFFER, 4096, smallSource, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    printf("[INFO] Misuse robustness (source buffer too small): glError=0x%X \n", err);
-
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_6, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
+    }
     glDeleteBuffers(1, &buf);
 }
 
 // size = 0 ama data != NULL
-// Sıfır boyutlu data store oluşturulurken geçerli bir data pointer'ı verilmesinin implementasyon tarafından güvenli şekilde ele alınıp alınmadığını doğrular.
+// Sıfır boyutlu data store oluşturulurken geçerli bir data pointer'ı verilmesinin
+// implementasyon tarafından güvenli şekilde ele alınıp alınmadığını doğrular.
 void BufferObjects_BufferData_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -136,8 +166,12 @@ void BufferObjects_BufferData_TC_007()
     glBufferData(GL_ARRAY_BUFFER, 0, &dummy, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    if (err == GL_NO_ERROR) printf("[PASS] size=0, data!=NULL accepted.\n");
-    else printf("[INFO] size=0, data!=NULL returned glError=0x%X\n", err);
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_7, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_7, test_procedure, "error = 0x%x.", err);
+    }
 
     glDeleteBuffers(1, &buf);
 }
@@ -145,7 +179,6 @@ void BufferObjects_BufferData_TC_007()
 // Sınır ve aşırı boyut size değerleri karşısında implementasyonun kararlılığını gözlemler.
 void BufferObjects_BufferData_TC_008()
 {
-
     GLsizeiptr candidates[] = { -1, INT_MIN, (GLsizeiptr)INT_MAX + 1, LLONG_MAX };
 
     for (int i = 0; i < 4; ++i) {
@@ -157,10 +190,13 @@ void BufferObjects_BufferData_TC_008()
         glBufferData(GL_ARRAY_BUFFER, candidates[i], NULL, GL_STATIC_DRAW);
 
         GLenum err = glGetError();
-        printf("[INFO] Boundary size test: size=%lld, glError=0x%X\n", (long long)candidates[i], err);
-
+        if (err != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+            return;
+        }
         glDeleteBuffers(1, &buf);
     }
+    TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }
 
 // Geçersiz ve kirlenmiş usage enum değerleri karşısında implementasyonun kararlılığını gözlemler.
@@ -178,13 +214,18 @@ void BufferObjects_BufferData_TC_009()
         glBufferData(GL_ARRAY_BUFFER, 64, NULL, usage);
 
         GLenum err = glGetError();
-        printf("[INFO] glBufferData(usage=0x%08X) completed, glError=0x%X\n", usage, err);
-
+        if (err != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
+            glDeleteBuffers(1, &buf);
+            return;
+        }
         glDeleteBuffers(1, &buf);
     }
+    TEST_LOG_SUCCESS(test_case_9, test_procedure);
 }
 
-// Hedefe herhangi bir buffer bağlı değilken glBufferData çağrısının implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
+// Hedefe herhangi bir buffer bağlı değilken glBufferData çağrısının implementasyon
+// tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
 void BufferObjects_BufferData_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -193,10 +234,16 @@ void BufferObjects_BufferData_TC_010()
     glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    printf("[INFO] glBufferData(buffer=0) completed, glError=0x%X\n", err);
+    if (err == GL_INVALID_OPERATION) {
+        TEST_LOG_SUCCESS(test_case_10, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "error = 0x%x.", err);
+    }
 }
 
-// Aynı buffer üzerinde farklı boyutlarda data store'ları art arda oluşturarak implementasyonun reallocation işlemlerindeki kararlılığını gözlemler.
+// Aynı buffer üzerinde farklı boyutlarda data store'ları art arda oluşturarak
+// implementasyonun reallocation işlemlerindeki kararlılığını gözlemler.
 void BufferObjects_BufferData_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -212,17 +259,18 @@ void BufferObjects_BufferData_TC_011()
         glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
 
         GLenum err = glGetError();
-        if (err != GL_NO_ERROR){
-            printf("[INFO] Iteration=%d, size=%lld, glError=0x%X\n", i, (long long)size, err);
-            break;
+        if (err != GL_NO_ERROR) {
+            TEST_LOG_FAIL(test_case_11, test_procedure, "error = 0x%x.", err);
+            glDeleteBuffers(1, &buf);
+            return;
         }
     }
-    printf("[INFO] Repeated resize stress test completed.\n");
-
+    TEST_LOG_SUCCESS(test_case_11, test_procedure);
     glDeleteBuffers(1, &buf);
 }
 
-// Hizasız bir kaynak data pointer'ı kullanılarak implementasyonun hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
+// Hizasız bir kaynak data pointer'ı kullanılarak implementasyonun hatalı
+// istemci girdisi karşısındaki kararlılığı gözlemlenir.
 void BufferObjects_BufferData_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -236,12 +284,17 @@ void BufferObjects_BufferData_TC_012()
     glBufferData(GL_ARRAY_BUFFER, 64, misaligned, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    printf("[INFO] glBufferData(misaligned data pointer) completed, glError=0x%X\n", err);
-
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_12, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_12, test_procedure, "error = 0x%x.", err);
+    }
     glDeleteBuffers(1, &buf);
 }
 
-// Serbest bırakılmış (dangling) bir kaynak pointer kullanılarak implementasyonun hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
+// Serbest bırakılmış (dangling) bir kaynak pointer kullanılarak implementasyonun
+// hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
 void BufferObjects_BufferData_TC_013()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -252,7 +305,7 @@ void BufferObjects_BufferData_TC_013()
 
     char *heapData = (char *)malloc(256);
     if (heapData == NULL) {
-        printf("[ERROR] Memory allocation failed.\n");
+        TEST_LOG_FAIL(test_case_13, test_procedure, "Memory allocation failed");
         glDeleteBuffers(1, &buf);
         return;
     }
@@ -262,12 +315,17 @@ void BufferObjects_BufferData_TC_013()
     glBufferData(GL_ARRAY_BUFFER, 256, heapData, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    printf("[INFO] glBufferData(dangling data pointer) completed, glError=0x%X\n", err);
-
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_13, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_13, test_procedure, "error = 0x%x.", err);
+    }
     glDeleteBuffers(1, &buf);
 }
 
-// Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin durumunun korunup korunmadığını gözlemler.
+// Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin
+// durumunun korunup korunmadığını gözlemler.
 void BufferObjects_BufferData_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -283,11 +341,16 @@ void BufferObjects_BufferData_TC_014()
     glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)1 << 40, NULL, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
-    printf("[INFO] glBufferData(huge size) completed, glError=0x%X\n", err);
 
     GLint sizeAfter = -1;
     glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &sizeAfter);
-    printf("[INFO] Buffer size after allocation attempt: %d bytes\n", sizeAfter);
+
+    if ((err == GL_OUT_OF_MEMORY || err == GL_NO_ERROR) && sizeAfter == 1024) {
+        TEST_LOG_SUCCESS(test_case_14, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_14, test_procedure, "error = 0x%x.", err);
+    }
 
     glDeleteBuffers(1, &buf);
 }

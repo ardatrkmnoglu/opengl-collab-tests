@@ -33,8 +33,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/tests/tmp.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BindBuffer_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BindBuffer_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BufferData_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BufferData_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_BufferSubData_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_BufferSubData_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_GenBuffers_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_GenBuffers_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_GetBufferParameteriv_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/BufferObjects_GetBufferParameteriv_TP_001.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Buffer Objects/tests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/BufferObjects/tests.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_BindFramebuffer_TP_001.c" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Framebuffer Objects/FramebufferObjects_BindFramebuffer_TP_001.c" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +55,10 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/tests/Buffer Objects/BufferObjects_GenBuffers_TP_001.c" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/tests/Framebuffer Objects/frameBuffer_tests.h" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="w5ujnCnI" />
@@ -97,6 +109,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="untitled" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="untitled" TARGET_NAME="untitled" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="untitled" RUN_TARGET_NAME="untitled">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -119,6 +136,7 @@
       <workItem from="1784618082017" duration="242000" />
       <workItem from="1784618876610" duration="23402000" />
       <workItem from="1784714501159" duration="2238000" />
+      <workItem from="1784783064222" duration="10724000" />
     </task>
     <servers />
   </component>

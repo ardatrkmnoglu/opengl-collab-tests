@@ -49,6 +49,14 @@ void init(void) {
     ReadingPixels_ReadnPixels_TC_002();
     ReadingPixels_ReadnPixels_TC_003();
     ReadingPixels_ReadnPixels_TC_004();
+
+    /* --------------- Per-FragmentOperations - Scissor --------------- */
+    PerFragmentOperations_Scissor_TC_001();
+    PerFragmentOperations_Scissor_TC_002();
+    PerFragmentOperations_Scissor_TC_003();
+    PerFragmentOperations_Scissor_TC_004();
+    PerFragmentOperations_Scissor_TC_005();
+    PerFragmentOperations_Scissor_TC_006();
 }
 
 void draw(void) {

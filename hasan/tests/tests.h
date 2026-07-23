@@ -8,4 +8,12 @@ void ReadingPixels_ReadnPixels_TC_002(void);
 void ReadingPixels_ReadnPixels_TC_003(void);
 void ReadingPixels_ReadnPixels_TC_004(void);
 
+/* --------------- Per-FragmentOperations - Scissor --------------- */
+void PerFragmentOperations_Scissor_TC_001(void);
+void PerFragmentOperations_Scissor_TC_002(void);
+void PerFragmentOperations_Scissor_TC_003(void);
+void PerFragmentOperations_Scissor_TC_004(void);
+void PerFragmentOperations_Scissor_TC_005(void);
+void PerFragmentOperations_Scissor_TC_006(void);
+
 #endif

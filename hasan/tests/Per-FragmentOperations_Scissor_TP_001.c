@@ -5,6 +5,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <limits.h>
+#include "../include/macro.h"
+
+static const char* test_case1 = "PerFragmentOperations_Scissor_TC_001";
+static const char* test_case2 = "PerFragmentOperations_Scissor_TC_002";
+static const char* test_case3 = "PerFragmentOperations_Scissor_TC_003";
+static const char* test_case4 = "PerFragmentOperations_Scissor_TC_004";
+static const char* test_case5 = "PerFragmentOperations_Scissor_TC_005";
+static const char* test_case6 = "PerFragmentOperations_Scissor_TC_006";
 
 static const char* test_procedure = "Per-FragmentOperations_Scissor_TP_001";
 
@@ -24,9 +32,7 @@ static const char* test_procedure = "Per-FragmentOperations_Scissor_TP_001";
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_001(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_001";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_negative_dimensions\n", test_procedure, test_case);
 
     glScissor(0, 0, -1, 100);
     GLenum err1 = glGetError();
@@ -37,14 +43,10 @@ void PerFragmentOperations_Scissor_TC_001(void)
     glScissor(0, 0, -1, -1);
     GLenum err3 = glGetError();
 
-    printf("  Genislik -1 hatasi: 0x%X (Beklenen: 0x501 GL_INVALID_VALUE)\n", err1);
-    printf("  Yukseklik -50 hatasi: 0x%X (Beklenen: 0x501)\n", err2);
-    printf("  Ikisi de negatif hatasi: 0x%X (Beklenen: 0x501)\n", err3);
-
     if (err1 == GL_INVALID_VALUE && err2 == GL_INVALID_VALUE && err3 == GL_INVALID_VALUE)
-        printf("  -> PASSED: Negatif boyutlar basariyla reddedildi\n\n");
+        TEST_LOG_SUCCESS(test_case1, test_procedure);
     else
-        printf("  -> FAILED\n\n");
+        TEST_LOG_FAIL(test_case1, test_procedure, "Negatif boyutlar reddedilmedi: err1=0x%X, err2=0x%X, err3=0x%X", err1, err2, err3);
 }
 
 // ---------------------------------------------------------------
@@ -54,9 +56,7 @@ void PerFragmentOperations_Scissor_TC_001(void)
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_002(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_002";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_negative_coordinates\n", test_procedure, test_case);
 
     glScissor(-100, -50, 200, 200);
     GLenum err = glGetError();
@@ -64,13 +64,10 @@ void PerFragmentOperations_Scissor_TC_002(void)
     GLint box[4];
     glGetIntegerv(GL_SCISSOR_BOX, box);
 
-    printf("  Negatif (x,y) set hatasi: 0x%X (Beklenen: 0x0 GL_NO_ERROR)\n", err);
-    printf("  Kaydedilen Box: x=%d, y=%d, w=%d, h=%d\n", box[0], box[1], box[2], box[3]);
-
     if (err == GL_NO_ERROR && box[0] == -100 && box[1] == -50)
-        printf("  -> PASSED: Negatif x,y degerleri tolere edildi ve dogru kaydedildi\n\n");
+        TEST_LOG_SUCCESS(test_case2, test_procedure);
     else
-        printf("  -> FAILED\n\n");
+        TEST_LOG_FAIL(test_case2, test_procedure, "Negatif koordinat hatasi: err=0x%X, box=(%d,%d,%d,%d)", err, box[0], box[1], box[2], box[3]);
 }
 
 // ---------------------------------------------------------------
@@ -80,9 +77,7 @@ void PerFragmentOperations_Scissor_TC_002(void)
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_003(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_003";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_extreme_limits\n", test_procedure, test_case);
 
     // Boyutlar (w, h) negatif olamaz, bu yuzden onlara INT_MAX veriyoruz.
     // Koordinatlar (x, y) negatif olabilir.
@@ -93,14 +88,11 @@ void PerFragmentOperations_Scissor_TC_003(void)
     glScissor(INT_MAX, INT_MAX, INT_MAX, INT_MAX);
     GLenum err2 = glGetError();
 
-    printf("  (INT_MIN, INT_MIN, INT_MAX, INT_MAX) hatasi: 0x%X\n", err1);
-    printf("  (INT_MAX, INT_MAX, INT_MAX, INT_MAX) hatasi: 0x%X\n", err2);
-    
     // Spec bu durumlarda hata tanimlamaz, ancak sistemin cokmemesi esastir.
     if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR)
-        printf("  -> PASSED: Asiri buyuk limitler cokus yaratmadan islendi\n\n");
+        TEST_LOG_SUCCESS(test_case3, test_procedure);
     else
-        printf("  -> FAILED/WARNING: Beklenmeyen hata veya durum (0x%X)\n\n", err1 != GL_NO_ERROR ? err1 : err2);
+        TEST_LOG_FAIL(test_case3, test_procedure, "Asiri buyuk limitlerde hata: err1=0x%X, err2=0x%X", err1, err2);
 }
 
 // ---------------------------------------------------------------
@@ -110,9 +102,7 @@ void PerFragmentOperations_Scissor_TC_003(void)
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_004(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_004";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_zero_dimensions\n", test_procedure, test_case);
 
     glScissor(10, 10, 0, 0);
     GLenum err = glGetError();
@@ -121,9 +111,9 @@ void PerFragmentOperations_Scissor_TC_004(void)
     glGetIntegerv(GL_SCISSOR_BOX, box);
 
     if (err == GL_NO_ERROR && box[2] == 0 && box[3] == 0)
-        printf("  -> PASSED: 0 boyutlu kutu basariyla islendi\n\n");
+        TEST_LOG_SUCCESS(test_case4, test_procedure);
     else
-        printf("  -> FAILED: Hata=0x%X, kaydedilen boyut: %dx%d\n\n", err, box[2], box[3]);
+        TEST_LOG_FAIL(test_case4, test_procedure, "Sifir boyutlu kutu hatasi: err=0x%X, boyut=%dx%d", err, box[2], box[3]);
 }
 
 // ---------------------------------------------------------------
@@ -133,9 +123,7 @@ void PerFragmentOperations_Scissor_TC_004(void)
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_005(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_005";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_enable_disable_thrash\n", test_procedure, test_case);
 
     int err_count = 0;
     for (int i = 0; i < 10000; i++) {
@@ -149,9 +137,9 @@ void PerFragmentOperations_Scissor_TC_005(void)
     GLenum err = glGetError();
 
     if (err == GL_NO_ERROR && err_count == 0)
-        printf("  -> PASSED: 10,000 kez Enable/Disable hatasiz tamamlandi\n\n");
+        TEST_LOG_SUCCESS(test_case5, test_procedure);
     else
-        printf("  -> FAILED: Hata=0x%X, State uyusmazligi=%d kez\n\n", err, err_count);
+        TEST_LOG_FAIL(test_case5, test_procedure, "State thrashing hatasi: err=0x%X, uyusmazlik=%d kez", err, err_count);
 }
 
 // ---------------------------------------------------------------
@@ -161,9 +149,7 @@ void PerFragmentOperations_Scissor_TC_005(void)
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_006(void)
 {
-    static const char* test_case = "PerFragmentOperations_Scissor_TC_006";
     while (glGetError() != GL_NO_ERROR);
-    printf("[TEST][%s][%s] test_scissor_random_fuzzing\n", test_procedure, test_case);
 
     srand(12345); // Sabit seed (tekrar edilebilirlik)
 
@@ -184,80 +170,5 @@ void PerFragmentOperations_Scissor_TC_006(void)
     }
 
     // Dongu cokmeden bittiyse surucu saglamdir.
-    printf("  -> PASSED: 50,000 rastgele glScissor cagrisi cokus olmadan tamamlandi\n\n");
-}
-
-
-// =========================================================
-// ANA YAPI: init, draw, clean
-// =========================================================
-
-static GLFWwindow* window = NULL;
-static int width = 800, height = 600;
-static const char* windowTitle = "glScissor Robustness Tests - Hasan";
-
-void init(void);
-void draw(void);
-void clean(void);
-
-void init(void)
-{
-    printf("=====================================================\n");
-    printf("  %s ROBUSTNESS SUITE - HASAN\n", test_procedure);
-    printf("=====================================================\n\n");
-
-    PerFragmentOperations_Scissor_TC_001();
-    PerFragmentOperations_Scissor_TC_002();
-    PerFragmentOperations_Scissor_TC_003();
-    PerFragmentOperations_Scissor_TC_004();
-    PerFragmentOperations_Scissor_TC_005();
-    PerFragmentOperations_Scissor_TC_006();
-
-    printf("=====================================================\n");
-    printf("  TUM TESTLER TAMAMLANDI\n");
-    printf("=====================================================\n");
-}
-
-void draw(void)
-{
-    glClearColor(0.12f, 0.12f, 0.18f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void clean(void)
-{
-    // Temizlik
-}
-
-int main(void)
-{
-    setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
-    setenv("GALLIUM_DRIVER", "llvmpipe", 1);
-    unsetenv("WAYLAND_DISPLAY");
-
-    if (!glfwInit()) return -1;
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-    window = glfwCreateWindow(width, height, windowTitle, NULL, NULL);
-    if (!window) {
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    init();
-
-    while (!glfwWindowShouldClose(window)) {
-        draw();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    clean();
-    glfwTerminate();
-    return 0;
+    TEST_LOG_SUCCESS(test_case6, test_procedure);
 }

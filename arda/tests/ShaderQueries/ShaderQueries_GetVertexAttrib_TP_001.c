@@ -24,7 +24,7 @@ void ShaderQueries_GetVertexAttrib_TC_001(void) {
 		    "GetVertexAttrib", "ShaderQueries_GetVertexAttrib_TC_001",
 		    "Geçersiz pname (0xDEADBEEF) GL_INVALID_ENUM üretmedi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttrib",
 				 "ShaderQueries_GetVertexAttrib_TC_001");
@@ -54,7 +54,7 @@ void ShaderQueries_GetVertexAttrib_TC_002(void) {
 			      "ShaderQueries_GetVertexAttrib_TC_002",
 			      "max_attribs indeksi GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttrib",
 				 "ShaderQueries_GetVertexAttrib_TC_002");
@@ -81,7 +81,7 @@ void ShaderQueries_GetVertexAttrib_TC_003(void) {
 		    "GetVertexAttrib", "ShaderQueries_GetVertexAttrib_TC_003",
 		    "Geçerli sorgu hata üretmemeli iken hata üretildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttrib",
 				 "ShaderQueries_GetVertexAttrib_TC_003");
@@ -118,7 +118,7 @@ void ShaderQueries_GetVertexAttrib_TC_004(void) {
 				      "pname=0x%04X hata üretmemeli iken "
 				      "üretdi. Actual: 0x%04X",
 				      (unsigned int)valid_pnames[i],
-				      (unsigned int)err);
+				      err);
 			fail_count++;
 		}
 	}

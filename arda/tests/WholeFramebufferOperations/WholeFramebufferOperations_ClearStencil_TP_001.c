@@ -28,7 +28,7 @@ void WholeFramebufferOperations_ClearStencil_TC_001(void) {
 			      "WholeFramebufferOperations_ClearStencil_TC_001",
 			      "Negatif değer atamasında hata fırlatıldı."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearStencil_TC_001");
@@ -54,7 +54,7 @@ void WholeFramebufferOperations_ClearStencil_TC_002(void) {
 			      "WholeFramebufferOperations_ClearStencil_TC_002",
 			      "INT_MIN degeri atanirken hata firlatildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err1);
+			      err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearStencil_TC_002");
@@ -68,7 +68,7 @@ void WholeFramebufferOperations_ClearStencil_TC_002(void) {
 			      "WholeFramebufferOperations_ClearStencil_TC_002",
 			      "INT_MAX degeri atanirken hata firlatildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err2);
+			      err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearStencil_TC_002");
@@ -102,7 +102,7 @@ void WholeFramebufferOperations_ClearStencil_TC_003(void) {
 		    "Buffer bit derinliginin bir üstündeki sinir degeri "
 		    "reddedildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearStencil_TC_003");
@@ -126,7 +126,7 @@ void WholeFramebufferOperations_ClearStencil_TC_004(void) {
 		    "WholeFramebufferOperations_ClearStencil_TC_004",
 		    "Sifir degeri atanirken beklenmedik bir hata döndü."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearStencil_TC_004");

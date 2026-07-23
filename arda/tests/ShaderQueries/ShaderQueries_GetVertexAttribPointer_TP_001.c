@@ -25,7 +25,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_001(void) {
 			      "ShaderQueries_GetVertexAttribPointer_TC_001",
 			      "GL_FLOAT pname GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttribPointer",
 				 "ShaderQueries_GetVertexAttribPointer_TC_001");
@@ -52,7 +52,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_002(void) {
 			      "ShaderQueries_GetVertexAttribPointer_TC_002",
 			      "Geçerli sorgu hata üretmemeli iken üretdi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttribPointer",
 				 "ShaderQueries_GetVertexAttribPointer_TC_002");
@@ -84,7 +84,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_003(void) {
 		    "ShaderQueries_GetVertexAttribPointer_TC_003",
 		    "max_attribs indeksinde GL_INVALID_VALUE beklendi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttribPointer",
 				 "ShaderQueries_GetVertexAttribPointer_TC_003");
@@ -113,7 +113,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_004(void) {
 			      "ShaderQueries_GetVertexAttribPointer_TC_004",
 			      "NULL pointer beklenmeyen hata kodu üretdi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetVertexAttribPointer",
 				 "ShaderQueries_GetVertexAttribPointer_TC_004");

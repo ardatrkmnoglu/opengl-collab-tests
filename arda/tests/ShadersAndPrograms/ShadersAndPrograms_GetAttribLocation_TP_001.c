@@ -102,7 +102,7 @@ void ShadersAndPrograms_GetAttribLocation_TC_004(void) {
 			      "ShadersAndPrograms_GetAttribLocation_TC_004",
 			      "Link edilmemiş program için GL_INVALID_OPERATION "
 			      "beklendi. err=0x%04X, loc=%d",
-			      (unsigned int)err, loc);
+			      err, loc);
 	} else {
 		TEST_LOG_SUCCESS("GetAttribLocation",
 				 "ShadersAndPrograms_GetAttribLocation_TC_004");

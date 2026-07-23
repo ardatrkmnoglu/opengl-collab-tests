@@ -27,7 +27,7 @@ void ShadersAndPrograms_CreateProgram_TC_001(void) {
 			TEST_LOG_FAIL("CreateProgram", "ShadersAndPrograms_CreateProgram_TC_001",
 				      "glCreateProgram beklenmedik hata üretti."
 				      " Actual: 0x%04X",
-				      (unsigned int)err);
+				      err);
 			glDeleteProgram(prog);
 			return;
 		}
@@ -66,7 +66,7 @@ void ShadersAndPrograms_CreateProgram_TC_002(void) {
 			    "CreateProgram",
 			    "ShadersAndPrograms_CreateProgram_TC_002",
 			    "Yeniden oluşturmada hata üretti. Actual: 0x%04X",
-			    (unsigned int)err);
+			    err);
 			glDeleteProgram(prog);
 			return;
 		}
@@ -102,7 +102,7 @@ void ShadersAndPrograms_CreateProgram_TC_003(void) {
 		    "CreateProgram", "ShadersAndPrograms_CreateProgram_TC_003",
 		    "Program ID'si Shader gibi silinebildi (tip karışıklığı)."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("CreateProgram",
 				 "ShadersAndPrograms_CreateProgram_TC_003");
@@ -138,7 +138,7 @@ void ShadersAndPrograms_CreateProgram_TC_004(void) {
 			      "ShadersAndPrograms_CreateProgram_TC_004",
 			      "glCreateProgram 0 ID döndürdü (OOM değilken)."
 			      " prog=%u, err=0x%04X",
-			      prog, (unsigned int)err);
+			      prog, err);
 	} else {
 		TEST_LOG_SUCCESS("CreateProgram",
 				 "ShadersAndPrograms_CreateProgram_TC_004");

@@ -27,7 +27,7 @@ void Vertices_EnableVertexAttribArray_TC_001(void) {
 			      "Vertices_EnableVertexAttribArray_TC_001",
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("EnableVertexAttrib",
 				 "Vertices_EnableVertexAttribArray_TC_001");
@@ -53,7 +53,7 @@ void Vertices_EnableVertexAttribArray_TC_002(void) {
 			      "Vertices_EnableVertexAttribArray_TC_002",
 			      "Geçerli indeks etkinleştirilirken hata oluştu."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("EnableVertexAttrib",
 				 "Vertices_EnableVertexAttribArray_TC_002");
@@ -83,7 +83,7 @@ void Vertices_EnableVertexAttribArray_TC_003(void) {
 			      "Vertices_EnableVertexAttribArray_TC_003",
 			      "Çift etkinleştirme hata üretti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("EnableVertexAttrib",
 				 "Vertices_EnableVertexAttribArray_TC_003");
@@ -116,7 +116,7 @@ void Vertices_EnableVertexAttribArray_TC_004(void) {
 			      "Vertices_EnableVertexAttribArray_TC_004",
 			      "Art arda aç/kapat işlemleri hata üretti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("EnableVertexAttrib",
 				 "Vertices_EnableVertexAttribArray_TC_004");

@@ -169,7 +169,7 @@ void Vertices_DrawArrays_TC_005(void) {
 	if (!(err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("DrawArrays", "Vertices_DrawArrays_TC_005",
 			      "Programsız çizimde GL_INVALID_OPERATION bekleniyordu."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_005");
 	}
@@ -195,7 +195,7 @@ void Vertices_DrawArrays_TC_006(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("DrawArrays", "Vertices_DrawArrays_TC_006",
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_006");
 	}

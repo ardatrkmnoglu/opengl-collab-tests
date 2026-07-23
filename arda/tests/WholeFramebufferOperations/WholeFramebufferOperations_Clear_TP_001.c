@@ -29,7 +29,7 @@ void WholeFramebufferOperations_Clear_TC_001(void) {
 		    "glClear, tanımsız olan geçersiz maske bitlerini yuttu "
 		    "(0xFFFFFFFF)."
 		    " Actual: 0x%04X",
-		    (unsigned int)err1);
+		    err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_001");
@@ -45,7 +45,7 @@ void WholeFramebufferOperations_Clear_TC_001(void) {
 		    "WholeFramebufferOperations", "WholeFramebufferOperations_Clear_TC_001",
 		    "Kirletilmiş mantıksal maske kombinasyonu reddedilmedi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err2);
+		    err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_001");
@@ -73,7 +73,7 @@ void WholeFramebufferOperations_Clear_TC_002(void) {
 		    "Bos bit maskesi (0), gecersiz mantiksal kombinasyon "
 		    "olarak yanlislikla reddedildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_002");
@@ -98,7 +98,7 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
 			      "WholeFramebufferOperations_Clear_TC_003",
 			      "Tek basina GL_COLOR_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err1);
+			      err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_003");
@@ -112,7 +112,7 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
 			      "WholeFramebufferOperations_Clear_TC_003",
 			      "Tek basina GL_DEPTH_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err2);
+			      err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_003");
@@ -126,7 +126,7 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
 			      "WholeFramebufferOperations_Clear_TC_003",
 			      "Tek basina GL_STENCIL_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err3);
+			      err3);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_003");
@@ -153,7 +153,7 @@ void WholeFramebufferOperations_Clear_TC_004(void) {
 			      "En yüksek bit (MSB) sentinel degeri gecerli bir "
 			      "kombinasyon olmamasina ragmen kabul edildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_004");
@@ -181,7 +181,7 @@ void WholeFramebufferOperations_Clear_TC_005(void) {
 			      "Ilk (kasitli gecersiz) cagri beklenen hatayi "
 			      "üretmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err1);
+			      err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_005");
@@ -197,7 +197,7 @@ void WholeFramebufferOperations_Clear_TC_005(void) {
 		    "Önceki gecersiz cagridan kalan hata durumu, sonraki "
 		    "gecerli cagriyi da etkiledi (yapiskan hata)."
 		    " Actual: 0x%04X",
-		    (unsigned int)err2);
+		    err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_Clear_TC_005");

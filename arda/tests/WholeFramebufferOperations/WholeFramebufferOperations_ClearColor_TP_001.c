@@ -31,7 +31,7 @@ void WholeFramebufferOperations_ClearColor_TC_001(void) {
 		    "NaN/Inf değerleri atanırken beklenmeyen bir hata kodu "
 		    "döndü veya sürücü kilitlendi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearColor_TC_001");
@@ -58,7 +58,7 @@ void WholeFramebufferOperations_ClearColor_TC_002(void) {
 		    "Asiri uc (FLT_MAX) degerleri atanirken beklenmeyen "
 		    "bir hata döndü."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearColor_TC_002");
@@ -99,7 +99,7 @@ void WholeFramebufferOperations_ClearColor_TC_003(void) {
 			      "WholeFramebufferOperations_ClearColor_TC_003",
 			      "Tam sinir degerleri (0.0 / 1.0) reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearColor_TC_003");
@@ -175,7 +175,7 @@ void WholeFramebufferOperations_ClearColor_TC_005(void) {
 		    "Subnormal (denormal) degerler atanirken beklenmeyen "
 		    "bir hata döndü (flush-to-zero istisnasi olabilir)."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearColor_TC_005");

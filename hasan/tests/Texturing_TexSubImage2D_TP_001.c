@@ -14,13 +14,18 @@ static const char* test_case5 = "Texturing_TexSubImage2D_TC_005";
 
 static const char* test_procedure = "Texturing_TexSubImage2D_TP_001";
 
+static GLuint g_tex1 = 0;
+static GLuint g_tex2 = 0;
+static GLuint g_tex3 = 0;
+static GLuint g_tex4 = 0;
+static GLuint g_tex5 = 0;
+
 // --- TEST 1: Negatif Boyut Testi (Invalid Value) ---
 void Texturing_TexSubImage2D_TC_001(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex1);
+    glBindTexture(GL_TEXTURE_2D, g_tex1);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     while (glGetError() != GL_NO_ERROR);
 
@@ -34,17 +39,14 @@ void Texturing_TexSubImage2D_TC_001(void) {
     } else {
         TEST_LOG_FAIL(test_case1, test_procedure, "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &tex);
 }
 
 // --- TEST 2: Sınır Aşımı (Out of Bounds) Testi ---
 void Texturing_TexSubImage2D_TC_002(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex2);
+    glBindTexture(GL_TEXTURE_2D, g_tex2);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     while (glGetError() != GL_NO_ERROR);
 
@@ -58,17 +60,14 @@ void Texturing_TexSubImage2D_TC_002(void) {
     } else {
         TEST_LOG_FAIL(test_case2, test_procedure, "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &tex);
 }
 
 // --- TEST 3: Format Uyuşmazlığı Testi ---
 void Texturing_TexSubImage2D_TC_003(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex3);
+    glBindTexture(GL_TEXTURE_2D, g_tex3);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     while (glGetError() != GL_NO_ERROR);
 
@@ -82,17 +81,14 @@ void Texturing_TexSubImage2D_TC_003(void) {
     } else {
         TEST_LOG_FAIL(test_case3, test_procedure, "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &tex);
 }
 
 // --- TEST 4: Geçersiz Hedef (Enum) Testi ---
 void Texturing_TexSubImage2D_TC_004(void) {
     while (glGetError() != GL_NO_ERROR);
 
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex4);
+    glBindTexture(GL_TEXTURE_2D, g_tex4);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     while (glGetError() != GL_NO_ERROR);
 
@@ -106,8 +102,6 @@ void Texturing_TexSubImage2D_TC_004(void) {
     } else {
         TEST_LOG_FAIL(test_case4, test_procedure, "Beklenen GL_INVALID_ENUM (0x500), alinan: 0x%X", err);
     }
-
-    glDeleteTextures(1, &tex);
 }
 
 // --- TEST 5: Sürekli Güncelleme Stres Testi ---
@@ -115,9 +109,8 @@ void Texturing_TexSubImage2D_TC_005(void) {
     while (glGetError() != GL_NO_ERROR);
 
     int texSize = 512;
-    GLuint tex;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenTextures(1, &g_tex5);
+    glBindTexture(GL_TEXTURE_2D, g_tex5);
 
     GLubyte* initialData = (GLubyte*)malloc(texSize * texSize * 4);
     if (initialData) {
@@ -163,6 +156,15 @@ void Texturing_TexSubImage2D_TC_005(void) {
     } else {
         TEST_LOG_FAIL(test_case5, test_procedure, "Surekli glTexSubImage2D guncellemesi sirasinda hata olustu");
     }
+}
 
-    glDeleteTextures(1, &tex);
+/* Cleanup */
+void Texturing_TexSubImage2D_close(void) {
+#ifdef __ubuntu__
+    if (g_tex1) glDeleteTextures(1, &g_tex1);
+    if (g_tex2) glDeleteTextures(1, &g_tex2);
+    if (g_tex3) glDeleteTextures(1, &g_tex3);
+    if (g_tex4) glDeleteTextures(1, &g_tex4);
+    if (g_tex5) glDeleteTextures(1, &g_tex5);
+#endif
 }

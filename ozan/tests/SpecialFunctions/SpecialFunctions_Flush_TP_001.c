@@ -1,17 +1,15 @@
-#include <GL/gl.h>
-#include <stdio.h>
-#include "../../../include/rtests.h"
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
+#include "../../../include/rtests.h"
 
-static const char* test_procedure = "SpecialFunctions_Flush_TP_001";
-static const char* test_case_1 = "SpecialFunctions_Flush_TC_001";
-static const char* test_case_2 = "SpecialFunctions_Flush_TC_002";
-static const char* test_case_3 = "SpecialFunctions_Flush_TC_003";
-static const char* test_case_4 = "SpecialFunctions_Flush_TC_004";
-static const char* test_case_5 = "SpecialFunctions_Flush_TC_005";
-static const char* test_case_6 = "SpecialFunctions_Flush_TC_006";
-static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
+static const char *test_procedure = "SpecialFunctions_Flush_TP_001";
+static const char *test_case_1 = "SpecialFunctions_Flush_TC_001";
+static const char *test_case_2 = "SpecialFunctions_Flush_TC_002";
+static const char *test_case_3 = "SpecialFunctions_Flush_TC_003";
+static const char *test_case_4 = "SpecialFunctions_Flush_TC_004";
+static const char *test_case_5 = "SpecialFunctions_Flush_TC_005";
+static const char *test_case_6 = "SpecialFunctions_Flush_TC_006";
+static const char *test_case_7 = "SpecialFunctions_Flush_TC_007";
 /* ============================================================
  * TEST 1 : Basic Robustness
  * ============================================================
@@ -26,28 +24,25 @@ static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
  * GL_NO_ERROR döndürmelidir.
  */
 
-void test_flush_basicRobustness(void)
-{
-    GLenum err;
+void SpecialFunctions_Flush_TC_001(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-    glFlush();
+	glFlush();
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_1, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    TEST_LOG_SUCCESS(test_case_1, test_procedure);
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 2 : State Preservation
@@ -66,33 +61,30 @@ void test_flush_basicRobustness(void)
  * Viewport'un aynı kaldığı doğrulanır.
  */
 
-void test_flush_statePreservation(void)
-{
-    GLenum err;
+void SpecialFunctions_Flush_TC_002(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glViewport(10,20,320,240);
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	glViewport(10, 20, 320, 240);
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    glFlush();
+	glFlush();
 
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    if(!checkViewport(test_case_2, test_procedure, 10,20,320,240))
-        return;
+	if (!checkViewport(test_case_2, test_procedure, 10, 20, 320, 240))
+		return;
 
-    TEST_LOG_SUCCESS(test_case_2, test_procedure);
+	TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -108,41 +100,37 @@ void test_flush_statePreservation(void)
  * bozmamalıdır.
  */
 
-void test_flush_errorQueuePreservation(void)
-{
-    GLenum err;
+void SpecialFunctions_Flush_TC_003(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    glFlush();
+	glFlush();
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Beklenmeyen hata kodu : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure,
+			      "Beklenmeyen hata kodu : 0x%X", err);
+		return;
+	}
 
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    TEST_LOG_SUCCESS(test_case_3, test_procedure);
+	TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 4 : Repeated Invocation
@@ -157,30 +145,26 @@ void test_flush_errorQueuePreservation(void)
  * herhangi bir OpenGL hatası üretmemelidir.
  */
 
-void test_flush_repeatedInvocation(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Flush_TC_004(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 10000; i++)
-    {
-        glFlush();
+	for (i = 0; i < 10000; i++) {
+		glFlush();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_4, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_4, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_4, test_procedure);
+	TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 5 : Command Submission Robustness
@@ -202,32 +186,29 @@ void test_flush_repeatedInvocation(void)
  *   oluşmadığını doğrulamaktır.
  */
 
-void test_flush_commandSubmissionRobustness(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Flush_TC_005(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 5000; i++)
-    {
-        GLfloat color = (GLfloat)(i % 255) / 255.0f;
+	for (i = 0; i < 5000; i++) {
+		GLfloat color = (GLfloat)(i % 255) / 255.0f;
 
-        glClearColor(color,0.0f,1.0f - color,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(color, 0.0f, 1.0f - color, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-        glFlush();
-        err = glGetError();
+		glFlush();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_5, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_5, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_5, test_procedure);
+	TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
 
 /* ============================================================
@@ -249,30 +230,26 @@ void test_flush_commandSubmissionRobustness(void)
  * Her çağrı GL_NO_ERROR üretmelidir.
  */
 
-void test_flush_stress(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Flush_TC_006(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 1000000; i++)
-    {
-        glFlush();
+	for (i = 0; i < 1000000; i++) {
+		glFlush();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_6, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_6, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_6, test_procedure);
+	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 7 : Consecutive Command Submission
@@ -291,54 +268,31 @@ void test_flush_stress(void)
  * sürücünün kararlı kaldığını doğrulamaktır.
  */
 
-void test_flush_consecutiveCommandSubmission(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Flush_TC_007(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 1000; i++)
-    {
-        GLfloat color = (GLfloat)(i % 100) / 100.0f;
+	for (i = 0; i < 1000; i++) {
+		GLfloat color = (GLfloat)(i % 100) / 100.0f;
 
-        glClearColor(color,
-                     1.0f - color,
-                     0.5f,
-                     1.0f);
+		glClearColor(color, 1.0f - color, 0.5f, 1.0f);
 
-        glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 
-        glFlush();
+		glFlush();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_7, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_7, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    clearGLErrors();
+	clearGLErrors();
 
-    TEST_LOG_SUCCESS(test_case_7, test_procedure);
-}
-
-
-/* ============================================================
- * Tüm glFlush Robustness Testlerini Çalıştır
- * ============================================================
- */
-
-void Run_glFlush_Robustness(void)
-{
-    test_flush_basicRobustness();
-    test_flush_statePreservation();
-    test_flush_errorQueuePreservation();
-    test_flush_repeatedInvocation();
-    test_flush_commandSubmissionRobustness();
-    test_flush_stress();
-    test_flush_consecutiveCommandSubmission();
+	TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }

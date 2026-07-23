@@ -1,19 +1,14 @@
-#include <GL/gl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <float.h>
-#include <math.h>
-#include "../../../include/rtests.h"
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
+#include "../../../include/rtests.h"
 
-static const char* test_procedure = "ViewportandClipping_DepthRangef_TP_001";
-static const char* test_case_1 = "ViewportandClipping_DepthRangef_TC_001";
-static const char* test_case_2 = "ViewportandClipping_DepthRangef_TC_002";
-static const char* test_case_3 = "ViewportandClipping_DepthRangef_TC_003";
-static const char* test_case_4 = "ViewportandClipping_DepthRangef_TC_004";
-static const char* test_case_5 = "ViewportandClipping_DepthRangef_TC_005";
-static const char* test_case_6 = "ViewportandClipping_DepthRangef_TC_006";
+static const char *test_procedure = "ViewportandClipping_DepthRangef_TP_001";
+static const char *test_case_1 = "ViewportandClipping_DepthRangef_TC_001";
+static const char *test_case_2 = "ViewportandClipping_DepthRangef_TC_002";
+static const char *test_case_3 = "ViewportandClipping_DepthRangef_TC_003";
+static const char *test_case_4 = "ViewportandClipping_DepthRangef_TC_004";
+static const char *test_case_5 = "ViewportandClipping_DepthRangef_TC_005";
+static const char *test_case_6 = "ViewportandClipping_DepthRangef_TC_006";
 /* ============================================================
  * TEST 1: Sozlesme dogrulama
  * ============================================================ */
@@ -25,60 +20,55 @@ static const char* test_case_6 = "ViewportandClipping_DepthRangef_TC_006";
  * [0,1] araligina clamp edilir; hata olusmaz.
  */
 
-void ViewportandClipping_DepthRangef_TC_001(void)
-{
-    GLdouble depthRange[2];
-    GLenum err;
+void ViewportandClipping_DepthRangef_TC_001(void) {
+	GLdouble depthRange[2];
+	GLenum err;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    glDepthRange(0.0,1.0);
+	glDepthRange(0.0, 1.0);
 
-    err=glGetError();
+	err = glGetError();
 
-    if(err!=GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure,
-                      "Varsayilan cagri hata uretti: 0x%X",err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_1, test_procedure,
+			      "Varsayilan cagri hata uretti: 0x%X", err);
+		return;
+	}
 
-    glGetDoublev(GL_DEPTH_RANGE,depthRange);
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
 
-    if(fabs(depthRange[0]-0.0)>1e-6 ||
-       fabs(depthRange[1]-1.0)>1e-6)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure,
-                      "Varsayilan state hatali: (%lf,%lf)",
-                      depthRange[0],depthRange[1]);
-        return;
-    }
+	if (fabs(depthRange[0] - 0.0) > 1e-6 ||
+	    fabs(depthRange[1] - 1.0) > 1e-6) {
+		TEST_LOG_FAIL(test_case_1, test_procedure,
+			      "Varsayilan state hatali: (%lf,%lf)",
+			      depthRange[0], depthRange[1]);
+		return;
+	}
 
-    glDepthRange(1.0,0.0);
+	glDepthRange(1.0, 0.0);
 
-    err=glGetError();
+	err = glGetError();
 
-    if(err!=GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure,
-                      "Ters depth range hata uretti: 0x%X",err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_1, test_procedure,
+			      "Ters depth range hata uretti: 0x%X", err);
+		return;
+	}
 
-    glGetDoublev(GL_DEPTH_RANGE,depthRange);
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
 
-    if(fabs(depthRange[0]-1.0)>1e-6 ||
-       fabs(depthRange[1]-0.0)>1e-6)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure,
-                      "Ters depth range state hatali: (%lf,%lf)",
-                      depthRange[0],depthRange[1]);
-        return;
-    }
+	if (fabs(depthRange[0] - 1.0) > 1e-6 ||
+	    fabs(depthRange[1] - 0.0) > 1e-6) {
+		TEST_LOG_FAIL(test_case_1, test_procedure,
+			      "Ters depth range state hatali: (%lf,%lf)",
+			      depthRange[0], depthRange[1]);
+		return;
+	}
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    TEST_LOG_SUCCESS(test_case_1, test_procedure);
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 /* ============================================================
@@ -92,53 +82,46 @@ void ViewportandClipping_DepthRangef_TC_001(void)
  * korumalidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_002(void)
-{
-    int nearStep;
-    int farStep;
-    int passCount=0;
-    int failCount=0;
+void ViewportandClipping_DepthRangef_TC_002(void) {
+	int nearStep;
+	int farStep;
+	int passCount = 0;
+	int failCount = 0;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    for(nearStep=-10;nearStep<=20;nearStep++)
-    {
-        for(farStep=-10;farStep<=20;farStep++)
-        {
-            GLdouble nearVal=nearStep/10.0;
-            GLdouble farVal=farStep/10.0;
-            GLenum err;
+	for (nearStep = -10; nearStep <= 20; nearStep++) {
+		for (farStep = -10; farStep <= 20; farStep++) {
+			GLdouble nearVal = nearStep / 10.0;
+			GLdouble farVal = farStep / 10.0;
+			GLenum err;
 
-            glDepthRange(nearVal,farVal);
+			glDepthRange(nearVal, farVal);
 
-            err=glGetError();
+			err = glGetError();
 
-            if(err!=GL_NO_ERROR)
-            {
-                TEST_LOG_FAIL(test_case_2, test_procedure,
-                              "near=%lf far=%lf error=0x%X",
-                              nearVal,farVal,err);
-                failCount++;
-            }
-            else
-            {
-                passCount++;
-            }
-        }
-    }
+			if (err != GL_NO_ERROR) {
+				TEST_LOG_FAIL(test_case_2, test_procedure,
+					      "near=%lf far=%lf error=0x%X",
+					      nearVal, farVal, err);
+				failCount++;
+			} else {
+				passCount++;
+			}
+		}
+	}
 
-    TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL",passCount,failCount);
+	TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL", passCount, failCount);
 
-    if(failCount!=0)
-    {
-        TEST_LOG_FAIL(test_case_2, test_procedure,
-                      "Basarisiz cagri sayisi: %d",failCount);
-        return;
-    }
+	if (failCount != 0) {
+		TEST_LOG_FAIL(test_case_2, test_procedure,
+			      "Basarisiz cagri sayisi: %d", failCount);
+		return;
+	}
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    TEST_LOG_SUCCESS(test_case_2, test_procedure);
+	TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -152,49 +135,43 @@ void ViewportandClipping_DepthRangef_TC_002(void)
  * hale getirmemelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_003(void)
-{
-    GLenum err;
-    GLdouble tests[][2]=
-    {
-        {0.0,1.0},
-        {1.0,0.0},
-        {-1.0,2.0},
-        {-DBL_MAX,DBL_MAX},
-        {DBL_MAX,-DBL_MAX},
-        {DBL_MIN,DBL_MAX},
-        {-DBL_MIN,DBL_MIN},
-        {1000000.0,-1000000.0},
-        {NAN,NAN},
-        {INFINITY,INFINITY},
-        {-INFINITY,-INFINITY}
-    };
+void ViewportandClipping_DepthRangef_TC_003(void) {
+	GLenum err;
+	GLdouble tests[][2] = {{0.0, 1.0},
+			       {1.0, 0.0},
+			       {-1.0, 2.0},
+			       {-DBL_MAX, DBL_MAX},
+			       {DBL_MAX, -DBL_MAX},
+			       {DBL_MIN, DBL_MAX},
+			       {-DBL_MIN, DBL_MIN},
+			       {1000000.0, -1000000.0},
+			       {NAN, NAN},
+			       {INFINITY, INFINITY},
+			       {-INFINITY, -INFINITY}};
 
-    int count=sizeof(tests)/sizeof(tests[0]);
-    int i;
+	int count = sizeof(tests) / sizeof(tests[0]);
+	int i;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    for(i=0;i<count;i++)
-    {
-        glDepthRange(tests[i][0],tests[i][1]);
+	for (i = 0; i < count; i++) {
+		glDepthRange(tests[i][0], tests[i][1]);
 
-        err=glGetError();
+		err = glGetError();
 
-        TEST_LOG_INFO("near=%lf far=%lf -> 0x%X",
-                      tests[i][0],tests[i][1],err);
+		TEST_LOG_INFO("near=%lf far=%lf -> 0x%X", tests[i][0],
+			      tests[i][1], err);
 
-        if(err!=GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_3, test_procedure,
-                          "Beklenmeyen hata olustu: 0x%X",err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_3, test_procedure,
+				      "Beklenmeyen hata olustu: 0x%X", err);
+			return;
+		}
+	}
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    TEST_LOG_SUCCESS(test_case_3, test_procedure);
+	TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
 
 /* ============================================================
@@ -208,61 +185,52 @@ void ViewportandClipping_DepthRangef_TC_003(void)
  * degerleri dondurmelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_004(void)
-{
-    GLdouble depthRange[2];
-    GLenum err;
+void ViewportandClipping_DepthRangef_TC_004(void) {
+	GLdouble depthRange[2];
+	GLenum err;
 
-    GLdouble values[][2]=
-    {
-        {0.0,1.0},
-        {1.0,0.0},
-        {0.25,0.75},
-        {-1.0,2.0},
-        {5.0,-5.0}
-    };
+	GLdouble values[][2] = {
+	    {0.0, 1.0}, {1.0, 0.0}, {0.25, 0.75}, {-1.0, 2.0}, {5.0, -5.0}};
 
-    int count=sizeof(values)/sizeof(values[0]);
-    int i;
+	int count = sizeof(values) / sizeof(values[0]);
+	int i;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    for(i=0;i<count;i++)
-    {
-        glDepthRange(values[i][0],values[i][1]);
+	for (i = 0; i < count; i++) {
+		glDepthRange(values[i][0], values[i][1]);
 
-        err=glGetError();
+		err = glGetError();
 
-        if(err!=GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_4, test_procedure,
-                          "Error=0x%X",err);
-            return;
-        }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_4, test_procedure, "Error=0x%X",
+				      err);
+			return;
+		}
 
-        glGetDoublev(GL_DEPTH_RANGE,depthRange);
+		glGetDoublev(GL_DEPTH_RANGE, depthRange);
 
-        if(depthRange[0]<0.0 || depthRange[0]>1.0)
-        {
-            TEST_LOG_FAIL(test_case_4, test_procedure,
-                          "Near aralik disinda: %lf",depthRange[0]);
-            return;
-        }
+		if (depthRange[0] < 0.0 || depthRange[0] > 1.0) {
+			TEST_LOG_FAIL(test_case_4, test_procedure,
+				      "Near aralik disinda: %lf",
+				      depthRange[0]);
+			return;
+		}
 
-        if(depthRange[1]<0.0 || depthRange[1]>1.0)
-        {
-            TEST_LOG_FAIL(test_case_4, test_procedure,
-                          "Far aralik disinda: %lf",depthRange[1]);
-            return;
-        }
-    }
+		if (depthRange[1] < 0.0 || depthRange[1] > 1.0) {
+			TEST_LOG_FAIL(test_case_4, test_procedure,
+				      "Far aralik disinda: %lf", depthRange[1]);
+			return;
+		}
+	}
 
-    if(!checkDoubleState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0, 1.0, 1e-6))
-        return;
-    
-    resetState_DepthRange();
+	if (!checkDoubleState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0,
+			       1.0, 1e-6))
+		return;
 
-    TEST_LOG_SUCCESS(test_case_4, test_procedure);
+	resetState_DepthRange();
+
+	TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
 /* ============================================================
@@ -275,60 +243,53 @@ void ViewportandClipping_DepthRangef_TC_004(void)
  * temiz kalmali ve state dogru sekilde guncellenmelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_005(void)
-{
-    GLdouble depthRange[2];
-    GLenum err;
+void ViewportandClipping_DepthRangef_TC_005(void) {
+	GLdouble depthRange[2];
+	GLenum err;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    glDepthRange(0.20,0.80);
+	glDepthRange(0.20, 0.80);
 
-    err=glGetError();
+	err = glGetError();
 
-    if(err!=GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_5, test_procedure,
-                      "Error=0x%X",err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_5, test_procedure, "Error=0x%X", err);
+		return;
+	}
 
-    glGetDoublev(GL_DEPTH_RANGE,depthRange);
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
 
-    if(depthRange[0]<0.0 || depthRange[0]>1.0 ||
-       depthRange[1]<0.0 || depthRange[1]>1.0)
-    {
-        TEST_LOG_FAIL(test_case_5, test_procedure,
-                      "Depth range state bozuldu: (%lf,%lf)",
-                      depthRange[0],depthRange[1]);
-        return;
-    }
+	if (depthRange[0] < 0.0 || depthRange[0] > 1.0 || depthRange[1] < 0.0 ||
+	    depthRange[1] > 1.0) {
+		TEST_LOG_FAIL(test_case_5, test_procedure,
+			      "Depth range state bozuldu: (%lf,%lf)",
+			      depthRange[0], depthRange[1]);
+		return;
+	}
 
-    glDepthRange(-1000.0,1000.0);
+	glDepthRange(-1000.0, 1000.0);
 
-    err=glGetError();
+	err = glGetError();
 
-    if(err!=GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_5, test_procedure,
-                      "Error=0x%X",err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_5, test_procedure, "Error=0x%X", err);
+		return;
+	}
 
-    glGetDoublev(GL_DEPTH_RANGE,depthRange);
+	glGetDoublev(GL_DEPTH_RANGE, depthRange);
 
-    if(depthRange[0]<0.0 || depthRange[0]>1.0 ||
-       depthRange[1]<0.0 || depthRange[1]>1.0)
-    {
-        TEST_LOG_FAIL(test_case_5, test_procedure,
-                      "Clamp sonrasi state gecersiz: (%lf,%lf)",
-                      depthRange[0],depthRange[1]);
-        return;
-    }
+	if (depthRange[0] < 0.0 || depthRange[0] > 1.0 || depthRange[1] < 0.0 ||
+	    depthRange[1] > 1.0) {
+		TEST_LOG_FAIL(test_case_5, test_procedure,
+			      "Clamp sonrasi state gecersiz: (%lf,%lf)",
+			      depthRange[0], depthRange[1]);
+		return;
+	}
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    TEST_LOG_SUCCESS(test_case_5, test_procedure);
+	TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
 
 /* ============================================================
@@ -340,48 +301,33 @@ void ViewportandClipping_DepthRangef_TC_005(void)
  * Beklenmeyen GL hatasi, context kaybi veya crash olmamalidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_006(void)
-{
-    unsigned int i;
+void ViewportandClipping_DepthRangef_TC_006(void) {
+	unsigned int i;
 
-    resetState_DepthRange();
+	resetState_DepthRange();
 
-    srand(12345);
+	srand(12345);
 
-    for(i=0;i<1000000;i++)
-    {
-        GLdouble nearValue=((GLdouble)rand()/RAND_MAX)*20.0-10.0;
-        GLdouble farValue=((GLdouble)rand()/RAND_MAX)*20.0-10.0;
+	for (i = 0; i < 1000000; i++) {
+		GLdouble nearValue =
+		    ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
+		GLdouble farValue = ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
 
-        GLenum err;
+		GLenum err;
 
-        glDepthRange(nearValue,farValue);
+		glDepthRange(nearValue, farValue);
 
-        err=glGetError();
+		err = glGetError();
 
-        if(err!=GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_6, test_procedure,
-                          "Iteration: %u Near: %lf Far: %lf Error: 0x%X",
-                          i,nearValue,farValue,err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(
+			    test_case_6, test_procedure,
+			    "Iteration: %u Near: %lf Far: %lf Error: 0x%X", i,
+			    nearValue, farValue, err);
+			return;
+		}
+	}
 
-    resetState_DepthRange();
-    TEST_LOG_SUCCESS(test_case_6, test_procedure);
-}
-
-/* ============================================================
- * Tum glDepthRange Robustness Testlerini Calistir
- * ============================================================ */
-
-void Run_glDepthRange_Robustness(void)
-{
-    ViewportandClipping_DepthRangef_TC_001();
-    ViewportandClipping_DepthRangef_TC_002();
-    ViewportandClipping_DepthRangef_TC_003();
-    ViewportandClipping_DepthRangef_TC_004();
-    ViewportandClipping_DepthRangef_TC_005();
-    ViewportandClipping_DepthRangef_TC_006();
+	resetState_DepthRange();
+	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }

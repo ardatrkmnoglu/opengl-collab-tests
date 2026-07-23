@@ -1,17 +1,15 @@
-#include <GL/gl.h>
-#include <stdio.h>
-#include "../../../include/rtests.h"
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
+#include "../../../include/rtests.h"
 
-static const char* test_procedure = "SpecialFunctions_Finish_TP_001";
-static const char* test_case_1 = "SpecialFunctions_Finish_TC_001";
-static const char* test_case_2 = "SpecialFunctions_Finish_TC_002";
-static const char* test_case_3 = "SpecialFunctions_Finish_TC_003";
-static const char* test_case_4 = "SpecialFunctions_Finish_TC_004";
-static const char* test_case_5 = "SpecialFunctions_Finish_TC_005";
-static const char* test_case_6 = "SpecialFunctions_Finish_TC_006";
-static const char* test_case_7 = "SpecialFunctions_Finish_TC_007";
+static const char *test_procedure = "SpecialFunctions_Finish_TP_001";
+static const char *test_case_1 = "SpecialFunctions_Finish_TC_001";
+static const char *test_case_2 = "SpecialFunctions_Finish_TC_002";
+static const char *test_case_3 = "SpecialFunctions_Finish_TC_003";
+static const char *test_case_4 = "SpecialFunctions_Finish_TC_004";
+static const char *test_case_5 = "SpecialFunctions_Finish_TC_005";
+static const char *test_case_6 = "SpecialFunctions_Finish_TC_006";
+static const char *test_case_7 = "SpecialFunctions_Finish_TC_007";
 
 /* ============================================================
  * TEST 1 : Basic Robustness
@@ -32,29 +30,26 @@ static const char* test_case_7 = "SpecialFunctions_Finish_TC_007";
  *  - Context kaybı yaşanmamalıdır.
  */
 
-void SpecialFunctions_Finish_TC_001(void)
-{
-    GLenum err;
+void SpecialFunctions_Finish_TC_001(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glClearColor(1.0f,0.0f,0.0f,1.0f);
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-    glFinish();
+	glFinish();
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_1, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_1, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    TEST_LOG_SUCCESS(test_case_1, test_procedure);
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 2 : State Preservation
@@ -73,36 +68,33 @@ void SpecialFunctions_Finish_TC_001(void)
  * Viewport'un aynı kaldığı doğrulanır.
  */
 
-void SpecialFunctions_Finish_TC_002(void)
-{
-    GLenum err;
+void SpecialFunctions_Finish_TC_002(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glViewport(10,20,320,240);
+	glViewport(10, 20, 320, 240);
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    glFinish();
+	glFinish();
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    if(!checkViewport(test_case_2, test_procedure, 10,20,320,240))
-        return;
+	if (!checkViewport(test_case_2, test_procedure, 10, 20, 320, 240))
+		return;
 
-    TEST_LOG_SUCCESS(test_case_2, test_procedure);
+	TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -118,41 +110,37 @@ void SpecialFunctions_Finish_TC_002(void)
  * bozmamalıdır.
  */
 
-void SpecialFunctions_Finish_TC_003(void)
-{
-    GLenum err;
+void SpecialFunctions_Finish_TC_003(void) {
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    glFinish();
+	glFinish();
 
-    err = glGetError();
+	err = glGetError();
 
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Beklenmeyen hata kodu : 0x%X", err);
-        return;
-    }
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure,
+			      "Beklenmeyen hata kodu : 0x%X", err);
+		return;
+	}
 
-    err = glGetError();
-    if(err != GL_NO_ERROR)
-    {
-        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
-        return;
-    }
+	err = glGetError();
+	if (err != GL_NO_ERROR) {
+		TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+		return;
+	}
 
-    TEST_LOG_SUCCESS(test_case_3, test_procedure);
+	TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 4 : Repeated Invocation
@@ -167,30 +155,26 @@ void SpecialFunctions_Finish_TC_003(void)
  * herhangi bir OpenGL hatası üretmemelidir.
  */
 
-void SpecialFunctions_Finish_TC_004(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Finish_TC_004(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 10000; i++)
-    {
-        glFinish();
+	for (i = 0; i < 10000; i++) {
+		glFinish();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_4, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_4, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_4, test_procedure);
+	TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 5 : Synchronization Robustness
@@ -212,32 +196,29 @@ void SpecialFunctions_Finish_TC_004(void)
  *   tamamlandığını doğrulamaktır.
  */
 
-void SpecialFunctions_Finish_TC_005(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Finish_TC_005(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 5000; i++)
-    {
-        GLfloat color = (GLfloat)(i % 255) / 255.0f;
+	for (i = 0; i < 5000; i++) {
+		GLfloat color = (GLfloat)(i % 255) / 255.0f;
 
-        glClearColor(color,0.0f,1.0f - color,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glFinish();
+		glClearColor(color, 0.0f, 1.0f - color, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glFinish();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_5, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_5, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_5, test_procedure);
+	TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
 
 /* ============================================================
@@ -257,30 +238,26 @@ void SpecialFunctions_Finish_TC_005(void)
  * Her çağrı GL_NO_ERROR üretmelidir.
  */
 
-void SpecialFunctions_Finish_TC_006(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Finish_TC_006(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 1000000; i++)
-    {
-        glFinish();
+	for (i = 0; i < 1000000; i++) {
+		glFinish();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_6, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_6, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_6, test_procedure);
+	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 7 : Consecutive Render Synchronization
@@ -297,46 +274,26 @@ void SpecialFunctions_Finish_TC_006(void)
  * Her iterasyonda GL_NO_ERROR beklenmektedir.
  */
 
-void SpecialFunctions_Finish_TC_007(void)
-{
-    unsigned int i;
-    GLenum err;
+void SpecialFunctions_Finish_TC_007(void) {
+	unsigned int i;
+	GLenum err;
 
-    clearGLErrors();
+	clearGLErrors();
 
-    for(i = 0; i < 1000; i++)
-    {
-        GLfloat color = (GLfloat)(i % 100) / 100.0f;
-        glClearColor(color,1.0f - color,color * 0.5f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glFinish();
+	for (i = 0; i < 1000; i++) {
+		GLfloat color = (GLfloat)(i % 100) / 100.0f;
+		glClearColor(color, 1.0f - color, color * 0.5f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glFinish();
 
-        err = glGetError();
+		err = glGetError();
 
-        if(err != GL_NO_ERROR)
-        {
-            TEST_LOG_FAIL(test_case_7, test_procedure,
-                          "Iteration : %u Error : 0x%X", i, err);
-            return;
-        }
-    }
+		if (err != GL_NO_ERROR) {
+			TEST_LOG_FAIL(test_case_7, test_procedure,
+				      "Iteration : %u Error : 0x%X", i, err);
+			return;
+		}
+	}
 
-    TEST_LOG_SUCCESS(test_case_7, test_procedure);
-}
-
-
-/* ============================================================
- * Tüm glFinish Robustness Testlerini Çalıştır
- * ============================================================
- */
-
-void Run_glFinish_Robustness(void)
-{
-    SpecialFunctions_Finish_TC_001();
-    SpecialFunctions_Finish_TC_002();
-    SpecialFunctions_Finish_TC_003();
-    SpecialFunctions_Finish_TC_004();
-    SpecialFunctions_Finish_TC_005();
-    SpecialFunctions_Finish_TC_006();
-    SpecialFunctions_Finish_TC_007();
+	TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }

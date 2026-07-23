@@ -1,6 +1,15 @@
 #include <GL/gl.h>
-#include <assert.h>
 #include <stdio.h>
+#include "C:/Users/Ozan/Desktop/Workspace/OpenGL_Proje/opengl-collab-tests/include/macro.h"
+
+static const char* test_procedure = "SpecialFunctions_Flush_TP_001";
+static const char* test_case_1 = "SpecialFunctions_Flush_TC_001";
+static const char* test_case_2 = "SpecialFunctions_Flush_TC_002";
+static const char* test_case_3 = "SpecialFunctions_Flush_TC_003";
+static const char* test_case_4 = "SpecialFunctions_Flush_TC_004";
+static const char* test_case_5 = "SpecialFunctions_Flush_TC_005";
+static const char* test_case_6 = "SpecialFunctions_Flush_TC_006";
+static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
 
 /* ============================================================
  * Test altyapısı
@@ -14,27 +23,23 @@
  * ============================================================
  */
 
-static void resetState(void)
-{
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static void checkViewportPreserved(GLint x,GLint y,GLsizei width,GLsizei height)
+static int checkViewportPreserved(const char* test_case,
+                                  GLint x,GLint y,GLsizei width,GLsizei height)
 {
     GLint viewport[4];
 
     glGetIntegerv(GL_VIEWPORT, viewport);
 
-    if(viewport[0] != x ||
-       viewport[1] != y ||
-       viewport[2] != width ||
-       viewport[3] != height)
+    if(viewport[0] != x || viewport[1] != y || viewport[2] != width ||viewport[3] != height)
     {
-        printf("  [FAIL] Viewport state bozuldu!\n");
-        printf("         Beklenen : (%d, %d, %d, %d)\n",x, y, width, height);
-        printf("         Gercek   : (%d, %d, %d, %d)\n",viewport[0],viewport[1],viewport[2],viewport[3]);
-        assert(0);
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
+                      x, y, width, height,
+                      viewport[0], viewport[1], viewport[2], viewport[3]);
+        return 0;
     }
+
+    return 1;
 }
 
 
@@ -56,9 +61,7 @@ void test_flush_basicRobustness(void)
 {
     GLenum err;
 
-    printf("TEST: Basic Robustness\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -69,14 +72,11 @@ void test_flush_basicRobustness(void)
 
     if(err != GL_NO_ERROR)
     {
-        printf("  [FAIL]\n");
-        printf("Error : 0x%X\n", err);
-        assert(0);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Error : 0x%X", err);
+        return;
     }
 
-    resetState();
-
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 
@@ -101,23 +101,29 @@ void test_flush_statePreservation(void)
 {
     GLenum err;
 
-    printf("TEST: State Preservation\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     glViewport(10,20,320,240);
     err = glGetError();
-    assert(err == GL_NO_ERROR);
+    if(err != GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+        return;
+    }
 
     glFlush();
 
     err = glGetError();
-    assert(err == GL_NO_ERROR);
+    if(err != GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Error : 0x%X", err);
+        return;
+    }
 
-    checkViewportPreserved(10,20,320,240);
+    if(!checkViewportPreserved(test_case_2,10,20,320,240))
+        return;
 
-    resetState();
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -137,14 +143,16 @@ void test_flush_errorQueuePreservation(void)
 {
     GLenum err;
 
-    printf("TEST: Error Queue Preservation\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     glClear(GL_COLOR_BUFFER_BIT);
 
     err = glGetError();
-    assert(err == GL_NO_ERROR);
+    if(err != GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+        return;
+    }
 
     glFlush();
 
@@ -152,17 +160,18 @@ void test_flush_errorQueuePreservation(void)
 
     if(err != GL_NO_ERROR)
     {
-        printf("  [FAIL]\n");
-        printf("Beklenmeyen hata kodu : 0x%X\n", err);
-        assert(0);
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Beklenmeyen hata kodu : 0x%X", err);
+        return;
     }
 
     err = glGetError();
-    assert(err == GL_NO_ERROR);
+    if(err != GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Error : 0x%X", err);
+        return;
+    }
 
-    resetState();
-
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
 
 
@@ -184,9 +193,7 @@ void test_flush_repeatedInvocation(void)
     unsigned int i;
     GLenum err;
 
-    printf("TEST: Repeated Invocation\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     for(i = 0; i < 10000; i++)
     {
@@ -196,16 +203,13 @@ void test_flush_repeatedInvocation(void)
 
         if(err != GL_NO_ERROR)
         {
-            printf("  [FAIL]\n");
-            printf("Iteration : %u\n", i);
-            printf("Error     : 0x%X\n", err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_4, test_procedure,
+                          "Iteration : %u Error : 0x%X", i, err);
+            return;
         }
     }
 
-    resetState();
-
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
 
@@ -234,9 +238,7 @@ void test_flush_commandSubmissionRobustness(void)
     unsigned int i;
     GLenum err;
 
-    printf("TEST: Command Submission Robustness\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     for(i = 0; i < 5000; i++)
     {
@@ -250,16 +252,13 @@ void test_flush_commandSubmissionRobustness(void)
 
         if(err != GL_NO_ERROR)
         {
-            printf("  [FAIL]\n");
-            printf("Iteration : %u\n", i);
-            printf("Error     : 0x%X\n", err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_5, test_procedure,
+                          "Iteration : %u Error : 0x%X", i, err);
+            return;
         }
     }
 
-    resetState();
-
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
 
 /* ============================================================
@@ -286,9 +285,7 @@ void test_flush_stress(void)
     unsigned int i;
     GLenum err;
 
-    printf("TEST: Stress Test\n");
-
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     for(i = 0; i < 1000000; i++)
     {
@@ -298,15 +295,13 @@ void test_flush_stress(void)
 
         if(err != GL_NO_ERROR)
         {
-            printf("\n[FAIL]\n");
-            printf("Iteration : %u\n", i);
-            printf("Error     : 0x%X\n", err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_6, test_procedure,
+                          "Iteration : %u Error : 0x%X", i, err);
+            return;
         }
     }
 
-    resetState();
-    printf("  [PASS] 1,000,000 glFlush() çağrısı başarıyla tamamlandı.\n\n");
+    TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
 
 
@@ -332,8 +327,7 @@ void test_flush_consecutiveCommandSubmission(void)
     unsigned int i;
     GLenum err;
 
-    printf("TEST: Consecutive Command Submission\n");
-    resetState();
+    while(glGetError()!=GL_NO_ERROR) {};
 
     for(i = 0; i < 1000; i++)
     {
@@ -352,15 +346,15 @@ void test_flush_consecutiveCommandSubmission(void)
 
         if(err != GL_NO_ERROR)
         {
-            printf("  [FAIL]\n");
-            printf("Iteration : %u\n", i);
-            printf("Error     : 0x%X\n", err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_7, test_procedure,
+                          "Iteration : %u Error : 0x%X", i, err);
+            return;
         }
     }
 
-    resetState();
-    printf("  [PASS]\n\n");
+    while(glGetError()!=GL_NO_ERROR) {};
+
+    TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }
 
 
@@ -371,11 +365,6 @@ void test_flush_consecutiveCommandSubmission(void)
 
 void Run_glFlush_Robustness(void)
 {
-    printf("\n");
-    printf("=============================================\n");
-    printf("       glFlush Robustness Test Suite\n");
-    printf("=============================================\n\n");
-
     test_flush_basicRobustness();
     test_flush_statePreservation();
     test_flush_errorQueuePreservation();
@@ -383,8 +372,4 @@ void Run_glFlush_Robustness(void)
     test_flush_commandSubmissionRobustness();
     test_flush_stress();
     test_flush_consecutiveCommandSubmission();
-
-    printf("=============================================\n");
-    printf(" Tüm glFlush Robustness Testleri Başarılı\n");
-    printf("=============================================\n\n");
 }

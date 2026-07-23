@@ -1,7 +1,16 @@
 #include <GL/gl.h>
-#include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
+#include "C:/Users/Ozan/Desktop/Workspace/OpenGL_Proje/opengl-collab-tests/include/macro.h"
+
+static const char* test_procedure = "PixelRectangles_PixelStorei_TP_001";
+static const char* test_case_1 = "PixelRectangles_PixelStorei_TC_001";
+static const char* test_case_2 = "PixelRectangles_PixelStorei_TC_002";
+static const char* test_case_3 = "PixelRectangles_PixelStorei_TC_003";
+static const char* test_case_4 = "PixelRectangles_PixelStorei_TC_004";
+static const char* test_case_5 = "PixelRectangles_PixelStorei_TC_005";
+static const char* test_case_6 = "PixelRectangles_PixelStorei_TC_006";
 
 /* ============================================================
  * Test altyapısı
@@ -23,23 +32,26 @@ static void resetState(void)
     while(glGetError()!=GL_NO_ERROR);
 }
 
-static void checkStatePreserved(GLenum pname, GLint expectedValue)
+static int checkStatePreserved(const char* test_case,
+                               GLenum pname, GLint expectedValue)
 {
     GLint value;
     glGetIntegerv(pname,&value);
+
     if(value!=expectedValue)
     {
-        printf("  [FAIL] PixelStore durumu bozuldu!\n");
-        printf("         Beklenen : %d\n",expectedValue);
-        printf("         Gercek   : %d\n",value);
-        assert(0);
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "PixelStore durumu bozuldu. Beklenen : %d Gercek : %d",
+                      expectedValue,value);
+        return 0;
     }
+
+    return 1;
 }
 
 /* ============================================================
  * TEST 1: Temel Robustness Doğrulaması
- * ============================================================
- */
+ * ============================================================ */
 
 /*
  * glPixelStorei() fonksiyonunun desteklediği tüm
@@ -60,44 +72,52 @@ static void checkStatePreserved(GLenum pname, GLint expectedValue)
  * oluşmadığı doğrulanır.
  */
 
-void test_pixelStore_basicRobustness(void)
+void PixelRectangles_PixelStorei_TC_001(void)
 {
     GLenum err;
-    GLint validValues[] =
-    {
+    int i;
+    GLint validValues[]={
         1,
         2,
         4,
         8
     };
 
-    printf("TEST: Basic Robustness\n");
     resetState();
-    for(int i=0;i<4;i++)
+
+    for(i=0;i<4;i++)
     {
-        glPixelStorei(GL_PACK_ALIGNMENT, validValues[i]);
+        glPixelStorei(GL_PACK_ALIGNMENT,validValues[i]);
         err=glGetError();
+
         if(err!=GL_NO_ERROR)
         {
-            printf("  [FAIL] PACK_ALIGNMENT=%d Error=0x%X\n", validValues[i], err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_1, test_procedure,
+                          "PACK_ALIGNMENT=%d Error=0x%X",validValues[i],err);
+            return;
         }
 
-        checkStatePreserved(GL_PACK_ALIGNMENT, validValues[i]);
-        glPixelStorei(GL_UNPACK_ALIGNMENT, validValues[i]);
+        if(!checkStatePreserved(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
+            return;
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT,validValues[i]);
         err=glGetError();
+
         if(err!=GL_NO_ERROR)
         {
-            printf("  [FAIL] UNPACK_ALIGNMENT=%d Error=0x%X\n", validValues[i], err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_1, test_procedure,
+                          "UNPACK_ALIGNMENT=%d Error=0x%X",validValues[i],err);
+            return;
         }
 
-        checkStatePreserved(GL_UNPACK_ALIGNMENT, validValues[i]);
+        if(!checkStatePreserved(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
+            return;
     }
-    resetState();
-    printf("  [PASS]\n\n");
-}
 
+    resetState();
+
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
+}
 
 /* ============================================================
  * TEST 2: Geçersiz Alignment Değerleri
@@ -123,12 +143,13 @@ void test_pixelStore_basicRobustness(void)
  * doğrulanır.
  */
 
-void test_pixelStore_invalidAlignment(void)
+void PixelRectangles_PixelStorei_TC_002(void)
 {
     GLenum err;
+    int i;
+    int count;
 
-    GLint invalidValues[] =
-    {
+    GLint invalidValues[]={
         0,
         3,
         5,
@@ -143,27 +164,32 @@ void test_pixelStore_invalidAlignment(void)
         INT_MIN
     };
 
-    printf("TEST: Invalid Alignment Values\n");
+    count=sizeof(invalidValues)/sizeof(invalidValues[0]);
+
     resetState();
+
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
-    for(int i=0;
-        i<sizeof(invalidValues)/sizeof(invalidValues[0]);
-        i++)
+    for(i=0;i<count;i++)
     {
-        glPixelStorei(GL_PACK_ALIGNMENT, invalidValues[i]);
+        glPixelStorei(GL_PACK_ALIGNMENT,invalidValues[i]);
         err=glGetError();
 
         if(err!=GL_INVALID_VALUE)
         {
-            printf("  [FAIL] Alignment=%d Beklenen=GL_INVALID_VALUE Gelen=0x%X\n", invalidValues[i], err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_2, test_procedure,
+                          "Alignment=%d Beklenen=GL_INVALID_VALUE Gelen=0x%X",
+                          invalidValues[i],err);
+            return;
         }
 
-        checkStatePreserved(GL_PACK_ALIGNMENT, 4);
+        if(!checkStatePreserved(test_case_2,GL_PACK_ALIGNMENT,4))
+            return;
     }
+
     resetState();
-    printf("  [PASS]\n\n");
+
+    TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -187,53 +213,59 @@ void test_pixelStore_invalidAlignment(void)
  * doğrulanmaktadır.
  */
 
-void test_pixelStore_invalidPname(void)
+void PixelRectangles_PixelStorei_TC_003(void)
 {
     GLenum err;
     GLenum pname;
-    printf("TEST: Invalid pname Values\n");
+
     resetState();
 
     /* Bilinen geçerli durum */
-    glPixelStorei(GL_PACK_ALIGNMENT, 4);
-    checkStatePreserved(GL_PACK_ALIGNMENT, 4);
+    glPixelStorei(GL_PACK_ALIGNMENT,4);
+
+    if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+        return;
 
     /* Çok sayıda geçersiz enum değeri dene */
-    for (pname = 0; pname < 10000; pname++)
+    for(pname=0;pname<10000;pname++)
     {
         /* Geçerli pname'ları atla */
-        if (pname == GL_PACK_ALIGNMENT)
+        if(pname==GL_PACK_ALIGNMENT)
             continue;
-        if (pname == GL_UNPACK_ALIGNMENT)
+        if(pname==GL_UNPACK_ALIGNMENT)
             continue;
 
-        glPixelStorei(pname, 4);
-        err = glGetError();
+        glPixelStorei(pname,4);
+        err=glGetError();
 
-        if (err == GL_INVALID_ENUM)
+        if(err==GL_INVALID_ENUM)
         {
             /* Beklenen durum */
-            checkStatePreserved(GL_PACK_ALIGNMENT, 4);
+            if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+                return;
         }
-        else if (err == GL_NO_ERROR)
+        else if(err==GL_NO_ERROR)
         {
             /*
              * Bazı implementasyonlar extension enumlarını
              * kabul edebilir. Bu durumda state'in yine de
              * bozulmadığını doğrula.
              */
-            checkStatePreserved(GL_PACK_ALIGNMENT, 4);
+            if(!checkStatePreserved(test_case_3,GL_PACK_ALIGNMENT,4))
+                return;
         }
         else
         {
-            printf("  [FAIL] pname=0x%X Beklenmeyen Error=0x%X\n", pname, err);
-            assert(0);
+            TEST_LOG_FAIL(test_case_3, test_procedure,
+                          "pname=0x%X Beklenmeyen Error=0x%X",pname,err);
+            return;
         }
     }
-    resetState();
-    printf("  [PASS]\n\n");
-}
 
+    resetState();
+
+    TEST_LOG_SUCCESS(test_case_3, test_procedure);
+}
 
 /* ============================================================
  * TEST 4: State Preservation
@@ -252,11 +284,11 @@ void test_pixelStore_invalidPname(void)
  * değiştirmemesi beklenmektedir.
  */
 
-void test_pixelStore_statePreservation(void)
+void PixelRectangles_PixelStorei_TC_004(void)
 {
     GLenum err;
     GLint value;
-    printf("TEST: State Preservation\n");
+
     resetState();
 
     /*--------------------------------------------*/
@@ -266,21 +298,37 @@ void test_pixelStore_statePreservation(void)
     glPixelStorei(GL_PACK_ALIGNMENT,8);
     err=glGetError();
 
-    assert(err==GL_NO_ERROR);
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "PACK_ALIGNMENT=8 Error=0x%X",err);
+        return;
+    }
 
-    glGetIntegerv(GL_PACK_ALIGNMENT, &value);
+    glGetIntegerv(GL_PACK_ALIGNMENT,&value);
 
-    assert(value==8);
+    if(value!=8)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "PACK_ALIGNMENT beklenen=8 gercek=%d",value);
+        return;
+    }
 
     glPixelStorei(GL_PACK_ALIGNMENT,3);
 
     err=glGetError();
 
-    assert(err==GL_INVALID_VALUE);
+    if(err!=GL_INVALID_VALUE)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "Beklenen=GL_INVALID_VALUE Gelen=0x%X",err);
+        return;
+    }
 
-    glGetIntegerv(GL_PACK_ALIGNMENT, &value);
+    glGetIntegerv(GL_PACK_ALIGNMENT,&value);
 
-    assert(value==8);
+    if(value!=8)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "PACK_ALIGNMENT durumu bozuldu. Gercek=%d",value);
+        return;
+    }
 
     /*--------------------------------------------*/
     /* UNPACK_ALIGNMENT                           */
@@ -290,25 +338,41 @@ void test_pixelStore_statePreservation(void)
 
     err=glGetError();
 
-    assert(err==GL_NO_ERROR);
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "UNPACK_ALIGNMENT=2 Error=0x%X",err);
+        return;
+    }
 
-    glGetIntegerv(GL_UNPACK_ALIGNMENT, &value);
+    glGetIntegerv(GL_UNPACK_ALIGNMENT,&value);
 
-    assert(value==2);
+    if(value!=2)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "UNPACK_ALIGNMENT beklenen=2 gercek=%d",value);
+        return;
+    }
 
     glPixelStorei(GL_UNPACK_ALIGNMENT,-5);
 
     err=glGetError();
 
-    assert(err==GL_INVALID_VALUE);
+    if(err!=GL_INVALID_VALUE)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "Beklenen=GL_INVALID_VALUE Gelen=0x%X",err);
+        return;
+    }
 
-    glGetIntegerv(GL_UNPACK_ALIGNMENT, &value);
+    glGetIntegerv(GL_UNPACK_ALIGNMENT,&value);
 
-    assert(value==2);
+    if(value!=2)
+    {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "UNPACK_ALIGNMENT durumu bozuldu. Gercek=%d",value);
+        return;
+    }
 
     resetState();
 
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
 /* ============================================================
@@ -330,49 +394,63 @@ void test_pixelStore_statePreservation(void)
  * hata kuyruğunun doğru çalıştığını doğrulamaktır.
  */
 
-void test_pixelStore_errorQueue(void)
+void PixelRectangles_PixelStorei_TC_005(void)
 {
     GLenum err;
-    printf("TEST: Error Queue and State Preservation\n");
+
     resetState();
 
     /* Geçerli çağrı */
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
-    err = glGetError();
-    assert(err == GL_NO_ERROR);
+    err=glGetError();
+
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Beklenen=GL_NO_ERROR Gelen=0x%X",err);
+        return;
+    }
 
     /* Geçersiz alignment */
-
     glPixelStorei(GL_PACK_ALIGNMENT,3);
 
-    err = glGetError();
+    err=glGetError();
 
-    assert(err == GL_INVALID_VALUE);
+    if(err!=GL_INVALID_VALUE)
+    {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Beklenen=GL_INVALID_VALUE Gelen=0x%X",err);
+        return;
+    }
 
     /* Geçersiz pname */
-
     glPixelStorei(GL_TEXTURE_2D,4);
 
-    err = glGetError();
+    err=glGetError();
 
-    assert(err == GL_INVALID_ENUM);
+    if(err!=GL_INVALID_ENUM)
+    {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Beklenen=GL_INVALID_ENUM Gelen=0x%X",err);
+        return;
+    }
 
     /* Tekrar geçerli çağrı */
-
     glPixelStorei(GL_UNPACK_ALIGNMENT,8);
 
-    err = glGetError();
+    err=glGetError();
 
-    assert(err == GL_NO_ERROR);
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Beklenen=GL_NO_ERROR Gelen=0x%X",err);
+        return;
+    }
 
-    checkStatePreserved(GL_UNPACK_ALIGNMENT, 8);
+    if(!checkStatePreserved(test_case_5,GL_UNPACK_ALIGNMENT,8))
+        return;
 
     resetState();
 
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
-
 
 /* ============================================================
  * TEST 6: Rastgele Stress / Fuzz Testi
@@ -401,53 +479,52 @@ void test_pixelStore_errorQueue(void)
  * Bunların dışındaki herhangi bir hata FAIL kabul edilir.
  */
 
-void test_pixelStore_stress(void)
+void PixelRectangles_PixelStorei_TC_006(void)
 {
     unsigned int i;
-    printf("TEST: Random Stress Test\n");
+
+    GLenum validPnames[]={
+        GL_PACK_ALIGNMENT,
+        GL_UNPACK_ALIGNMENT
+    };
 
     resetState();
 
     srand(12345);
 
-    GLenum validPnames[] =
-    {
-        GL_PACK_ALIGNMENT,
-        GL_UNPACK_ALIGNMENT
-    };
-
     for(i=0;i<1000000;i++)
     {
         GLenum pname;
+        GLint value;
+        GLenum err;
 
         if(rand()%2)
-            pname = validPnames[rand()%2];
+            pname=validPnames[rand()%2];
         else
-            pname = (GLenum)rand();
-        GLint value =
-            (rand()%200)-100;
+            pname=(GLenum)rand();
+
+        value=(rand()%200)-100;
+
         glPixelStorei(pname,value);
 
-        GLenum err = glGetError();
+        err=glGetError();
 
-        if(err != GL_NO_ERROR &&
-           err != GL_INVALID_ENUM &&
-           err != GL_INVALID_VALUE)
+        if(err!=GL_NO_ERROR &&
+           err!=GL_INVALID_ENUM &&
+           err!=GL_INVALID_VALUE)
         {
-            printf("\n[FAIL]\n");
-            printf("Iteration : %u\n",i);
-            printf("pname     : 0x%X\n",pname);
-            printf("value     : %d\n",value);
-            printf("Error     : 0x%X\n",err);
-
-            assert(0);
+            TEST_LOG_FAIL(test_case_6, test_procedure,
+                          "Iteration : %u pname : 0x%X value : %d Error : 0x%X",
+                          i,pname,value,err);
+            return;
         }
     }
 
     resetState();
-    printf("  [PASS] 1,000,000 rastgele test başarıyla tamamlandı.\n\n");
-}
 
+    TEST_LOG_INFO("1,000,000 rastgele test basariyla tamamlandi.");
+    TEST_LOG_SUCCESS(test_case_6, test_procedure);
+}
 
 /* ============================================================
  * Tüm glPixelStorei Robustness Testlerini Çalıştır
@@ -456,19 +533,10 @@ void test_pixelStore_stress(void)
 
 void Run_glPixelStorei_Robustness(void)
 {
-    printf("\n");
-    printf("=============================================\n");
-    printf("   glPixelStorei Robustness Test Suite\n");
-    printf("=============================================\n\n");
-
-    test_pixelStore_basicRobustness();
-    test_pixelStore_invalidAlignment();
-    test_pixelStore_invalidPname();
-    test_pixelStore_statePreservation();
-    test_pixelStore_errorQueue();
-    test_pixelStore_stress();
-
-    printf("=============================================\n");
-    printf(" Tüm glPixelStorei Robustness Testleri Başarılı\n");
-    printf("=============================================\n\n");
+    PixelRectangles_PixelStorei_TC_001();
+    PixelRectangles_PixelStorei_TC_002();
+    PixelRectangles_PixelStorei_TC_003();
+    PixelRectangles_PixelStorei_TC_004();
+    PixelRectangles_PixelStorei_TC_005();
+    PixelRectangles_PixelStorei_TC_006();
 }

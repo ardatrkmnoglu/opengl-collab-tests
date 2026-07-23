@@ -13,23 +13,23 @@
  * ============================================================ */
 
 /* glLineWidth */
-extern void test_lineWidth_basicRobustness(void);
-extern void test_lineWidth_stressSweep(void);
-extern void test_lineWidth_specialFloats(void);
-extern void test_lineWidth_errorQueue(void);
-extern void test_lineWidth_limits(void);
+extern void Rasterizaton_LineWidth_TC_001(void);
+extern void Rasterizaton_LineWidth_TC_002(void);
+extern void Rasterizaton_LineWidth_TC_003(void);
+extern void Rasterizaton_LineWidth_TC_004(void);
+extern void Rasterizaton_LineWidth_TC_005(void);
 
 /* glFrontFace */
-extern void test_frontFace_errorQueue(void);
-extern void test_frontFace_rapidToggle(void);
-extern void test_frontFace_mixedValidity(void);
-extern void test_frontFace_largeEnum(void);
+extern void Rasterizaton_FrontFace_TC_001(void);
+extern void Rasterizaton_FrontFace_TC_002(void);
+extern void Rasterizaton_FrontFace_TC_003(void);
+extern void Rasterizaton_FrontFace_TC_006(void);
 
 /* glCullFace */
-extern void test_cullFace_basicRobustness(void);
-extern void test_cullFace_stressSweep(void);
-extern void test_cullFace_errorQueue(void);
-extern void test_cullFace_rapidToggle(void);
+extern void Rasterizaton_CullFace_TC_001(void);
+extern void Rasterizaton_CullFace_TC_002(void);
+extern void Rasterizaton_CullFace_TC_003(void);
+extern void Rasterizaton_CullFace_TC_004(void);
 extern void test_cullFace_frontFaceCombo(void);
 
 /* glEnable_glDisable */
@@ -39,11 +39,11 @@ extern void test_cullFaceEnable_invalidCaps(void);
 extern void test_cullFaceEnable_capCombinations(void);
 
 /* glPolygonOffset */
-extern void test_polygonOffset_basicRobustness(void);
-extern void test_polygonOffset_stressSweep(void);
-extern void test_polygonOffset_errorQueue(void);
-extern void test_polygonOffset_statePreservation(void);
-extern void test_polygonOffset_specialFloats(void);
+extern void Rasterizaton_PolygonOffset_TC_001(void);
+extern void Rasterizaton_PolygonOffset_TC_002(void);
+extern void Rasterizaton_PolygonOffset_TC_003(void);
+extern void Rasterizaton_PolygonOffset_TC_004(void);
+extern void Rasterizaton_PolygonOffset_TC_005(void);
 
 /* ============================================================
  * Test calistirma cercevesi
@@ -56,23 +56,23 @@ static struct {
     TestFunc func;
 } testList[] = {
     /* glLineWidth */
-    {"glLineWidth - Basic Robustness",       test_lineWidth_basicRobustness},
-    {"glLineWidth - Stress Sweep",           test_lineWidth_stressSweep},
-    {"glLineWidth - Special Floats",         test_lineWidth_specialFloats},
-    {"glLineWidth - Error Queue",            test_lineWidth_errorQueue},
-    {"glLineWidth - Implementation Limits",  test_lineWidth_limits},
+    {"glLineWidth - Basic Robustness",       Rasterizaton_LineWidth_TC_001},
+    {"glLineWidth - Stress Sweep",           Rasterizaton_LineWidth_TC_002},
+    {"glLineWidth - Special Floats",         Rasterizaton_LineWidth_TC_003},
+    {"glLineWidth - Error Queue",            Rasterizaton_LineWidth_TC_004},
+    {"glLineWidth - Implementation Limits",  Rasterizaton_LineWidth_TC_005},
 
     /* glFrontFace */
-    {"glFrontFace - Error Queue",            test_frontFace_errorQueue},
-    {"glFrontFace - Rapid Toggle",           test_frontFace_rapidToggle},
-    {"glFrontFace - Mixed Validity",         test_frontFace_mixedValidity},
-    {"glFrontFace - Large Enum",             test_frontFace_largeEnum},
+    {"glFrontFace - Error Queue",            Rasterizaton_FrontFace_TC_001},
+    {"glFrontFace - Rapid Toggle",           Rasterizaton_FrontFace_TC_002},
+    {"glFrontFace - Mixed Validity",         Rasterizaton_FrontFace_TC_003},
+    {"glFrontFace - Large Enum",             Rasterizaton_FrontFace_TC_006},
 
     /* glCullFace */
-    {"glCullFace - Basic Robustness",        test_cullFace_basicRobustness},
-    {"glCullFace - Stress Sweep",            test_cullFace_stressSweep},
-    {"glCullFace - Error Queue",             test_cullFace_errorQueue},
-    {"glCullFace - Rapid Toggle",            test_cullFace_rapidToggle},
+    {"glCullFace - Basic Robustness",        Rasterizaton_CullFace_TC_001},
+    {"glCullFace - Stress Sweep",            Rasterizaton_CullFace_TC_002},
+    {"glCullFace - Error Queue",             Rasterizaton_CullFace_TC_003},
+    {"glCullFace - Rapid Toggle",            Rasterizaton_CullFace_TC_004},
     {"glCullFace - FrontFace Combinations",  test_cullFace_frontFaceCombo},
 
     /* glEnable/glDisable */
@@ -82,11 +82,11 @@ static struct {
     {"glEnable/Disable - Invalid Caps",      test_cullFaceEnable_invalidCaps},
 
     /* glPolygonOffset */
-    {"glPolygonOffset - Basic Robustness",   test_polygonOffset_basicRobustness},
-    {"glPolygonOffset - Stress Sweep",       test_polygonOffset_stressSweep},
-    {"glPolygonOffset - Error Queue",        test_polygonOffset_errorQueue},
-    {"glPolygonOffset - State Preservation", test_polygonOffset_statePreservation},
-    {"glPolygonOffset - Special Floats",     test_polygonOffset_specialFloats},
+    {"glPolygonOffset - Basic Robustness",   Rasterizaton_PolygonOffset_TC_001},
+    {"glPolygonOffset - Stress Sweep",       Rasterizaton_PolygonOffset_TC_002},
+    {"glPolygonOffset - Error Queue",        Rasterizaton_PolygonOffset_TC_003},
+    {"glPolygonOffset - State Preservation", Rasterizaton_PolygonOffset_TC_004},
+    {"glPolygonOffset - Special Floats",     Rasterizaton_PolygonOffset_TC_005},
 };
 
 int main(int argc, char **argv) {

@@ -1,7 +1,18 @@
 #include <GL/gl.h>
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "C:/Users/Ozan/Desktop/Workspace/OpenGL_Proje/opengl-collab-tests/include/macro.h"
+
+static const char* test_procedure = "Rasterizaton_CullFace_TP_001";
+static const char* test_case_1 = "Rasterizaton_CullFace_TC_001";
+static const char* test_case_2 = "Rasterizaton_CullFace_TC_002";
+static const char* test_case_3 = "Rasterizaton_CullFace_TC_003";
+static const char* test_case_4 = "Rasterizaton_CullFace_TC_004";
+static const char* test_case_5 = "Rasterizaton_CullFace_TC_005";
+static const char* test_case_6 = "Rasterizaton_CullFace_TC_006";
+static const char* test_case_7 = "Rasterizaton_CullFace_TC_007";
+static const char* test_case_8 = "Rasterizaton_CullFace_TC_008";
+static const char* test_case_9 = "Rasterizaton_CullFace_TC_009";
 
 /* ============================================================
  * Test altyapısı
@@ -24,7 +35,7 @@ static void resetState(void)
     while(glGetError()!=GL_NO_ERROR);
 }
 
-static void checkStatePreserved(GLint expected)
+static int checkStatePreserved(const char* test_case, GLint expected)
 {
     GLint actual;
     glGetIntegerv(GL_CULL_FACE_MODE,
@@ -32,12 +43,14 @@ static void checkStatePreserved(GLint expected)
 
     if(actual!=expected)
     {
-        printf("  [FAIL] State bozuldu!\n");
-        printf("         Beklenen : 0x%X\n",expected);
-        printf("         Gercek   : 0x%X\n",actual);
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "State bozuldu. Beklenen : 0x%X Gercek : 0x%X",
+                      expected,actual);
 
-        assert(0);
+        return 0;
     }
+
+    return 1;
 }
 
 
@@ -55,36 +68,68 @@ static void checkStatePreserved(GLint expected)
  * değişmediği kontrol edilir.
  * ============================================================ */
 
-void test_cullFace_basicRobustness(void)
+void Rasterizaton_CullFace_TC_001(void)
 {
     GLenum err;
-    printf("TEST : Basic Robustness\n");
+
     resetState();
     glCullFace(GL_BACK);
-    assert(glGetError()==GL_NO_ERROR);
-    checkStatePreserved(GL_BACK);
+    err=glGetError();
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_1,GL_BACK))
+        return;
 
     glCullFace(GL_FRONT);
-    assert(glGetError()==GL_NO_ERROR);
-    checkStatePreserved(GL_FRONT);
+    err=glGetError();
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_1,GL_FRONT))
+        return;
 
     glCullFace(GL_FRONT_AND_BACK);
-    assert(glGetError()==GL_NO_ERROR);
-    checkStatePreserved(GL_FRONT_AND_BACK);
+    err=glGetError();
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_1,GL_FRONT_AND_BACK))
+        return;
 
     glCullFace((GLenum)0x0BAD);
     err=glGetError();
 
-    assert(err==GL_INVALID_ENUM);
-    checkStatePreserved(GL_FRONT_AND_BACK);
+    if(err!=GL_INVALID_ENUM)
+    {
+        TEST_LOG_FAIL(test_case_1, test_procedure,
+                      "Beklenen : 0x%X Gelen : 0x%X",GL_INVALID_ENUM,err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_1,GL_FRONT_AND_BACK))
+        return;
+
     glCullFace(GL_CCW);
     err=glGetError();
 
-    assert(err==GL_INVALID_ENUM);
-    checkStatePreserved(GL_FRONT_AND_BACK);
+    if(err!=GL_INVALID_ENUM)
+    {
+        TEST_LOG_FAIL(test_case_1, test_procedure,
+                      "Beklenen : 0x%X Gelen : 0x%X",GL_INVALID_ENUM,err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_1,GL_FRONT_AND_BACK))
+        return;
+
     resetState();
 
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 
@@ -109,12 +154,13 @@ void test_cullFace_basicRobustness(void)
  * da doğrulanmaktadır.
  * ============================================================ */
 
-void test_cullFace_stressSweep(void)
+void Rasterizaton_CullFace_TC_002(void)
 {
     GLenum mode;
+    GLint currentMode=GL_BACK;
     int passCount=0;
     int failCount=0;
-    printf("TEST : Stress Sweep\n");
+
     resetState();
 
     for(mode=0; mode<65536; mode++)
@@ -133,10 +179,11 @@ void test_cullFace_stressSweep(void)
         err=glGetError();
         if(err!=expected)
         {
-            printf("  [FAIL] Enum=0x%X Beklenen=0x%X Gelen=0x%X\n",
-                   mode,
-                   expected,
-                   err);
+            TEST_LOG_FAIL(test_case_2, test_procedure,
+                          "Enum=0x%X Beklenen=0x%X Gelen=0x%X",
+                          mode,
+                          expected,
+                          err);
 
             failCount++;
         }
@@ -145,19 +192,29 @@ void test_cullFace_stressSweep(void)
             passCount++;
         }
 
+        if(err==GL_NO_ERROR)
+        {
+            currentMode=(GLint)mode;
+        }
+
         if(err==GL_INVALID_ENUM)
         {
-            checkStatePreserved(GL_BACK);
+            if(!checkStatePreserved(test_case_2,currentMode))
+                return;
         }
     }
 
-    printf("  PASS : %d\n",passCount);
-    printf("  FAIL : %d\n",failCount);
+    TEST_LOG_INFO("PASS : %d",passCount);
+    TEST_LOG_INFO("FAIL : %d",failCount);
 
-    assert(failCount==0);
+    if(failCount!=0)
+    {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Basarisiz cagri sayisi : %d",failCount);
+        return;
+    }
     resetState();
 
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 
@@ -174,12 +231,12 @@ void test_cullFace_stressSweep(void)
  * normal çalışmaya döndüğü kontrol edilir.
  * ============================================================ */
 
-void test_cullFace_errorQueue(void)
+void Rasterizaton_CullFace_TC_003(void)
 {
     GLenum err;
     int i;
     int errorCount=0;
-    printf("TEST : Error Queue Management\n");
+
     resetState();
     for(i=0;i<100;i++)
     {
@@ -188,17 +245,34 @@ void test_cullFace_errorQueue(void)
 
     while((err=glGetError())!=GL_NO_ERROR)
     {
-        assert(err==GL_INVALID_ENUM);
+        if(err!=GL_INVALID_ENUM)
+        {
+            TEST_LOG_FAIL(test_case_3, test_procedure,
+                          "Beklenen : 0x%X Gelen : 0x%X",GL_INVALID_ENUM,err);
+            return;
+        }
 
         errorCount++;
     }
-    assert(errorCount>0);
+    if(errorCount<=0)
+    {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Hata kuyrugunda hic hata bulunamadi.");
+        return;
+    }
     glCullFace(GL_FRONT);
 
-    assert(glGetError()==GL_NO_ERROR);
-    checkStatePreserved(GL_FRONT);
+    err=glGetError();
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "Beklenmeyen hata : 0x%X",err);
+        return;
+    }
+    if(!checkStatePreserved(test_case_3,GL_FRONT))
+        return;
+
     resetState();
-    printf("  [PASS]\n\n");
+
+    TEST_LOG_SUCCESS(test_case_3, test_procedure);
 }
 
 /* ============================================================
@@ -214,11 +288,10 @@ void test_cullFace_errorQueue(void)
  * Her çağrıdan sonra GL_CULL_FACE_MODE sorgulanır.
  * ============================================================ */
 
-void test_cullFace_rapidToggle(void)
+void Rasterizaton_CullFace_TC_004(void)
 {
     const int repeat = 100000;
     int i;
-    printf("TEST : Rapid Toggle\n");
 
     resetState();
     for(i=0;i<repeat;i++)
@@ -242,15 +315,26 @@ void test_cullFace_rapidToggle(void)
         }
 
         glCullFace(expected);
-        assert(glGetError()==GL_NO_ERROR);
+        if(glGetError()!=GL_NO_ERROR)
+        {
+            TEST_LOG_FAIL(test_case_4, test_procedure,
+                          "Iteration : %d Enum : 0x%X",i,expected);
+            return;
+        }
         glGetIntegerv(GL_CULL_FACE_MODE,
                       &current);
-        assert(current==expected);
+        if(current!=(GLint)expected)
+        {
+            TEST_LOG_FAIL(test_case_4, test_procedure,
+                          "Iteration : %d Beklenen : 0x%X Gercek : 0x%X",
+                          i,expected,current);
+            return;
+        }
     }
 
     resetState();
 
-    printf("  [PASS]\n\n");
+    TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
 
@@ -269,7 +353,7 @@ void test_cullFace_rapidToggle(void)
  * gönderilir.
  * ============================================================ */
 
-void test_cullFace_statePreservation(void)
+void Rasterizaton_CullFace_TC_005(void)
 {
     GLenum err;
     GLenum invalidEnums[] =
@@ -283,27 +367,43 @@ void test_cullFace_statePreservation(void)
         0xFFFFFFFF
     };
 
+    int count=sizeof(invalidEnums)/sizeof(invalidEnums[0]);
     int i;
-    printf("TEST : State Preservation\n");
+
     resetState();
     glCullFace(GL_FRONT);
-    assert(glGetError()==GL_NO_ERROR);
+    err=glGetError();
+    if(err!=GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "Beklenmeyen hata : 0x%X",err);
+        return;
+    }
 
-    checkStatePreserved(GL_FRONT);
-    for(i=0;
-        i<sizeof(invalidEnums)/sizeof(invalidEnums[0]);
-        i++)
+    if(!checkStatePreserved(test_case_5,GL_FRONT))
+        return;
+
+    for(i=0;i<count;i++)
     {
         glCullFace(invalidEnums[i]);
 
         err=glGetError();
 
-        assert(err==GL_INVALID_ENUM);
+        if(err!=GL_INVALID_ENUM)
+        {
+            TEST_LOG_FAIL(test_case_5, test_procedure,
+                          "Enum=0x%X Beklenen=0x%X Gelen=0x%X",
+                          invalidEnums[i],
+                          GL_INVALID_ENUM,
+                          err);
+            return;
+        }
 
-        checkStatePreserved(GL_FRONT);
+        if(!checkStatePreserved(test_case_5,GL_FRONT))
+            return;
     }
     resetState();
-    printf("  [PASS]\n\n");
+
+    TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
 
 
@@ -320,7 +420,7 @@ void test_cullFace_statePreservation(void)
  * Tüm geçerli kombinasyonlar denenmektedir.
  * ============================================================ */
 
-void test_cullFace_frontFaceCombination(void)
+void Rasterizaton_CullFace_TC_006(void)
 {
     GLenum frontModes[] =
     {
@@ -338,7 +438,6 @@ void test_cullFace_frontFaceCombination(void)
     int i;
     int j;
 
-    printf("TEST : FrontFace Combination\n");
     resetState();
     for(i=0;i<2;i++)
     {
@@ -347,20 +446,43 @@ void test_cullFace_frontFaceCombination(void)
             GLint front;
             GLint cull;
             glFrontFace(frontModes[i]);
-            assert(glGetError()==GL_NO_ERROR);
+            if(glGetError()!=GL_NO_ERROR)
+            {
+                TEST_LOG_FAIL(test_case_6, test_procedure,
+                              "glFrontFace basarisiz. Enum : 0x%X",frontModes[i]);
+                return;
+            }
             glCullFace(cullModes[j]);
 
-            assert(glGetError()==GL_NO_ERROR);
+            if(glGetError()!=GL_NO_ERROR)
+            {
+                TEST_LOG_FAIL(test_case_6, test_procedure,
+                              "glCullFace basarisiz. Enum : 0x%X",cullModes[j]);
+                return;
+            }
             glGetIntegerv(GL_FRONT_FACE,
                           &front);
             glGetIntegerv(GL_CULL_FACE_MODE,
                           &cull);
-            assert(front==frontModes[i]);
-            assert(cull==cullModes[j]);
+            if(front!=(GLint)frontModes[i])
+            {
+                TEST_LOG_FAIL(test_case_6, test_procedure,
+                              "FrontFace bozuldu. Beklenen : 0x%X Gercek : 0x%X",
+                              frontModes[i],front);
+                return;
+            }
+            if(cull!=(GLint)cullModes[j])
+            {
+                TEST_LOG_FAIL(test_case_6, test_procedure,
+                              "CullFace bozuldu. Beklenen : 0x%X Gercek : 0x%X",
+                              cullModes[j],cull);
+                return;
+            }
         }
     }
     resetState();
-    printf("  [PASS]\n\n");
+
+    TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
 
 
@@ -378,7 +500,7 @@ void test_cullFace_frontFaceCombination(void)
  * değiştirmediği kontrol edilir.
  * ============================================================ */
 
-void test_cullFace_largeEnum(void)
+void Rasterizaton_CullFace_TC_007(void)
 {
     GLenum values[] =
     {
@@ -388,23 +510,32 @@ void test_cullFace_largeEnum(void)
         (GLenum)0xFFFFFFFF
     };
 
+    int count=sizeof(values)/sizeof(values[0]);
     int i;
-    printf("TEST : Large Invalid Enum Values\n");
+
     resetState();
-    for(i=0;
-        i<sizeof(values)/sizeof(values[0]);
-        i++)
+    for(i=0;i<count;i++)
     {
         GLenum err;
         glCullFace(values[i]);
         err=glGetError();
 
-        assert(err==GL_INVALID_ENUM);
-        checkStatePreserved(GL_BACK);
+        if(err!=GL_INVALID_ENUM)
+        {
+            TEST_LOG_FAIL(test_case_7, test_procedure,
+                          "Enum=0x%X Beklenen=0x%X Gelen=0x%X",
+                          values[i],
+                          GL_INVALID_ENUM,
+                          err);
+            return;
+        }
+        if(!checkStatePreserved(test_case_7,GL_BACK))
+            return;
     }
 
     resetState();
-    printf("  [PASS]\n\n");
+
+    TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }
 
 /* ============================================================
@@ -421,11 +552,11 @@ void test_cullFace_largeEnum(void)
  * ve son durum doğru şekilde korunmalıdır.
  * ============================================================ */
 
-void test_cullFace_rapidFire(void)
+void Rasterizaton_CullFace_TC_008(void)
 {
     const unsigned int repeat = 1000000;
     unsigned int i;
-    printf("TEST : Rapid Fire\n");
+
     resetState();
     for(i = 0; i < repeat; i++)
     {
@@ -433,11 +564,18 @@ void test_cullFace_rapidFire(void)
         glCullFace(GL_FRONT);
         glCullFace(GL_FRONT_AND_BACK);
     }
-    assert(glGetError() == GL_NO_ERROR);
-    checkStatePreserved(GL_FRONT_AND_BACK);
+    if(glGetError() != GL_NO_ERROR)
+    {
+        TEST_LOG_FAIL(test_case_8, test_procedure, "Yogun kullanim sonrasi hata olustu.");
+        return;
+    }
+    if(!checkStatePreserved(test_case_8,GL_FRONT_AND_BACK))
+        return;
+
     resetState();
 
-    printf("  [PASS] %u çağrı tamamlandı.\n\n", repeat * 3);
+    TEST_LOG_INFO("%u cagri tamamlandi.", repeat * 3);
+    TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }
 
 
@@ -460,10 +598,11 @@ void test_cullFace_rapidFire(void)
  * olarak değerlendirilir.
  * ============================================================ */
 
-void test_cullFace_randomFuzz(void)
+void Rasterizaton_CullFace_TC_009(void)
 {
     unsigned int i;
-    printf("TEST : Random Fuzz Test\n");
+    GLint lastValid=GL_BACK;
+
     resetState();
     srand(12345);
 
@@ -492,22 +631,29 @@ void test_cullFace_randomFuzz(void)
         if(err != GL_NO_ERROR &&
            err != GL_INVALID_ENUM)
         {
-            printf("\n[FAIL]\n");
-            printf("Iteration : %u\n", i);
-            printf("Enum      : 0x%X\n", value);
-            printf("Error     : 0x%X\n", err);
+            TEST_LOG_FAIL(test_case_9, test_procedure,
+                          "Iteration : %u Enum : 0x%X Error : 0x%X",
+                          i, value, err);
 
-            assert(0);
+            return;
+        }
+
+        if(err == GL_NO_ERROR)
+        {
+            lastValid=(GLint)value;
         }
 
         if(err == GL_INVALID_ENUM)
         {
-            checkStatePreserved(GL_FRONT_AND_BACK);
+            if(!checkStatePreserved(test_case_9,lastValid))
+                return;
         }
     }
 
     resetState();
-    printf("  [PASS] 1,000,000 rastgele test tamamlandı.\n\n");
+
+    TEST_LOG_INFO("1,000,000 rastgele test tamamlandi.");
+    TEST_LOG_SUCCESS(test_case_9, test_procedure);
 }
 
 
@@ -517,22 +663,13 @@ void test_cullFace_randomFuzz(void)
 
 void Run_glCullFace_Robustness(void)
 {
-    printf("\n");
-    printf("=============================================\n");
-    printf("      glCullFace Robustness Test Suite\n");
-    printf("=============================================\n\n");
-
-    test_cullFace_basicRobustness();
-    test_cullFace_stressSweep();
-    test_cullFace_errorQueue();
-    test_cullFace_rapidToggle();
-    test_cullFace_statePreservation();
-    test_cullFace_frontFaceCombination();
-    test_cullFace_largeEnum();
-    test_cullFace_rapidFire();
-    test_cullFace_randomFuzz();
-
-    printf("=============================================\n");
-    printf("  Tüm glCullFace Robustness Testleri Başarılı\n");
-    printf("=============================================\n\n");
+    Rasterizaton_CullFace_TC_001();
+    Rasterizaton_CullFace_TC_002();
+    Rasterizaton_CullFace_TC_003();
+    Rasterizaton_CullFace_TC_004();
+    Rasterizaton_CullFace_TC_005();
+    Rasterizaton_CullFace_TC_006();
+    Rasterizaton_CullFace_TC_007();
+    Rasterizaton_CullFace_TC_008();
+    Rasterizaton_CullFace_TC_009();
 }

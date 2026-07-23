@@ -43,7 +43,7 @@ void Rasterizaton_PolygonOffset_TC_001(void) {
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_1, 2.0f, 3.0f))
+    if (!checkFloatState2(test_case_1, 2.0f, 3.0f))
         return;
 
     glPolygonOffset(-1000.0f, -500.0f);
@@ -52,7 +52,7 @@ void Rasterizaton_PolygonOffset_TC_001(void) {
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_1, -1000.0f, -500.0f))
+    if (!checkFloatState2(test_case_1, -1000.0f, -500.0f))
         return;
 
     glPolygonOffset(1000.0f, 500.0f);
@@ -61,7 +61,7 @@ void Rasterizaton_PolygonOffset_TC_001(void) {
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_1, 1000.0f, 500.0f))
+    if (!checkFloatState2(test_case_1, 1000.0f, 500.0f))
         return;
 
     resetState_PolygonO();
@@ -102,7 +102,7 @@ void Rasterizaton_PolygonOffset_TC_002(void) {
     }
 
     glPolygonOffset(0.0f, 0.0f);
-    if (!checkStatePreserved__PolygonO(test_case_2, 0.0f, 0.0f))
+    if (!checkFloatState2(test_case_2, 0.0f, 0.0f))
         return;
 
     TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL", passCount, failCount);
@@ -138,7 +138,7 @@ void Rasterizaton_PolygonOffset_TC_003(void) {
         TEST_LOG_FAIL(test_case_3, test_procedure, "Kuyrukta beklenmeyen hata: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_3, 999.0f, -999.0f))
+    if (!checkFloatState2(test_case_3, 999.0f, -999.0f))
         return;
 
     TEST_LOG_INFO("1000 cagri sonrasi kuyruk temiz");
@@ -172,7 +172,7 @@ void Rasterizaton_PolygonOffset_TC_004(void) {
         return;
     }
 
-    if (!checkStatePreserved__PolygonO(test_case_4, 5.0f, 7.0f))
+    if (!checkFloatState2(test_case_4, 5.0f, 7.0f))
         return;
 
     err = glGetError();
@@ -249,7 +249,7 @@ void Rasterizaton_PolygonOffset_TC_006(void) {
             return;
         }
 
-        if (!checkStatePreserved__PolygonO(test_case_6, factor, units))
+        if (!checkFloatState2(test_case_6, factor, units))
             return;
     }
 
@@ -284,7 +284,7 @@ void Rasterizaton_PolygonOffset_TC_007(void) {
         TEST_LOG_FAIL(test_case_7, test_procedure, "glEnable hata uretti: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_7, 4.0f, 8.0f))
+    if (!checkFloatState2(test_case_7, 4.0f, 8.0f))
         return;
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -293,7 +293,7 @@ void Rasterizaton_PolygonOffset_TC_007(void) {
         TEST_LOG_FAIL(test_case_7, test_procedure, "glDisable hata uretti: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_7, 4.0f, 8.0f))
+    if (!checkFloatState2(test_case_7, 4.0f, 8.0f))
         return;
 
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -302,7 +302,7 @@ void Rasterizaton_PolygonOffset_TC_007(void) {
         TEST_LOG_FAIL(test_case_7, test_procedure, "glEnable hata uretti: 0x%X", err);
         return;
     }
-    if (!checkStatePreserved__PolygonO(test_case_7, 4.0f, 8.0f))
+    if (!checkFloatState2(test_case_7, 4.0f, 8.0f))
         return;
 
     resetState_PolygonO();
@@ -313,16 +313,3 @@ void Rasterizaton_PolygonOffset_TC_007(void) {
 /* ============================================================
  * Tum testleri calistir
  * ============================================================ */
-
-int main(void) {
-
-    Rasterizaton_PolygonOffset_TC_001();
-    Rasterizaton_PolygonOffset_TC_002();
-    Rasterizaton_PolygonOffset_TC_003();
-    Rasterizaton_PolygonOffset_TC_004();
-    Rasterizaton_PolygonOffset_TC_005();
-    Rasterizaton_PolygonOffset_TC_006();
-    Rasterizaton_PolygonOffset_TC_007();
-
-    return 0;
-}

@@ -14,35 +14,6 @@ static const char* test_case_6 = "ErrorsandStatusReset_GetError_TC_006";
 static const char* test_case_7 = "ErrorsandStatusReset_GetError_TC_007";
 
 /* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   OpenGL hata kuyruğunu temizler.
- *
- * checkStatePreserved:
- *   glGetError() çağrılarının OpenGL state'ini
- *   değiştirmediğini doğrular.
- * ============================================================
- */
-
-static int checkStatePreserved_GetError(const char* test_case, GLfloat expectedWidth)
-{
-    GLfloat width=0.0f;
-
-    glGetFloatv(GL_LINE_WIDTH,&width);
-
-    if(width!=expectedWidth)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "OpenGL state bozuldu. Beklenen : %f Gercek : %f",
-                      expectedWidth,width);
-        return 0;
-    }
-
-    return 1;
-}
-
-/* ============================================================
  * TEST 1: Basic Robustness
  * ============================================================
  */
@@ -58,7 +29,7 @@ static int checkStatePreserved_GetError(const char* test_case, GLfloat expectedW
 void ErrorsandStatusReset_GetError_TC_001(void)
 {
     GLenum err;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     err=glGetError();
     if(err!=GL_NO_ERROR)
@@ -102,7 +73,7 @@ void ErrorsandStatusReset_GetError_TC_001(void)
 void ErrorsandStatusReset_GetError_TC_002(void)
 {
     GLenum err;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     glEnable((GLenum)0xFFFFFFFF);
 
@@ -141,7 +112,7 @@ void ErrorsandStatusReset_GetError_TC_003(void)
 {
     unsigned int i;
     GLenum err;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     for(i=0;i<10000;i++)
     {
@@ -176,7 +147,7 @@ void ErrorsandStatusReset_GetError_TC_004(void)
 {
     GLenum err;
     int errorCount=0;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     /* Bilinçli olarak geçersiz enumlar gönder */
     glEnable((GLenum)0xFFFFFFFF);
@@ -232,7 +203,7 @@ void ErrorsandStatusReset_GetError_TC_005(void)
     GLenum err;
     unsigned int i;
     GLfloat width;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     glLineWidth(3.0f);
 
@@ -263,11 +234,11 @@ void ErrorsandStatusReset_GetError_TC_005(void)
         }
     }
 
-    if(!checkStatePreserved_GetError(test_case_5, 3.0f))
+    if(!checkFloatState(test_case_5, 3.0f))
         return;
 
     glLineWidth(1.0f);
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     TEST_LOG_SUCCESS(test_case_5, test_procedure);
 }
@@ -295,7 +266,7 @@ void ErrorsandStatusReset_GetError_TC_006(void)
 {
     unsigned int i;
     GLenum err;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     for(i=0;i<1000000;i++)
     {
@@ -329,7 +300,7 @@ void ErrorsandStatusReset_GetError_TC_007(void)
 {
     GLenum err;
     int i;
-    while(glGetError()!=GL_NO_ERROR) {}
+    clearGLErrors();
 
     glEnable((GLenum)0xFFFFFFFF);
 

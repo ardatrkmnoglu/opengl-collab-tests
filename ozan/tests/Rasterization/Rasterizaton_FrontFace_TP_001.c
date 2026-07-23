@@ -16,40 +16,6 @@ static const char* test_case_7 = "Rasterizaton_FrontFace_TC_007";
 static const char* test_case_8 = "Rasterizaton_FrontFace_TC_008";
 
 /* ============================================================
- * Test altyapısı
- *
- * resetState:
- * Her test öncesinde glFrontFace varsayılan değeri olan
- * GL_CCW olarak ayarlanır ve hata kuyruğu temizlenir.
- *
- * checkStatePreserved:
- * OpenGL durumunun beklenen değerde kaldığını doğrular.
- * Geçersiz çağrılar sonrasında state değişmemelidir.
- * ============================================================ */
-
-static void resetState_FrontFace(void)
-{
-    glFrontFace(GL_CCW);
-    while(glGetError()!=GL_NO_ERROR);
-}
-
-static int checkStatePreserved_FrontFace(const char* test_case, GLint expected)
-{
-    GLint actual;
-    glGetIntegerv(GL_FRONT_FACE,&actual);
-    if(actual!=expected)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "State bozuldu. Beklenen : 0x%X Gercek : 0x%X",
-                      expected,actual);
-        return 0;
-    }
-
-    return 1;
-}
-
-
-/* ============================================================
  * TEST 1 : Error Queue Management
  * ============================================================
  *
@@ -95,7 +61,7 @@ void Rasterizaton_FrontFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkStatePreserved_FrontFace(test_case_1,GL_CW))
+    if(!checkIntState(test_case_1,GL_CW))
         return;
 
     resetState_FrontFace();
@@ -208,12 +174,12 @@ void Rasterizaton_FrontFace_TC_003(void)
         }
         if(value==GL_CW)
         {
-            if(!checkStatePreserved_FrontFace(test_case_3,GL_CW))
+            if(!checkIntState(test_case_3,GL_CW))
                 return;
         }
         if(value==GL_CCW)
         {
-            if(!checkStatePreserved_FrontFace(test_case_3,GL_CCW))
+            if(!checkIntState(test_case_3,GL_CCW))
                 return;
         }
     }
@@ -263,7 +229,7 @@ void Rasterizaton_FrontFace_TC_004(void)
         TEST_LOG_FAIL(test_case_4, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkStatePreserved_FrontFace(test_case_4,GL_CW))
+    if(!checkIntState(test_case_4,GL_CW))
         return;
 
     for(i=0;i<count;i++)
@@ -279,7 +245,7 @@ void Rasterizaton_FrontFace_TC_004(void)
                           err);
             return;
         }
-        if(!checkStatePreserved_FrontFace(test_case_4,GL_CW))
+        if(!checkIntState(test_case_4,GL_CW))
             return;
     }
 
@@ -420,7 +386,7 @@ void Rasterizaton_FrontFace_TC_006(void)
                           err);
             return;
         }
-        if(!checkStatePreserved_FrontFace(test_case_6,GL_CCW))
+        if(!checkIntState(test_case_6,GL_CCW))
             return;
     }
 
@@ -461,7 +427,7 @@ void Rasterizaton_FrontFace_TC_007(void)
         TEST_LOG_FAIL(test_case_7, test_procedure, "Yogun kullanim sonrasi hata olustu.");
         return;
     }
-    if(!checkStatePreserved_FrontFace(test_case_7,GL_CCW))
+    if(!checkIntState(test_case_7,GL_CCW))
         return;
 
     resetState_FrontFace();

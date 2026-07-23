@@ -15,43 +15,6 @@ static const char* test_case_5 = "PixelRectangles_PixelStorei_TC_005";
 static const char* test_case_6 = "PixelRectangles_PixelStorei_TC_006";
 
 /* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   Her testten önce GL_PACK_ALIGNMENT ve
- *   GL_UNPACK_ALIGNMENT varsayılan değerleri olan
- *   4'e ayarlanır ve OpenGL hata kuyruğu temizlenir.
- *
- * checkStatePreserved:
- *   Geçersiz bir glPixelStorei() çağrısından sonra
- *   OpenGL state'inin değişmediğini doğrular.
- * ============================================================ */
-
-static void resetState_PixelStorei(void)
-{
-    glPixelStorei(GL_PACK_ALIGNMENT,4);
-    glPixelStorei(GL_UNPACK_ALIGNMENT,4);
-    while(glGetError()!=GL_NO_ERROR);
-}
-
-static int checkStatePreserved_PixelStorei(const char* test_case,
-                               GLenum pname, GLint expectedValue)
-{
-    GLint value;
-    glGetIntegerv(pname,&value);
-
-    if(value!=expectedValue)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "PixelStore durumu bozuldu. Beklenen : %d Gercek : %d",
-                      expectedValue,value);
-        return 0;
-    }
-
-    return 1;
-}
-
-/* ============================================================
  * TEST 1: Temel Robustness Doğrulaması
  * ============================================================ */
 
@@ -99,7 +62,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkStatePreserved_PixelStorei(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
+        if(!checkIntState(test_case_1,GL_PACK_ALIGNMENT,validValues[i]))
             return;
 
         glPixelStorei(GL_UNPACK_ALIGNMENT,validValues[i]);
@@ -112,7 +75,7 @@ void PixelRectangles_PixelStorei_TC_001(void)
             return;
         }
 
-        if(!checkStatePreserved_PixelStorei(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
+        if(!checkIntState(test_case_1,GL_UNPACK_ALIGNMENT,validValues[i]))
             return;
     }
 
@@ -185,7 +148,7 @@ void PixelRectangles_PixelStorei_TC_002(void)
             return;
         }
 
-        if(!checkStatePreserved_PixelStorei(test_case_2,GL_PACK_ALIGNMENT,4))
+        if(!checkIntState(test_case_2,GL_PACK_ALIGNMENT,4))
             return;
     }
 
@@ -225,7 +188,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
     /* Bilinen geçerli durum */
     glPixelStorei(GL_PACK_ALIGNMENT,4);
 
-    if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
+    if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
         return;
 
     /* Çok sayıda geçersiz enum değeri dene */
@@ -243,7 +206,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
         if(err==GL_INVALID_ENUM)
         {
             /* Beklenen durum */
-            if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
                 return;
         }
         else if(err==GL_NO_ERROR)
@@ -253,7 +216,7 @@ void PixelRectangles_PixelStorei_TC_003(void)
              * kabul edebilir. Bu durumda state'in yine de
              * bozulmadığını doğrula.
              */
-            if(!checkStatePreserved_PixelStorei(test_case_3,GL_PACK_ALIGNMENT,4))
+            if(!checkIntState(test_case_3,GL_PACK_ALIGNMENT,4))
                 return;
         }
         else
@@ -446,7 +409,7 @@ void PixelRectangles_PixelStorei_TC_005(void)
         return;
     }
 
-    if(!checkStatePreserved_PixelStorei(test_case_5,GL_UNPACK_ALIGNMENT,8))
+    if(!checkIntState(test_case_5,GL_UNPACK_ALIGNMENT,8))
         return;
 
     resetState_PixelStorei();

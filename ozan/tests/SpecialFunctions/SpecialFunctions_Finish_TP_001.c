@@ -36,7 +36,7 @@ void SpecialFunctions_Finish_TC_001(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glClearColor(1.0f,0.0f,0.0f,1.0f);
 
@@ -77,7 +77,7 @@ void SpecialFunctions_Finish_TC_002(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glViewport(10,20,320,240);
 
@@ -99,7 +99,7 @@ void SpecialFunctions_Finish_TC_002(void)
         return;
     }
 
-    if(!checkViewportPreserved_Finish(test_case_2,10,20,320,240))
+    if(!checkViewport(test_case_2,10,20,320,240))
         return;
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
@@ -122,7 +122,7 @@ void SpecialFunctions_Finish_TC_003(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -172,7 +172,7 @@ void SpecialFunctions_Finish_TC_004(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 10000; i++)
     {
@@ -217,7 +217,7 @@ void SpecialFunctions_Finish_TC_005(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 5000; i++)
     {
@@ -262,7 +262,7 @@ void SpecialFunctions_Finish_TC_006(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 1000000; i++)
     {
@@ -302,7 +302,7 @@ void SpecialFunctions_Finish_TC_007(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 1000; i++)
     {

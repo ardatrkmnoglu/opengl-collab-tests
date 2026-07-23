@@ -133,147 +133,192 @@ static void runTest(void (*test_func)(), const char *name) {
 /******************************************/
 /*** Category-specific Helper Functions ***/
 /******************************************/
+#include <GL/gl.h>
+#include <stdlib.h>
+#include <math.h>
 
-/* ---------- glLineWidth ---------- */
-static void resetState_lineWidth(void) {
-	glLineWidth(1.0f);
-	while (glGetError() != GL_NO_ERROR)
-		;
+#include "../include/helper.h"
+#include "../include/macro.h"
+
+/* ============================================================
+ * Hata kuyrugu
+ * ============================================================ */
+
+void clearGLErrors(void)
+{
+    while(glGetError()!=GL_NO_ERROR) {}
 }
 
-static void checkStatePreserved_lineWidth(GLfloat expected) {
-	GLfloat actual;
-	glGetFloatv(GL_LINE_WIDTH, &actual);
-	if (actual != expected) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen %f, "
-			"gercek %f\n",
-			expected, actual);
-		retcode = 1;
-	}
+/* ============================================================
+ * Durum kontrolleri
+ * ============================================================ */
+
+int checkViewport(const char* test_case, const char* test_procedure,
+                  GLint x, GLint y, GLsizei width, GLsizei height)
+{
+    GLint viewport[4];
+
+    glGetIntegerv(GL_VIEWPORT, viewport);
+
+    if(viewport[0]!=x ||
+       viewport[1]!=y ||
+       viewport[2]!=width ||
+       viewport[3]!=height)
+    {
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "Viewport durumu bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
+                      x, y, width, height,
+                      viewport[0], viewport[1], viewport[2], viewport[3]);
+        return 0;
+    }
+
+    return 1;
 }
 
-/* ---------- glCullFace ---------- */
-static void resetState_cullFace(void) {
-	glDisable(GL_CULL_FACE);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	while (glGetError() != GL_NO_ERROR)
-		;
+int checkIntState(const char* test_case, const char* test_procedure,
+                  GLenum pname, GLint expected)
+{
+    GLint actual;
+
+    glGetIntegerv(pname, &actual);
+
+    if(actual!=expected)
+    {
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "State bozuldu. pname=0x%X Beklenen: 0x%X Gercek: 0x%X",
+                      pname, expected, actual);
+        return 0;
+    }
+
+    return 1;
 }
 
-static void checkStatePreserved_cullFace(GLint expected) {
-	GLint actual;
-	glGetIntegerv(GL_CULL_FACE_MODE, &actual);
-	if (actual != expected) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen 0x%X, "
-			"gercek 0x%X\n",
-			expected, actual);
-		retcode = 1;
-	}
+int checkFloatState(const char* test_case, const char* test_procedure,
+                    GLenum pname, GLfloat expected, GLfloat tolerance)
+{
+    GLfloat actual;
+
+    glGetFloatv(pname, &actual);
+
+    if(fabsf(actual-expected) > tolerance)
+    {
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "State bozuldu. pname=0x%X Beklenen: %.3f Gercek: %.3f",
+                      pname, expected, actual);
+        return 0;
+    }
+
+    return 1;
 }
 
-/* ---------- glFrontFace ---------- */
-static void resetState_frontFace(void) {
-	glFrontFace(GL_CCW);
-	while (glGetError() != GL_NO_ERROR)
-		;
+int checkFloatState2(const char* test_case, const char* test_procedure,
+                     GLenum pnameA, GLfloat expectedA,
+                     GLenum pnameB, GLfloat expectedB,
+                     GLfloat tolerance)
+{
+    GLfloat actualA;
+    GLfloat actualB;
+
+    glGetFloatv(pnameA, &actualA);
+    glGetFloatv(pnameB, &actualB);
+
+    if(fabsf(actualA-expectedA) > tolerance ||
+       fabsf(actualB-expectedB) > tolerance)
+    {
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "State bozuldu. Beklenen: (%.3f, %.3f) Gercek: (%.3f, %.3f)",
+                      expectedA, expectedB, actualA, actualB);
+        return 0;
+    }
+
+    return 1;
 }
 
-static void checkStatePreserved_frontFace(GLint expected) {
-	GLint actual;
-	glGetIntegerv(GL_FRONT_FACE, &actual);
-	if (actual != expected) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m State bozuldu: beklenen 0x%X, "
-			"gercek 0x%X\n",
-			expected, actual);
-		retcode = 1;
-	}
+int checkDoubleState2(const char* test_case, const char* test_procedure,
+                      GLenum pname,
+                      GLdouble expectedA, GLdouble expectedB,
+                      GLdouble tolerance)
+{
+    GLdouble value[2];
+
+    glGetDoublev(pname, value);
+
+    if(fabs(value[0]-expectedA) > tolerance ||
+       fabs(value[1]-expectedB) > tolerance)
+    {
+        TEST_LOG_FAIL(test_case, test_procedure,
+                      "State bozuldu. Beklenen: (%lf,%lf) Gercek: (%lf,%lf)",
+                      expectedA, expectedB, value[0], value[1]);
+        return 0;
+    }
+
+    return 1;
 }
 
-/* ---------- glEnable/Disable (Cull Face) ---------- */
-static void resetState_cullFaceEnable(void) {
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_SCISSOR_TEST);
-	glFrontFace(GL_CCW);
-	glCullFace(GL_BACK);
-	while (glGetError() != GL_NO_ERROR)
-		;
+/* ============================================================
+ * Durum sifirlama
+ * ============================================================ */
+
+void resetState_Viewport(void)
+{
+    glViewport(0,0,640,480);
+    clearGLErrors();
 }
 
-/* ---------- glPolygonOffset ---------- */
-static void resetState_polygonOffset(void) {
-	glDisable(GL_POLYGON_OFFSET_FILL);
-	glDisable(GL_DEPTH_TEST);
-	glPolygonOffset(0.0f, 0.0f);
-	while (glGetError() != GL_NO_ERROR)
-		;
+void resetState_DepthRange(void)
+{
+    glDepthRange(0.0,1.0);
+    clearGLErrors();
 }
 
-/* ---------- glViewport ---------- */
-static void resetState_viewport(void) {
-	glViewport(0, 0, 640, 480);
-	while (glGetError() != GL_NO_ERROR)
-		;
+void resetState_LineWidth(void)
+{
+    glLineWidth(1.0f);
+    clearGLErrors();
 }
 
-static void checkStatePreserved_viewport(GLint x, GLint y, GLsizei width,
-					 GLsizei height) {
-	GLint viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	if (viewport[0] != x || viewport[1] != y || viewport[2] != width ||
-	    viewport[3] != height) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m Viewport bozuldu: beklenen "
-			"(%d,%d,%d,%d), gercek (%d,%d,%d,%d)\n",
-			x, y, width, height, viewport[0], viewport[1],
-			viewport[2], viewport[3]);
-		retcode = 1;
-	}
+void resetState_FrontFace(void)
+{
+    glFrontFace(GL_CCW);
+    clearGLErrors();
 }
 
-/* ---------- glDepthRange ---------- */
-static void resetState_depthRange(void) {
-	glDepthRange(0.0, 1.0);
-	while (glGetError() != GL_NO_ERROR)
-		;
+void resetState_CullFace(void)
+{
+    glDisable(GL_CULL_FACE);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
+    clearGLErrors();
 }
 
-static void checkStatePreserved_depthRange(GLdouble expectedNear,
-					   GLdouble expectedFar) {
-	GLdouble depthRange[2];
-	glGetDoublev(GL_DEPTH_RANGE, depthRange);
-	if (fabs(depthRange[0] - expectedNear) > 0.000001 ||
-	    fabs(depthRange[1] - expectedFar) > 0.000001) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m Depth range bozuldu: beklenen "
-			"(%lf,%lf), gercek (%lf,%lf)\n",
-			expectedNear, expectedFar, depthRange[0],
-			depthRange[1]);
-		retcode = 1;
-	}
+void resetState_PolygonO(void)
+{
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glDisable(GL_DEPTH_TEST);
+    glPolygonOffset(0.0f, 0.0f);
+    clearGLErrors();
 }
 
-/* ---------- glPixelStorei ---------- */
-static void resetState_pixelStore(void) {
-	glPixelStorei(GL_PACK_ALIGNMENT, 4);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	while (glGetError() != GL_NO_ERROR)
-		;
+void resetState_PixelStorei(void)
+{
+    glPixelStorei(GL_PACK_ALIGNMENT,4);
+    glPixelStorei(GL_UNPACK_ALIGNMENT,4);
+    clearGLErrors();
 }
 
-static void checkStatePreserved_pixelStore(GLenum pname, GLint expectedValue) {
-	GLint value;
-	glGetIntegerv(pname, &value);
-	if (value != expectedValue) {
-		fprintf(stderr,
-			"\x1b[33m[FAIL]\x1b[0m PixelStore bozuldu: beklenen "
-			"%d, gercek %d\n",
-			expectedValue, value);
-		retcode = 1;
-	}
+/* ============================================================
+ * Yardimci
+ * ============================================================ */
+
+GLint randInt32(void)
+{
+    unsigned int value;
+
+    value = ((unsigned int)rand() & 0x7FFFu);
+    value = (value << 15) | ((unsigned int)rand() & 0x7FFFu);
+    value = (value << 2)  | ((unsigned int)rand() & 0x3u);
+
+    return (GLint)value;
 }
 
 /***************************************/

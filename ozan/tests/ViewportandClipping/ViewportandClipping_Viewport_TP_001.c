@@ -13,6 +13,7 @@ static const char* test_case_3 = "ViewportandClipping_Viewport_TC_003";
 static const char* test_case_4 = "ViewportandClipping_Viewport_TC_004";
 static const char* test_case_5 = "ViewportandClipping_Viewport_TC_005";
 static const char* test_case_6 = "ViewportandClipping_Viewport_TC_006";
+
 /* ============================================================
  * TEST 1: Temel Robustness Dogrulamasi
  * ============================================================ */
@@ -60,7 +61,7 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkStatePreserved_Viewport(test_case_1,10,20,640,480))
+    if(!checkViewport(test_case_1,10,20,640,480))
         return;
 
     glViewport(10,20,640,-1);
@@ -73,7 +74,7 @@ void ViewportandClipping_Viewport_TC_001(void)
         return;
     }
 
-    if(!checkStatePreserved_Viewport(test_case_1,10,20,640,480))
+    if(!checkViewport(test_case_1,10,20,640,480))
         return;
 
     resetState_Viewport();
@@ -278,7 +279,7 @@ void ViewportandClipping_Viewport_TC_005(void) {
         return;
     }
 
-    if (!checkStatePreserved_Viewport(test_case_5, 50, 50, 400, 300))
+    if (!checkViewport(test_case_5, 50, 50, 400, 300))
         return;
 
     glViewport(0, 0, 640, 480);
@@ -314,10 +315,10 @@ void ViewportandClipping_Viewport_TC_006(void) {
     srand(12345);
 
     for (i = 0; i < 1000000; i++) {
-        GLint x = randInt32_Viewport();
-        GLint y = randInt32_Viewport();
-        GLsizei width  = (GLsizei)(randInt32_Viewport() % 4096);
-        GLsizei height = (GLsizei)(randInt32_Viewport() % 4096);
+        GLint x = randInt32();
+        GLint y = randInt32();
+        GLsizei width  = (GLsizei)(randInt32() % 4096);
+        GLsizei height = (GLsizei)(randInt32() % 4096);
 
         GLenum expected;
         GLenum err;

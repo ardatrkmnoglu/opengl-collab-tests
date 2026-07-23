@@ -13,38 +13,6 @@ static const char* test_case_5 = "SpecialFunctions_Flush_TC_005";
 static const char* test_case_6 = "SpecialFunctions_Flush_TC_006";
 static const char* test_case_7 = "SpecialFunctions_Flush_TC_007";
 /* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   Her testten önce OpenGL hata kuyruğu temizlenir.
- *
- * checkViewportPreserved:
- *   glFlush() çağrısından sonra OpenGL state'inin
- *   değişmediğini doğrular.
- * ============================================================
- */
-
-static int checkViewportPreserved_Flush(const char* test_case_8,
-                                  GLint x,GLint y,GLsizei width,GLsizei height)
-{
-    GLint viewport[4];
-
-    glGetIntegerv(GL_VIEWPORT, viewport);
-
-    if(viewport[0] != x || viewport[1] != y || viewport[2] != width ||viewport[3] != height)
-    {
-        TEST_LOG_FAIL(test_case_8, test_procedure,
-                      "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                      x, y, width, height,
-                      viewport[0], viewport[1], viewport[2], viewport[3]);
-        return 0;
-    }
-
-    return 1;
-}
-
-
-/* ============================================================
  * TEST 1 : Basic Robustness
  * ============================================================
  */
@@ -62,7 +30,7 @@ void test_flush_basicRobustness(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -102,7 +70,7 @@ void test_flush_statePreservation(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glViewport(10,20,320,240);
     err = glGetError();
@@ -121,7 +89,7 @@ void test_flush_statePreservation(void)
         return;
     }
 
-    if(!checkViewportPreserved_Flush(test_case_2,10,20,320,240))
+    if(!checkViewport(test_case_2,10,20,320,240))
         return;
 
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
@@ -144,7 +112,7 @@ void test_flush_errorQueuePreservation(void)
 {
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -194,7 +162,7 @@ void test_flush_repeatedInvocation(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 10000; i++)
     {
@@ -239,7 +207,7 @@ void test_flush_commandSubmissionRobustness(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 5000; i++)
     {
@@ -286,7 +254,7 @@ void test_flush_stress(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 1000000; i++)
     {
@@ -328,7 +296,7 @@ void test_flush_consecutiveCommandSubmission(void)
     unsigned int i;
     GLenum err;
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     for(i = 0; i < 1000; i++)
     {
@@ -353,7 +321,7 @@ void test_flush_consecutiveCommandSubmission(void)
         }
     }
 
-    while(glGetError()!=GL_NO_ERROR) {};
+    clearGLErrors();
 
     TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }

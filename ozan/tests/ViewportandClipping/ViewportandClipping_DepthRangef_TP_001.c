@@ -257,7 +257,7 @@ void ViewportandClipping_DepthRangef_TC_004(void)
         }
     }
 
-    if(!checkStatePreserved_DepthRange(test_case_4,0.0,1.0))
+    if(!checkDoubleState2(test_case_4,0.0,1.0))
         return;
 
     resetState_DepthRange();

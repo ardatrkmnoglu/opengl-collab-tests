@@ -15,3 +15,4 @@ add_executable(robustness_test main.c ${TEST_SOURCES}
         tests/SpecialFunctions/glHint.c)
 
 target_link_libraries(robustness_test PRIVATE opengl32 m)
+    

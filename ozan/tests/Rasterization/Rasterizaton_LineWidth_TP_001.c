@@ -16,27 +16,6 @@ static const char* test_case_6 = "Rasterizaton_LineWidth_TC_006";
 static const char* test_case_7 = "Rasterizaton_LineWidth_TC_007";
 static const char* test_case_8 = "Rasterizaton_LineWidth_TC_008";
 
-static void resetState_LineWidth(void)
-{
-    glLineWidth(1.0f);
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static int checkStatePreserved_GetError(const char* test_case, GLfloat expected)
-{
-    GLfloat actual;
-    glGetFloatv(GL_LINE_WIDTH, &actual);
-
-    if (fabsf(actual - expected) > 1e-6f)
-    {
-        TEST_LOG_FAIL(test_case, test_procedure,
-                      "Durum bozuldu: beklenen %.3f, gercek %.3f", expected, actual);
-        return 0;
-    }
-
-    return 1;
-}
-
 /* ============================================================
  * TEST 1: Sozlesme dogrulama
  *
@@ -86,7 +65,7 @@ void Rasterizaton_LineWidth_TC_001(void)
         return;
     }
 
-    if (!checkStatePreserved_GetError(test_case_1, 2.0f))
+    if (!checkFloatState(test_case_1, 2.0f))
         return;
 
     err = glGetError();
@@ -147,7 +126,7 @@ void Rasterizaton_LineWidth_TC_002(void)
         return;
     }
 
-    if (!checkStatePreserved_GetError(test_case_2, 1.0f))
+    if (!checkFloatState(test_case_2, 1.0f))
         return;
 
     TEST_LOG_INFO("Sonuc: %d PASS, %d FAIL", passCount, failCount);
@@ -189,19 +168,19 @@ void Rasterizaton_LineWidth_TC_003(void)
     glLineWidth(NAN);
     err=glGetError();
     TEST_LOG_INFO("NaN       -> 0x%X",err);
-    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, 3.0f))
         return;
 
     glLineWidth(INFINITY);
     err=glGetError();
     TEST_LOG_INFO("+Infinity -> 0x%X",err);
-    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, 3.0f))
         return;
 
     glLineWidth(-INFINITY);
     err=glGetError();
     TEST_LOG_INFO("-Infinity -> 0x%X",err);
-    if(!checkStatePreserved_GetError(test_case_3, 3.0f))
+    if(!checkFloatState(test_case_3, 3.0f))
         return;
 
     resetState_LineWidth();
@@ -257,7 +236,7 @@ void Rasterizaton_LineWidth_TC_004(void)
         return;
     }
 
-    if(!checkStatePreserved_GetError(test_case_4, 4.0f))
+    if(!checkFloatState(test_case_4, 4.0f))
         return;
 
     resetState_LineWidth();
@@ -347,7 +326,7 @@ void Rasterizaton_LineWidth_TC_005(void)
         return;
     }
 
-    if(!checkStatePreserved_GetError(test_case_5, range[0]))
+    if(!checkFloatState(test_case_5, range[0]))
         return;
 
     resetState_LineWidth();
@@ -383,7 +362,7 @@ void Rasterizaton_LineWidth_TC_006(void)
             return;
         }
 
-        if(!checkStatePreserved_GetError(test_case_6, width))
+        if(!checkFloatState(test_case_6, width))
             return;
     }
 
@@ -423,7 +402,7 @@ void Rasterizaton_LineWidth_TC_007(void)
         return;
     }
 
-    if(!checkStatePreserved_GetError(test_case_7, 5.0f))
+    if(!checkFloatState(test_case_7, 5.0f))
         return;
 
     resetState_LineWidth();
@@ -474,7 +453,7 @@ void Rasterizaton_LineWidth_TC_008(void)
             lastValid=width;
         else
         {
-            if(!checkStatePreserved_GetError(test_case_8, lastValid))
+            if(!checkFloatState(test_case_8, lastValid))
                 return;
         }
     }

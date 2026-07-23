@@ -1,116 +1,134 @@
-/* main.c
- * Rasterization Robustness Test Suite
- *
- * glLineWidth, glFrontFace, glCullFace, glEnable/glDisable,
- * glPolygonOffset fonksiyonlarinin robustness testlerini
- * calistiran ana program.
- */
-
+#include <GLFW/glfw3.h>
+#include <GL/gl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "tests/tests.h"
 
-/* ============================================================
- * Test fonksiyon bildirimleri
- * ============================================================ */
+void init(void);
+void draw(void);
+void cleanup(void);
 
-/* glLineWidth */
-extern void Rasterizaton_LineWidth_TC_001(void);
-extern void Rasterizaton_LineWidth_TC_002(void);
-extern void Rasterizaton_LineWidth_TC_003(void);
-extern void Rasterizaton_LineWidth_TC_004(void);
-extern void Rasterizaton_LineWidth_TC_005(void);
+int main(void) {
+    GLFWwindow* window;
 
-/* glFrontFace */
-extern void Rasterizaton_FrontFace_TC_001(void);
-extern void Rasterizaton_FrontFace_TC_002(void);
-extern void Rasterizaton_FrontFace_TC_003(void);
-extern void Rasterizaton_FrontFace_TC_006(void);
+    if (!glfwInit()) return -1;
 
-/* glCullFace */
-extern void Rasterizaton_CullFace_TC_001(void);
-extern void Rasterizaton_CullFace_TC_002(void);
-extern void Rasterizaton_CullFace_TC_003(void);
-extern void Rasterizaton_CullFace_TC_004(void);
-extern void test_cullFace_frontFaceCombo(void);
-
-/* glEnable_glDisable */
-extern void test_cullFaceEnable_basicRobustness(void);
-extern void test_cullFaceEnable_rapidToggle(void);
-extern void test_cullFaceEnable_invalidCaps(void);
-extern void test_cullFaceEnable_capCombinations(void);
-
-/* glPolygonOffset */
-extern void Rasterizaton_PolygonOffset_TC_001(void);
-extern void Rasterizaton_PolygonOffset_TC_002(void);
-extern void Rasterizaton_PolygonOffset_TC_003(void);
-extern void Rasterizaton_PolygonOffset_TC_004(void);
-extern void Rasterizaton_PolygonOffset_TC_005(void);
-
-/* ============================================================
- * Test calistirma cercevesi
- * ============================================================ */
-
-typedef void (*TestFunc)(void);
-
-static struct {
-    const char *name;
-    TestFunc func;
-} testList[] = {
-    /* glLineWidth */
-    {"glLineWidth - Basic Robustness",       Rasterizaton_LineWidth_TC_001},
-    {"glLineWidth - Stress Sweep",           Rasterizaton_LineWidth_TC_002},
-    {"glLineWidth - Special Floats",         Rasterizaton_LineWidth_TC_003},
-    {"glLineWidth - Error Queue",            Rasterizaton_LineWidth_TC_004},
-    {"glLineWidth - Implementation Limits",  Rasterizaton_LineWidth_TC_005},
-
-    /* glFrontFace */
-    {"glFrontFace - Error Queue",            Rasterizaton_FrontFace_TC_001},
-    {"glFrontFace - Rapid Toggle",           Rasterizaton_FrontFace_TC_002},
-    {"glFrontFace - Mixed Validity",         Rasterizaton_FrontFace_TC_003},
-    {"glFrontFace - Large Enum",             Rasterizaton_FrontFace_TC_006},
-
-    /* glCullFace */
-    {"glCullFace - Basic Robustness",        Rasterizaton_CullFace_TC_001},
-    {"glCullFace - Stress Sweep",            Rasterizaton_CullFace_TC_002},
-    {"glCullFace - Error Queue",             Rasterizaton_CullFace_TC_003},
-    {"glCullFace - Rapid Toggle",            Rasterizaton_CullFace_TC_004},
-    {"glCullFace - FrontFace Combinations",  test_cullFace_frontFaceCombo},
-
-    /* glEnable/glDisable */
-    {"glEnable/Disable - Basic Robustness",  test_cullFaceEnable_basicRobustness},
-    {"glEnable/Disable - Rapid Toggle",      test_cullFaceEnable_rapidToggle},
-    {"glEnable/Disable - Cap Combinations",  test_cullFaceEnable_capCombinations},
-    {"glEnable/Disable - Invalid Caps",      test_cullFaceEnable_invalidCaps},
-
-    /* glPolygonOffset */
-    {"glPolygonOffset - Basic Robustness",   Rasterizaton_PolygonOffset_TC_001},
-    {"glPolygonOffset - Stress Sweep",       Rasterizaton_PolygonOffset_TC_002},
-    {"glPolygonOffset - Error Queue",        Rasterizaton_PolygonOffset_TC_003},
-    {"glPolygonOffset - State Preservation", Rasterizaton_PolygonOffset_TC_004},
-    {"glPolygonOffset - Special Floats",     Rasterizaton_PolygonOffset_TC_005},
-};
-
-int main(int argc, char **argv) {
-    int i;
-    int testCount = sizeof(testList) / sizeof(testList[0]);
-
-    printf("========================================\n");
-    printf("Rasterization Robustness Test Suite\n");
-    printf("Toplam test: %d\n", testCount);
-    printf("Fonksiyonlar: glLineWidth, glFrontFace,\n");
-    printf("              glCullFace, glEnable/glDisable,\n");
-    printf("              glPolygonOffset\n");
-    printf("========================================\n\n");
-
-    for (i = 0; i < testCount; i++) {
-        printf("----------------------------------------\n");
-        printf("[%d/%d] %s\n", i + 1, testCount, testList[i].name);
-        printf("----------------------------------------\n");
-        testList[i].func();
+    window = glfwCreateWindow(800, 600, "Ozan Robustness Tests", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        return -1;
     }
 
-    printf("========================================\n");
-    printf("TUM TESTLER BASARIYLA TAMAMLANDI\n");
-    printf("========================================\n");
+    glfwMakeContextCurrent(window);
 
+    init();
+
+    while (!glfwWindowShouldClose(window)) {
+        draw();
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    cleanup();
+    glfwTerminate();
     return 0;
+}
+
+void init(void) {
+    /* --------------- ViewportandClipping - Viewport --------------- */
+    ViewportandClipping_Viewport_TC_001();
+    ViewportandClipping_Viewport_TC_002();
+    ViewportandClipping_Viewport_TC_003();
+    ViewportandClipping_Viewport_TC_004();
+    ViewportandClipping_Viewport_TC_005();
+    ViewportandClipping_Viewport_TC_006();
+
+    /* --------------- ViewportandClipping - DepthRangef --------------- */
+    ViewportandClipping_DepthRangef_TC_001();
+    ViewportandClipping_DepthRangef_TC_002();
+    ViewportandClipping_DepthRangef_TC_003();
+    ViewportandClipping_DepthRangef_TC_004();
+    ViewportandClipping_DepthRangef_TC_005();
+    ViewportandClipping_DepthRangef_TC_006();
+
+    /* --------------- Rasterization - CullFace --------------- */
+    Rasterizaton_CullFace_TC_001();
+    Rasterizaton_CullFace_TC_002();
+    Rasterizaton_CullFace_TC_003();
+    Rasterizaton_CullFace_TC_004();
+    Rasterizaton_CullFace_TC_005();
+    Rasterizaton_CullFace_TC_006();
+    Rasterizaton_CullFace_TC_007();
+    Rasterizaton_CullFace_TC_008();
+    Rasterizaton_CullFace_TC_009();
+
+    /* --------------- Rasterization - FrontFace --------------- */
+    Rasterizaton_FrontFace_TC_001();
+    Rasterizaton_FrontFace_TC_002();
+    Rasterizaton_FrontFace_TC_003();
+    Rasterizaton_FrontFace_TC_004();
+    Rasterizaton_FrontFace_TC_005();
+    Rasterizaton_FrontFace_TC_006();
+    Rasterizaton_FrontFace_TC_007();
+    Rasterizaton_FrontFace_TC_008();
+
+    /* --------------- Rasterization - LineWidth --------------- */
+    Rasterizaton_LineWidth_TC_001();
+    Rasterizaton_LineWidth_TC_002();
+    Rasterizaton_LineWidth_TC_003();
+    Rasterizaton_LineWidth_TC_004();
+    Rasterizaton_LineWidth_TC_005();
+    Rasterizaton_LineWidth_TC_006();
+    Rasterizaton_LineWidth_TC_007();
+    Rasterizaton_LineWidth_TC_008();
+
+    /* --------------- Rasterization - PolygonOffset --------------- */
+    Rasterizaton_PolygonOffset_TC_001();
+    Rasterizaton_PolygonOffset_TC_002();
+    Rasterizaton_PolygonOffset_TC_003();
+    Rasterizaton_PolygonOffset_TC_004();
+    Rasterizaton_PolygonOffset_TC_005();
+    Rasterizaton_PolygonOffset_TC_006();
+    Rasterizaton_PolygonOffset_TC_007();
+
+    /* --------------- PixelRectangles - PixelStorei --------------- */
+    PixelRectangles_PixelStorei_TC_001();
+    PixelRectangles_PixelStorei_TC_002();
+    PixelRectangles_PixelStorei_TC_003();
+    PixelRectangles_PixelStorei_TC_004();
+    PixelRectangles_PixelStorei_TC_005();
+    PixelRectangles_PixelStorei_TC_006();
+
+    /* --------------- SpecialFunctions - Flush --------------- */
+    SpecialFunctions_Flush_TC_001();
+    SpecialFunctions_Flush_TC_002();
+    SpecialFunctions_Flush_TC_003();
+    SpecialFunctions_Flush_TC_004();
+    SpecialFunctions_Flush_TC_005();
+    SpecialFunctions_Flush_TC_006();
+    SpecialFunctions_Flush_TC_007();
+
+    /* --------------- SpecialFunctions - Finish --------------- */
+    SpecialFunctions_Finish_TC_001();
+    SpecialFunctions_Finish_TC_002();
+    SpecialFunctions_Finish_TC_003();
+    SpecialFunctions_Finish_TC_004();
+    SpecialFunctions_Finish_TC_005();
+    SpecialFunctions_Finish_TC_006();
+    SpecialFunctions_Finish_TC_007();
+
+    /* --------------- ErrorsandStatusReset - GetError --------------- */
+    ErrorsandStatusReset_GetError_TC_001();
+    ErrorsandStatusReset_GetError_TC_002();
+    ErrorsandStatusReset_GetError_TC_003();
+    ErrorsandStatusReset_GetError_TC_004();
+    ErrorsandStatusReset_GetError_TC_005();
+    ErrorsandStatusReset_GetError_TC_006();
+    ErrorsandStatusReset_GetError_TC_007();
+}
+
+void draw(void) {
+}
+
+void cleanup(void) {
 }

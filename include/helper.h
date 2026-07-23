@@ -45,197 +45,88 @@ void cleanOpenGLState(void);
 
 #endif /* HELPER_H */
 
+#ifndef HELPER_H
+#define HELPER_H
+
+#include <GL/gl.h>
+
 /* ============================================================
- * Test altyapisi
+ * Ortak test altyapisi
+ * Bu dosya, robustness test paketlerinde tekrar eden
+ * yardimci fonksiyonlari tek noktada toplar.
  *
- * resetState:
- * Her test oncesi viewport varsayilan degerlere dondurulur
- * ve hata kuyrugu temizlenir.
+ * Durum kontrol fonksiyonlari basarisizlikta TEST_LOG_FAIL
+ * basar ve 0 doner; basariliysa 1 doner.
  *
- * checkStatePreserved:
- * Gecersiz glViewport cagrilarindan sonra viewport state'inin
- * degismedigini dogrular.
+ * Kullanim:
  *
- * randInt32:
- * rand() fonksiyonu bazi platformlarda yalnizca 15 bit
- * uretir. Tam 32-bit aralikta rastgele deger elde etmek
- * icin birden fazla cagri birlestirilir.
+ *     if(!checkIntState(test_case_1, test_procedure,
+ *                       GL_CULL_FACE_MODE, GL_BACK))
+ *         return;
  * ============================================================ */
 
-static void resetState_Viewport(void)
-{
- glViewport(0,0,640,480);
+/* ---------- Hata kuyrugu ---------- */
 
- while(glGetError()!=GL_NO_ERROR);
-}
+/* OpenGL hata kuyrugunu tamamen bosaltir. */
+void clearGLErrors(void);
 
-static int checkStatePreserved_Viewport(const char* test_case,
-                               GLint x,GLint y,
-                               GLsizei width,GLsizei height)
-{
- GLint viewport[4];
+/* ---------- Durum kontrolleri ---------- */
 
- glGetIntegerv(GL_VIEWPORT,viewport);
+/* GL_VIEWPORT degerini beklenen dortlu ile karsilastirir.
+   Kullananlar: Viewport, Flush, Finish */
+int checkViewport(const char* test_case, const char* test_procedure,
+                  GLint x, GLint y, GLsizei width, GLsizei height);
 
- if(viewport[0]!=x ||
-    viewport[1]!=y ||
-    viewport[2]!=width ||
-    viewport[3]!=height)
- {
-  TEST_LOG_FAIL(test_case, test_procedure,
-                "Viewport durumu bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                x,y,width,height,
-                viewport[0],viewport[1],viewport[2],viewport[3]);
-  return 0;
- }
+/* Tek elemanli tamsayi durum sorgusu.
+   Kullananlar: FrontFace (GL_FRONT_FACE),
+                CullFace  (GL_CULL_FACE_MODE),
+                PixelStorei (GL_PACK_ALIGNMENT / GL_UNPACK_ALIGNMENT) */
+int checkIntState(const char* test_case, const char* test_procedure,
+                  GLenum pname, GLint expected);
 
- return 1;
-}
+/* Tek elemanli float durum sorgusu.
+   Kullananlar: LineWidth (GL_LINE_WIDTH), GetError (GL_LINE_WIDTH) */
+int checkFloatState(const char* test_case, const char* test_procedure,
+                    GLenum pname, GLfloat expected, GLfloat tolerance);
 
-static GLint randInt32_Viewport(void) {
- unsigned int value;
+/* Iki ayri float durumun ayni anda dogrulanmasi.
+   Kullanan: PolygonOffset (factor + units) */
+int checkFloatState2(const char* test_case, const char* test_procedure,
+                     GLenum pnameA, GLfloat expectedA,
+                     GLenum pnameB, GLfloat expectedB,
+                     GLfloat tolerance);
 
- value = ((unsigned int)rand() & 0x7FFFu);
- value = (value << 15) | ((unsigned int)rand() & 0x7FFFu);
- value = (value << 2)  | ((unsigned int)rand() & 0x3u);
+/* Iki elemanli double durum sorgusu.
+   Kullanan: DepthRange (GL_DEPTH_RANGE) */
+int checkDoubleState2(const char* test_case, const char* test_procedure,
+                      GLenum pname,
+                      GLdouble expectedA, GLdouble expectedB,
+                      GLdouble tolerance);
 
- return (GLint)value;
-}
+/* ---------- Durum sifirlama ---------- */
 
-/* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi/sonrasi OpenGL durumunu varsayilan
- * hale getirir ve hata kuyrugunu temizler.
- *
- * checkStatePreserved: Beklenen depth range durumunun
- * bozulmadigini dogrular.
- * ============================================================ */
-
-static void resetState_DepthRange(void)
-{
- glDepthRange(0.0,1.0);
-
- while(glGetError()!=GL_NO_ERROR);
-}
-
-static int checkStatePreserved_DepthRange(const char* test_case,
-                               GLdouble expectedNear,GLdouble expectedFar)
-{
- GLdouble depthRange[2];
-
- glGetDoublev(GL_DEPTH_RANGE,depthRange);
-
- if(fabs(depthRange[0]-expectedNear)>1e-6 ||
-    fabs(depthRange[1]-expectedFar)>1e-6)
- {
-  TEST_LOG_FAIL(test_case, test_procedure,
-                "Depth range durumu bozuldu. Beklenen: (%lf,%lf) Gercek: (%lf,%lf)",
-                expectedNear,expectedFar,depthRange[0],depthRange[1]);
-  return 0;
- }
-
- return 1;
-}
-
-/* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   Her testten önce OpenGL hata kuyruğu temizlenir.
- *
- * checkViewportPreserved:
- *   glFlush() çağrısından sonra OpenGL state'inin
- *   değişmediğini doğrular.
- * ============================================================
- */
-static int checkViewportPreserved_Flush(const char* test_case,
-                                  GLint x,GLint y,GLsizei width,GLsizei height)
-{
- GLint viewport[4];
-
- glGetIntegerv(GL_VIEWPORT, viewport);
-
- if(viewport[0] != x || viewport[1] != y || viewport[2] != width ||viewport[3] != height)
- {
-  TEST_LOG_FAIL(test_case, test_procedure,
-                "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                x, y, width, height,
-                viewport[0], viewport[1], viewport[2], viewport[3]);
-  return 0;
- }
-
- return 1;
-
- /* ============================================================
- * Test altyapısı
- *
- * resetState:
- *   Her testten önce OpenGL hata kuyruğu temizlenir.
- *
- * checkViewportPreserved:
- *   glFinish() çağrısından sonra OpenGL state'inin
- *   değişmediğini doğrular.
- * ============================================================
+/*
+ * Her test paketi farkli bir baslangic durumu gerektirdigi
+ * icin sifirlama fonksiyonlari ayri ayri tanimlanmistir.
+ * Hepsi islem sonunda hata kuyrugunu bosaltir.
  */
 
- static int checkViewportPreserved_Finish(const char* test_case,
-                                   GLint x,GLint y,GLsizei width,GLsizei height)
- {
-  GLint viewport[4];
+void resetState_Viewport(void);      /* glViewport(0,0,640,480)          */
+void resetState_DepthRange(void);    /* glDepthRange(0.0,1.0)            */
+void resetState_LineWidth(void);     /* glLineWidth(1.0f)                */
+void resetState_FrontFace(void);     /* glFrontFace(GL_CCW)              */
+void resetState_CullFace(void);      /* culling kapali, GL_CCW, GL_BACK  */
+void resetState_PolygonO(void);      /* offset fill / depth test kapali  */
+void resetState_PixelStorei(void);   /* pack / unpack alignment = 4      */
 
-  glGetIntegerv(GL_VIEWPORT, viewport);
+/* ---------- Yardimci ---------- */
 
-  if(viewport[0] != x || viewport[1] != y || viewport[2] != width || viewport[3] != height)
-  {
-   TEST_LOG_FAIL(test_case, test_procedure,
-                 "Viewport state bozuldu. Beklenen: (%d,%d,%d,%d) Gercek: (%d,%d,%d,%d)",
-                 x, y, width, height,
-                 viewport[0], viewport[1], viewport[2], viewport[3]);
-   return 0;
-  }
+/*
+ * rand() bazi platformlarda yalnizca 15 bit uretir.
+ * Tam 32-bit aralikta rastgele deger elde etmek icin
+ * birden fazla cagri birlestirilir.
+ */
+GLint randInt32(void);
 
-  return 1;
- }
-
- /* ============================================================
- * Test altyapisi
- *
- * Bu kisim, testlerin tekrarlanabilir ve izole calismasini saglar.
- * resetState: Her test oncesi ve sonrasinda OpenGL durumunu
- * bilinen bir baslangic degerine getirir ve birikmis hatalari
- * temizler; boylece testler birbirine bagimli olmaz.
- * checkStatePreserved: PolygonOffset durumunun beklenen
- * factor ve units degerlerini korudugunu dogrular.
- * ============================================================ */
-
- static void resetState_PolygonO(void)
- {
-  glDisable(GL_POLYGON_OFFSET_FILL);
-  glDisable(GL_DEPTH_TEST);
-  glPolygonOffset(0.0f, 0.0f);
-  while (glGetError() != GL_NO_ERROR);
- }
-
- static int checkStatePreserved__PolygonO(const char* test_case, GLfloat expectedFactor, GLfloat expectedUnits)
- {
-  GLfloat factor, units;
-
-  glGetFloatv(GL_POLYGON_OFFSET_FACTOR, &factor);
-  glGetFloatv(GL_POLYGON_OFFSET_UNITS, &units);
-
-  if (fabsf(factor - expectedFactor) > 1e-6f ||
-      fabsf(units - expectedUnits) > 1e-6f) {
-
-   TEST_LOG_FAIL(test_case, test_procedure,
-                 "Durum bozuldu. factor: beklenen %.3f gercek %.3f, units: beklenen %.3f gercek %.3f",
-                 expectedFactor, factor, expectedUnits, units);
-   return 0;
-      }
-
-  return 1;
- }
-
-
+#endif /* HELPER_H */
 

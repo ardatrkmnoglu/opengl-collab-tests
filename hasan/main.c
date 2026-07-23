@@ -57,6 +57,16 @@ void init(void) {
     PerFragmentOperations_Scissor_TC_004();
     PerFragmentOperations_Scissor_TC_005();
     PerFragmentOperations_Scissor_TC_006();
+
+    /* --------------- Texturing - BindTexture --------------- */
+    Texturing_BindTexture_TC_001();
+    Texturing_BindTexture_TC_002();
+    Texturing_BindTexture_TC_003();
+    Texturing_BindTexture_TC_004();
+    Texturing_BindTexture_TC_005();
+    Texturing_BindTexture_TC_006();
+    Texturing_BindTexture_TC_007();
+    Texturing_BindTexture_TC_008();
 }
 
 void draw(void) {

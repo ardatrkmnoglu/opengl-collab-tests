@@ -4,6 +4,9 @@ project(hasan_robustness_tests C)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# Enable __ubuntu__ definition for cleanup / close functions
+add_compile_definitions(__ubuntu__)
+
 # Find OpenGL, GLFW3, GLESv2, EGL for Linux/Ubuntu environment
 find_package(OpenGL REQUIRED)
 find_package(PkgConfig REQUIRED)

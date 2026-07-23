@@ -67,6 +67,14 @@ void init(void) {
     Texturing_BindTexture_TC_006();
     Texturing_BindTexture_TC_007();
     Texturing_BindTexture_TC_008();
+
+    /* --------------- Texturing - TexStorage2D --------------- */
+    Texturing_TexStorage2D_init();
+    Texturing_TexStorage2D_TC_001();
+    Texturing_TexStorage2D_TC_002();
+    Texturing_TexStorage2D_TC_003();
+    Texturing_TexStorage2D_TC_004();
+    Texturing_TexStorage2D_TC_005();
 }
 
 void draw(void) {

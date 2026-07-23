@@ -26,4 +26,12 @@ void Texturing_BindTexture_TC_006(void);
 void Texturing_BindTexture_TC_007(void);
 void Texturing_BindTexture_TC_008(void);
 
+/* --------------- Texturing - TexStorage2D --------------- */
+void Texturing_TexStorage2D_init(void);
+void Texturing_TexStorage2D_TC_001(void);
+void Texturing_TexStorage2D_TC_002(void);
+void Texturing_TexStorage2D_TC_003(void);
+void Texturing_TexStorage2D_TC_004(void);
+void Texturing_TexStorage2D_TC_005(void);
+
 #endif

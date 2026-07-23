@@ -30,11 +30,10 @@ add_executable(hasan_tests main.c
     tests/ReadingPixels_ReadnPixels_TP_001.c
     tests/Per-FragmentOperations_Scissor_TP_001.c
     tests/Texturing_BindTexture_TP_001.c
+    tests/Texturing_TexStorage2D_TP_001.c
 )
 target_link_libraries(hasan_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
 
-add_executable(Texturing_TexStorage2D_TP_001 tests/Texturing_TexStorage2D_TP_001.c)
-target_link_libraries(Texturing_TexStorage2D_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})
 
 add_executable(Texturing_TexSubImage2D_TP_001 tests/Texturing_TexSubImage2D_TP_001.c)
 target_link_libraries(Texturing_TexSubImage2D_TP_001 PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${M_LIB})

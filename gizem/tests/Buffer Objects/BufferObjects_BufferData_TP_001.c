@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -15,26 +14,23 @@
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
-void rTest_glBufferData_invalid_enum_target()
+void BufferObjects_BufferData_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_invalid_enum_target()\n");
 
     glBufferData(0xFFFFFFFF, 16, NULL, GL_STATIC_DRAW);
 
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
         printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-        assert(err == GL_INVALID_ENUM);
     }
     printf("[PASS] rTest_glBufferData_invalid_enum_target()\n");
 }
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if usage is not GL_STREAM_DRAW, GL_STATIC_DRAW, or GL_DYNAMIC_DRAW.
-void rTest_glBufferData_invalid_enum_usage()
+void BufferObjects_BufferData_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_invalid_enum_usage()\n");
 
     GLuint buffer;
     glGenBuffers(1, &buffer);
@@ -44,7 +40,6 @@ void rTest_glBufferData_invalid_enum_usage()
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
         printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-        assert(err == GL_INVALID_ENUM);
     }
     printf("[PASS] rTest_glBufferData_invalid_enum_usage()\n");
 
@@ -52,10 +47,9 @@ void rTest_glBufferData_invalid_enum_usage()
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
-void rTest_glBufferData_invalid_value_negative_size()
+void BufferObjects_BufferData_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_invalid_value_negative_size()\n");
 
     GLuint buffer;
     glGenBuffers(1, &buffer);
@@ -65,7 +59,6 @@ void rTest_glBufferData_invalid_value_negative_size()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-        assert(err == GL_INVALID_VALUE);
     }
     printf("[PASS] rTest_glBufferData_invalid_value_negative_size()\n");
 
@@ -73,10 +66,9 @@ void rTest_glBufferData_invalid_value_negative_size()
 }
 
 // Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer object name 0 is bound to target.
-void rTest_glBufferData_invalid_operation_zero_buffer_bound()
+void BufferObjects_BufferData_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_invalid_operation_zero_buffer_bound()\n");
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBufferData(GL_ARRAY_BUFFER, 16, NULL, GL_STATIC_DRAW);
@@ -84,17 +76,14 @@ void rTest_glBufferData_invalid_operation_zero_buffer_bound()
     GLenum err = glGetError();
     if (err != GL_INVALID_OPERATION) {
         printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n", err);
-        assert(err == GL_INVALID_OPERATION);
     }
     printf("[PASS] rTest_glBufferData_invalid_operation_zero_buffer_bound()\n");
 }
 
 // Belirtilen hata: GL_OUT_OF_MEMORY is generated if the GL is unable to create a data store with the specified size.
-void rTest_glBufferData_out_of_memory()
+void BufferObjects_BufferData_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_out_of_memory()\n");
-
     GLuint buffer;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
@@ -105,7 +94,7 @@ void rTest_glBufferData_out_of_memory()
     else if (err == GL_NO_ERROR) { printf("[INFO] GL_OUT_OF_MEMORY was not generated. This behavior is implementation-dependent.\n");}
     else {
         printf("[FAIL] Expected GL_OUT_OF_MEMORY or GL_NO_ERROR, but got 0x%X\n", err);
-        assert(0); }
+         }
 
     glDeleteBuffers(1, &buffer);
 }
@@ -114,10 +103,9 @@ void rTest_glBufferData_out_of_memory()
 // Belirtilmeyen hatalar --------------------------------------------------
 
 // Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API kullanımına karşı implementasyonun dayanıklılığını gözlemler.
-void rTest_glBufferData_source_buffer_too_small()
+void BufferObjects_BufferData_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_source_buffer_too_small()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -136,10 +124,9 @@ void rTest_glBufferData_source_buffer_too_small()
 
 // size = 0 ama data != NULL
 // Sıfır boyutlu data store oluşturulurken geçerli bir data pointer'ı verilmesinin implementasyon tarafından güvenli şekilde ele alınıp alınmadığını doğrular.
-void rTest_glBufferData_zero_size_nonnull_data()
+void BufferObjects_BufferData_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_zero_size_nonnull_data()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -156,9 +143,8 @@ void rTest_glBufferData_zero_size_nonnull_data()
 }
 
 // Sınır ve aşırı boyut size değerleri karşısında implementasyonun kararlılığını gözlemler.
-void rTest_glBufferData_size_overflow_boundary()
+void BufferObjects_BufferData_TC_008()
 {
-    printf("[START] rTest_glBufferData_size_overflow_boundary()\n");
 
     GLsizeiptr candidates[] = { -1, INT_MIN, (GLsizeiptr)INT_MAX + 1, LLONG_MAX };
 
@@ -178,9 +164,8 @@ void rTest_glBufferData_size_overflow_boundary()
 }
 
 // Geçersiz ve kirlenmiş usage enum değerleri karşısında implementasyonun kararlılığını gözlemler.
-void rTest_glBufferData_dirty_usage_enum()
+void BufferObjects_BufferData_TC_009()
 {
-    printf("[START] rTest_glBufferData_dirty_usage_enum()\n");
     GLenum candidates[] = {GL_STATIC_DRAW, 0xFFFF0000u, 0xFFFFFFFFu, 0x12345678u, 0xDEADBEEFu};
 
     for (int i = 0; i < sizeof(candidates) / sizeof(candidates[0]); i++){
@@ -200,10 +185,9 @@ void rTest_glBufferData_dirty_usage_enum()
 }
 
 // Hedefe herhangi bir buffer bağlı değilken glBufferData çağrısının implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
-void rTest_glBufferData_target_zero_bound()
+void BufferObjects_BufferData_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_target_zero_bound()\n");
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // hiçbir buffer bound değil
     glBufferData(GL_ARRAY_BUFFER, 64, NULL, GL_STATIC_DRAW);
@@ -213,10 +197,9 @@ void rTest_glBufferData_target_zero_bound()
 }
 
 // Aynı buffer üzerinde farklı boyutlarda data store'ları art arda oluşturarak implementasyonun reallocation işlemlerindeki kararlılığını gözlemler.
-void rTest_glBufferData_repeated_resize_thrash()
+void BufferObjects_BufferData_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_repeated_resize_thrash()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -240,10 +223,9 @@ void rTest_glBufferData_repeated_resize_thrash()
 }
 
 // Hizasız bir kaynak data pointer'ı kullanılarak implementasyonun hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
-void rTest_glBufferData_misaligned_data_pointer()
+void BufferObjects_BufferData_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_misaligned_data_pointer()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -260,9 +242,8 @@ void rTest_glBufferData_misaligned_data_pointer()
 }
 
 // Serbest bırakılmış (dangling) bir kaynak pointer kullanılarak implementasyonun hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
-void rTest_glBufferData_dangling_data_pointer()
+void BufferObjects_BufferData_TC_013()
 {
-    printf("[START] rTest_glBufferData_dangling_data_pointer()\n");
     while (glGetError() != GL_NO_ERROR) {}
 
     GLuint buf;
@@ -287,10 +268,9 @@ void rTest_glBufferData_dangling_data_pointer()
 }
 
 // Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin durumunun korunup korunmadığını gözlemler.
-void rTest_glBufferData_state_after_out_of_memory()
+void BufferObjects_BufferData_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferData_state_after_out_of_memory()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);

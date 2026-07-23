@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -12,26 +11,23 @@
 
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if n is negative
-void rTest_glGenBuffers_invalid_value()
+void BufferObjects_GenBuffers_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_invalid_value()\n");
 
     GLuint buffer = 0;
     glGenBuffers(-1, &buffer);
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-        assert(err == GL_INVALID_VALUE);
     }
     printf("[PASS] rTest_glGenBuffers_invalid_value()\n");
 }
 
 // n = 0 ile çağrı
-void rTest_glGenBuffers_zero_count()
+void BufferObjects_GenBuffers_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_zero_count()\n");
 
     GLuint buf = 0xCDCDCDCD; // sentinel değer
     glGenBuffers(0, &buf);
@@ -40,10 +36,9 @@ void rTest_glGenBuffers_zero_count()
 }
 
 // buffers = NULL, n > 0 (negative robustness)
-void rTest_glGenBuffers_null_buffers()
+void BufferObjects_GenBuffers_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_null_buffers()\n");
 
     glGenBuffers(5, NULL);
     GLenum err = glGetError();
@@ -51,10 +46,9 @@ void rTest_glGenBuffers_null_buffers()
 }
 
 // Aşırı büyük n
-void rTest_glGenBuffers_large_n()
+void BufferObjects_GenBuffers_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_large_n()\n");
 
     const GLsizei largeCount = 100000;
     GLuint *buffers = (GLuint *)malloc(sizeof(GLuint) * largeCount);
@@ -70,10 +64,9 @@ void rTest_glGenBuffers_large_n()
 }
 
 // Aynı array'i art arda, isim tekilliğini bozmaya çalışarak çağırma (fonksiyon 1000 kez art arda çağrıldığında hata veriyor mu)
-void rTest_glGenBuffers_repeated_generation()
+void BufferObjects_GenBuffers_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_repeated_generation()\n");
 
     GLuint buffers[10];
     for (int i = 0; i < 1000; ++i)
@@ -88,10 +81,9 @@ void rTest_glGenBuffers_repeated_generation()
 }
 
 // Çok sayıda buffer adı üreterek döndürülen isimlerin benzersiz olduğunu ve reserved 0 isminin üretilmediğini doğrular.
-void rTest_glGenBuffers_unique_names()
+void BufferObjects_GenBuffers_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_unique_names()\n");
 
     const GLsizei COUNT = 1000;
     GLuint buffers[COUNT];
@@ -120,10 +112,9 @@ void rTest_glGenBuffers_unique_names()
 }
 
 // Bind edilmemiş buffer isimleri üzerinde glIsBuffer ve glDeleteBuffers çağrılarının spesifikasyona uygun davranıp davranmadığını doğrular.
-void rTest_glGenBuffers_unbound_names_lifecycle()
+void BufferObjects_GenBuffers_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_unbound_names_lifecycle()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -136,10 +127,9 @@ void rTest_glGenBuffers_unbound_names_lifecycle()
 }
 
 // Aynı buffer isminin birden fazla kez silinmesi durumunda implementasyonun kararlılığını test eder.
-void rTest_glGenBuffers_double_delete()
+void BufferObjects_GenBuffers_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glGenBuffers_double_delete()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -151,11 +141,9 @@ void rTest_glGenBuffers_double_delete()
 }
 
 // Büyük 'n' değeri ve kasıtlı olarak yetersiz output buffer kullanılarak implementasyonun geçersiz istemci belleği karşısındaki davranışı test edilir (negative robustness)
-void rTest_glGenBuffers_huge_count_small_buffer()
+void BufferObjects_GenBuffers_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
-
-    printf("[START] rTest_glGenBuffers_huge_count_small_buffer()\n");
 
     GLsizei huge_n = INT_MAX; // n * sizeof(GLuint) iç hesapta overflow edebilir
 

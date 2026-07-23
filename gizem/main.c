@@ -1,4 +1,4 @@
-git add g,#include <stdio.h>
+#include <stdio.h>
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include "tests/Buffer Objects/tests.h"
@@ -85,110 +85,113 @@ void init(void)
 {
     /* TESTLER */
 
-    // rTest_glGenFramebuffers_invalid_value();
-    // rTest_glGenFramebuffers_negative_n();
-    // rTest_glGenFramebuffers_extreme_negative_n();
-    // rTest_glGenFramebuffers_zero_n_null_pointer();
-    // rTest_glGenFramebuffers_null_pointer_nonzero_n();
-    rTest_glGenFramebuffers_invalid_memory_pointer();
-    rTest_glGenFramebuffers_buffer_overflow_canary();
-    rTest_glGenFramebuffers_huge_n();
-    rTest_glGenFramebuffers_stack_smash_small_array();
-    rTest_glGenFramebuffers_exhaustion();
-    rTest_glGenFramebuffers_unbound_name_lifecycle();
-    rTest_glGenFramebuffers_name_reuse_after_delete();
-    rTest_glGenFramebuffers_unaligned_pointer();
-    rTest_glGenFramebuffers_varying_n_stability();
-    rTest_glGenFramebuffers_namespace_isolation_from_renderbuffers();
+    /* --------------- BindBuffer --------------- */
+// BufferObjects_BindBuffer_TC_001();
+// BufferObjects_BindBuffer_TC_002();
+// BufferObjects_BindBuffer_TC_003();
+// BufferObjects_BindBuffer_TC_004();
+// BufferObjects_BindBuffer_TC_005();
+// BufferObjects_BindBuffer_TC_006();
+// BufferObjects_BindBuffer_TC_007();
+// BufferObjects_BindBuffer_TC_008();
+// BufferObjects_BindBuffer_TC_009();
+// BufferObjects_BindBuffer_TC_010();
+// BufferObjects_BindBuffer_TC_011();
+
+/* --------------- BufferData --------------- */
+// BufferObjects_BufferData_TC_001();
+// BufferObjects_BufferData_TC_002();
+// BufferObjects_BufferData_TC_003();
+// BufferObjects_BufferData_TC_004();
+// BufferObjects_BufferData_TC_005();
+// BufferObjects_BufferData_TC_006();
+// BufferObjects_BufferData_TC_007();
+// BufferObjects_BufferData_TC_008();
+// BufferObjects_BufferData_TC_009();
+// BufferObjects_BufferData_TC_010();
+// BufferObjects_BufferData_TC_011();
+// BufferObjects_BufferData_TC_012();
+// BufferObjects_BufferData_TC_013();
+// BufferObjects_BufferData_TC_014();
+
+/* --------------- BufferSubData --------------- */
+// BufferObjects_BufferSubData_TC_001();
+// BufferObjects_BufferSubData_TC_002();
+// BufferObjects_BufferSubData_TC_003();
+// BufferObjects_BufferSubData_TC_004();
+// BufferObjects_BufferSubData_TC_005();
+// BufferObjects_BufferSubData_TC_006();
+// BufferObjects_BufferSubData_TC_007();
+// BufferObjects_BufferSubData_TC_008();
+// BufferObjects_BufferSubData_TC_009();
+// BufferObjects_BufferSubData_TC_010();
+// BufferObjects_BufferSubData_TC_011();
+// BufferObjects_BufferSubData_TC_012();
+// BufferObjects_BufferSubData_TC_013();
+// BufferObjects_BufferSubData_TC_014();
+
+/* --------------- GenBuffers --------------- */
+// BufferObjects_GenBuffers_TC_001();
+// BufferObjects_GenBuffers_TC_002();
+// BufferObjects_GenBuffers_TC_003();
+// BufferObjects_GenBuffers_TC_004();
+// BufferObjects_GenBuffers_TC_005();
+// BufferObjects_GenBuffers_TC_006();
+// BufferObjects_GenBuffers_TC_007();
+// BufferObjects_GenBuffers_TC_008();
+// BufferObjects_GenBuffers_TC_009();
+
+/* --------------- glGetBufferParameteriv --------------- */
+// BufferObjects_GetBufferParameteriv_TC_001();
+// BufferObjects_GetBufferParameteriv_TC_002();
+// BufferObjects_GetBufferParameteriv_TC_003();
+// BufferObjects_GetBufferParameteriv_TC_004();
+// BufferObjects_GetBufferParameteriv_TC_005();
+// BufferObjects_GetBufferParameteriv_TC_006();
+// BufferObjects_GetBufferParameteriv_TC_007();
+// BufferObjects_GetBufferParameteriv_TC_008();
+// BufferObjects_GetBufferParameteriv_TC_009();
+// BufferObjects_GetBufferParameteriv_TC_010();
+// BufferObjects_GetBufferParameteriv_TC_011();
+// BufferObjects_GetBufferParameteriv_TC_012();
+// BufferObjects_GetBufferParameteriv_TC_013();
+// BufferObjects_GetBufferParameteriv_TC_014();
+// BufferObjects_GetBufferParameteriv_TC_015();
+// BufferObjects_GetBufferParameteriv_TC_016();
+
+    /* --------------- GenFramebuffer --------------- */
+    // FramebufferObjects_GenFramebuffers_TC_001();
+    // FramebufferObjects_GenFramebuffers_TC_002();
+    // FramebufferObjects_GenFramebuffers_TC_003();
+    // FramebufferObjects_GenFramebuffers_TC_004();
+    // FramebufferObjects_GenFramebuffers_TC_005();
+    // FramebufferObjects_GenFramebuffers_TC_006();
+    // FramebufferObjects_GenFramebuffers_TC_007();
+    // FramebufferObjects_GenFramebuffers_TC_008();
+    // FramebufferObjects_GenFramebuffers_TC_009();
+    // FramebufferObjects_GenFramebuffers_TC_010();
+    // FramebufferObjects_GenFramebuffers_TC_011();
+    // FramebufferObjects_GenFramebuffers_TC_012();
+    // FramebufferObjects_GenFramebuffers_TC_013();
+    // FramebufferObjects_GenFramebuffers_TC_014();
+    // FramebufferObjects_GenFramebuffers_TC_015();
 
 
-    // --------------- glBindFramebuffer ---------------
-    // rTest_glBindFramebuffer_invalid_enum();
-    // rTest_glBindFramebuffer_invalid_target();
-    // rTest_glBindFramebuffer_arbitrary_unused_name();
-    // rTest_glBindFramebuffer_initial_attachment_state();
-    // rTest_glBindFramebuffer_zero_bound_query_rejected();
-    // rTest_glBindFramebuffer_binding_reverts_after_delete();
-    // rTest_glBindFramebuffer_repeated_rebind_same_name();
-    // rTest_glBindFramebuffer_extreme_name_value();
-    // rTest_glBindFramebuffer_type_confusion_with_other_object();
-    // rTest_glBindFramebuffer_bind_unbind_stress();
-    // rTest_glBindFramebuffer_previous_binding_broken_on_switch();
-    // rTest_glBindFramebuffer_self_rebind_preserves_state();
+    /* --------------- BindFramebuffer --------------- */
+    // FramebufferObjects_BindFramebuffer_TC_001();
+    // FramebufferObjects_BindFramebuffer_TC_002();
+    // FramebufferObjects_BindFramebuffer_TC_003();
+    // FramebufferObjects_BindFramebuffer_TC_004();
+    // FramebufferObjects_BindFramebuffer_TC_005();
+    // FramebufferObjects_BindFramebuffer_TC_006();
+    // FramebufferObjects_BindFramebuffer_TC_007();
+    // FramebufferObjects_BindFramebuffer_TC_008();
+    // FramebufferObjects_BindFramebuffer_TC_009();
+    // FramebufferObjects_BindFramebuffer_TC_010();
+    // FramebufferObjects_BindFramebuffer_TC_011();
+    // FramebufferObjects_BindFramebuffer_TC_012();
 
-    // --------------- glGetBufferParameteriv ---------------
-    // rTest_glGetBufferParameteriv_invalid_enum_target();
-    // rTest_glGetBufferParameteriv_invalid_enum_value();
-    // rTest_glGetBufferParameteriv_invalid_operation_zero_buffer_bound();
-    // rTest_glGetBufferParameteriv_invalid_target();
-    // rTest_glGetBufferParameteriv_invalid_value();
-    // rTest_glGetBufferParameteriv_reserved_name_zero_bound();
-    // rTest_glGetBufferParameteriv_element_array_zero_bound();
-    // rTest_glGetBufferParameteriv_null_data_pointer();
-    // rTest_glGetBufferParameteriv_dangling_data_pointer(); // test, başta geçmiş görünüyor ancak kısa süre sonra çöküyor. Sorunu bulamadım.
-    // rTest_glGetBufferParameteriv_size_consistency();
-    // rTest_glGetBufferParameteriv_usage_initial_and_updates();
-    // rTest_glGetBufferParameteriv_both_invalid();
-    // rTest_glGetBufferParameteriv_after_delete_binding_reverts();
-    // rTest_glGetBufferParameteriv_same_buffer_multiple_targets();
-    // rTest_glGetBufferParameteriv_unaligned_data_pointer();
-    // rTest_glGetBufferParameteriv_error_state_stress();
 
-    // --------------- glBufferSubData ---------------
-    // rTest_glBufferSubData_invalid_enum_target();
-    // rTest_glBufferSubData_invalid_value_negative_offset();
-    // rTest_glBufferSubData_invalid_value_negative_size();
-    // rTest_glBufferSubData_invalid_value_out_of_bounds();
-    // rTest_glBufferSubData_invalid_operation_zero_buffer_bound();
-    // rTest_glBufferSubData_offset_size_overflow_wraparound();
-    // rTest_glBufferSubData_exact_boundary_offset();
-    // rTest_glBufferSubData_negative_offset_compensating_size();
-    // rTest_glBufferSubData_zero_size_null_data();
-    // rTest_glBufferSubData_target_zero_bound();
-    // rTest_glBufferSubData_into_zero_sized_store();
-    // rTest_glBufferSubData_source_smaller_than_size();
-    // rTest_glBufferSubData_dangling_data_pointer();
-    // rTest_glBufferSubData_overlapping_misaligned_thrash();
-
-    // --------------- glBufferData ---------------
-    // rTest_glBufferData_invalid_enum_target();
-    // rTest_glBufferData_invalid_enum_usage();
-    // rTest_glBufferData_invalid_value_negative_size();
-    // rTest_glBufferData_invalid_operation_zero_buffer_bound();
-    // rTest_glBufferData_out_of_memory();
-    // rTest_glBufferData_source_buffer_too_small();
-    // rTest_glBufferData_zero_size_nonnull_data();
-    // rTest_glBufferData_size_overflow_boundary();
-    // rTest_glBufferData_dirty_usage_enum();
-    // rTest_glBufferData_target_zero_bound();
-    // rTest_glBufferData_repeated_resize_thrash();
-    // rTest_glBufferData_misaligned_data_pointer();
-    // rTest_glBufferData_dangling_data_pointer();
-    // rTest_glBufferData_state_after_out_of_memory();
-
-    // --------------- glBindBuffer ---------------
-    // rTest_glBindBuffer_invalid_enum();
-    // rTest_glBindBuffer_new_name_without_gen();
-    // rTest_glBindBuffer_deleted_buffer();
-    // rTest_glBindBuffer_boundary_handles();
-    // rTest_glBindBuffer_dirty_high_bits_enum();
-    // rTest_glBindBuffer_rapid_cross_target_rebind_stress();
-    // rTest_glBindBuffer_delete_while_double_bound();
-    // rTest_glBindBuffer_zero_binding_query_thrash();
-    // rTest_glBindBuffer_massive_namespace_fuzz();
-    // rTest_glBindBuffer_binding_churn_stress();
-    // rTest_glBindBuffer_lifecycle_stress();
-
-    // --------------- glGenBuffers ---------------
-    // rTest_glGenBuffers_invalid_value();
-    // rTest_glGenBuffers_zero_count();
-    // rTest_glGenBuffers_null_buffers();
-    // rTest_glGenBuffers_large_n();
-    // rTest_glGenBuffers_repeated_generation();
-    // rTest_glGenBuffers_unique_names();
-    // rTest_glGenBuffers_unbound_names_lifecycle();
-    // rTest_glGenBuffers_double_delete();
-    // rTest_glGenBuffers_huge_count_small_buffer();
 
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

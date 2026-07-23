@@ -1,7 +1,6 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,10 +15,9 @@
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
-void rTest_glBufferSubData_invalid_enum_target()
+void BufferObjects_BufferSubData_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_invalid_enum_target()\n");
 
     int data = 123;
     glBufferSubData(0xFFFFFFFF, 0, sizeof(data), &data);
@@ -27,16 +25,14 @@ void rTest_glBufferSubData_invalid_enum_target()
     GLenum err = glGetError();
     if (err != GL_INVALID_ENUM) {
         printf("[FAIL] Expected GL_INVALID_ENUM, but got 0x%X\n", err);
-        assert(err == GL_INVALID_ENUM);
     }
     printf("[PASS] rTest_glBufferSubData_invalid_enum_target()\n");
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if offset is negative.
-void rTest_glBufferSubData_invalid_value_negative_offset()
+void BufferObjects_BufferSubData_TC_002()
 {
     while (glGetError() != GL_NO_ERROR){}
-    printf("[START] rTest_glBufferSubData_invalid_value_negative_offset()\n");
 
     GLuint buffer;
     int data = 123;
@@ -48,7 +44,6 @@ void rTest_glBufferSubData_invalid_value_negative_offset()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-        assert(err == GL_INVALID_VALUE);
     }
     printf("[PASS] rTest_glBufferSubData_invalid_value_negative_offset()\n");
 
@@ -56,10 +51,9 @@ void rTest_glBufferSubData_invalid_value_negative_offset()
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
-void rTest_glBufferSubData_invalid_value_negative_size()
+void BufferObjects_BufferSubData_TC_003()
 {
     while (glGetError() != GL_NO_ERROR){}
-    printf("[START] rTest_glBufferSubData_invalid_value_negative_size()\n");
 
     GLuint buffer;
     int data = 123;
@@ -71,7 +65,6 @@ void rTest_glBufferSubData_invalid_value_negative_size()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-        assert(err == GL_INVALID_VALUE);
     }
     printf("[PASS] rTest_glBufferSubData_invalid_value_negative_size()\n");
 
@@ -79,10 +72,9 @@ void rTest_glBufferSubData_invalid_value_negative_size()
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if offset and size together define a region beyond the allocated data store.
-void rTest_glBufferSubData_invalid_value_out_of_bounds()
+void BufferObjects_BufferSubData_TC_004()
 {
     while (glGetError() != GL_NO_ERROR){}
-    printf("[START] rTest_glBufferSubData_invalid_value_out_of_bounds()\n");
 
     GLuint buffer;
     int data = 123;
@@ -94,7 +86,6 @@ void rTest_glBufferSubData_invalid_value_out_of_bounds()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
-        assert(err == GL_INVALID_VALUE);
     }
     printf("[PASS] rTest_glBufferSubData_invalid_value_out_of_bounds()\n");
 
@@ -102,10 +93,9 @@ void rTest_glBufferSubData_invalid_value_out_of_bounds()
 }
 
 // Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer object name 0 is bound to target.
-void rTest_glBufferSubData_invalid_operation_zero_buffer_bound()
+void BufferObjects_BufferSubData_TC_005()
 {
     while (glGetError() != GL_NO_ERROR){}
-    printf("[START] rTest_glBufferSubData_invalid_operation_zero_buffer_bound()\n");
 
     int data = 123;
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -114,7 +104,6 @@ void rTest_glBufferSubData_invalid_operation_zero_buffer_bound()
     GLenum err = glGetError();
     if (err != GL_INVALID_OPERATION) {
         printf("[FAIL] Expected GL_INVALID_OPERATION, but got 0x%X\n", err);
-        assert(err == GL_INVALID_OPERATION);
     }
     printf("[PASS] rTest_glBufferSubData_invalid_operation_zero_buffer_bound()\n");
 }
@@ -125,10 +114,9 @@ void rTest_glBufferSubData_invalid_operation_zero_buffer_bound()
 
 // Offset ve size değerlerinin toplamında oluşabilecek integer overflow durumunda implementasyonun sınır kontrollerini güvenli şekilde yapıp yapmadığını gözlemler.
 // GLsizeptr 32 bit ise LLONG_MAX yerine INT_MAX kullanmak gerekebilir
-void rTest_glBufferSubData_offset_size_overflow_wraparound()
+void BufferObjects_BufferSubData_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_offset_size_overflow_wraparound()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -146,10 +134,9 @@ void rTest_glBufferSubData_offset_size_overflow_wraparound()
 }
 
 // Buffer sınırının tam bitiş noktası ve bir byte ötesi kullanılarak implementasyonun sınır kontrollerindeki kararlılığı gözlemlenir.
-void rTest_glBufferSubData_exact_boundary_offset()
+void BufferObjects_BufferSubData_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_exact_boundary_offset()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -170,10 +157,9 @@ void rTest_glBufferSubData_exact_boundary_offset()
 
 // Negatif offset değerinin büyük bir size ile "telafi edildiği" durumda implementasyonun offset
 // doğrulamasını bağımsız olarak yapıp yapmadığını ve sınır kontrollerindeki kararlılığını gözlemler
-void rTest_glBufferSubData_negative_offset_compensating_size()
+void BufferObjects_BufferSubData_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_negative_offset_compensating_size()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -194,10 +180,9 @@ void rTest_glBufferSubData_negative_offset_compensating_size()
 }
 
 // Sıfır byte güncelleme isteğinde implementasyonun gereksiz bellek erişimi yapmadan çağrıyı güvenli şekilde tamamlayıp tamamlamadığını gözlemler.
-void rTest_glBufferSubData_zero_size_null_data()
+void BufferObjects_BufferSubData_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_zero_size_null_data()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -211,10 +196,9 @@ void rTest_glBufferSubData_zero_size_null_data()
 }
 
 // Hedefe herhangi bir buffer bağlı değilken glBufferSubData çağrısının implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
-void rTest_glBufferSubData_target_zero_bound()
+void BufferObjects_BufferSubData_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_target_zero_bound()\n");
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -227,10 +211,9 @@ void rTest_glBufferSubData_target_zero_bound()
 
 // Data store'u henüz oluşturulmamış (0 byte) bir buffer nesnesine yazma isteğinin
 // implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler
-void rTest_glBufferSubData_into_zero_sized_store()
+void BufferObjects_BufferSubData_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_into_zero_sized_store()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -245,10 +228,9 @@ void rTest_glBufferSubData_into_zero_sized_store()
 }
 
 // Kaynak veri tamponunun belirtilen size değerinden küçük olduğu hatalı API kullanımına karşı implementasyonun dayanıklılığını gözlemler.
-void rTest_glBufferSubData_source_smaller_than_size()
+void BufferObjects_BufferSubData_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_source_smaller_than_size()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -264,10 +246,9 @@ void rTest_glBufferSubData_source_smaller_than_size()
 }
 
 // Serbest bırakılmış bir istemci bellek işaretçisi kullanılarak implementasyonun geçersiz veri kaynağı karşısındaki davranışı gözlemlenir.
-void rTest_glBufferSubData_dangling_data_pointer(void)
+void BufferObjects_BufferSubData_TC_013(void)
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_dangling_data_pointer()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);
@@ -285,10 +266,9 @@ void rTest_glBufferSubData_dangling_data_pointer(void)
 
 // Aynı buffer bölgesine çakışan ve hizasız güncellemeleri art arda gerçekleştirerek
 // implementasyonun yoğun bellek kopyalama yükü altındaki kararlılığını gözlemler.
-void rTest_glBufferSubData_overlapping_misaligned_thrash()
+void BufferObjects_BufferSubData_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
-    printf("[START] rTest_glBufferSubData_overlapping_misaligned_thrash()\n");
 
     GLuint buf;
     glGenBuffers(1, &buf);

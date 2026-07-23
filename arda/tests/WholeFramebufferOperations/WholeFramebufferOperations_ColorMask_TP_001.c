@@ -26,7 +26,7 @@ void WholeFramebufferOperations_ColorMask_TC_001(void) {
 		    "Standart dışı değerler girildiğinde hata üretildi "
 		    "(Spesifikasyona aykırı)."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ColorMask_TC_001");
@@ -73,7 +73,7 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
 			      "WholeFramebufferOperations_ColorMask_TC_002",
 			      "Bayt sinirindaki tasma degerleri hata ürettirdi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ColorMask_TC_002");
@@ -197,7 +197,7 @@ void WholeFramebufferOperations_ColorMask_TC_005(void) {
 			      "Tekrarli uc deger degisimleri sonrasinda hata "
 			      "durumu biriktirilmis olabilir."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ColorMask_TC_005");

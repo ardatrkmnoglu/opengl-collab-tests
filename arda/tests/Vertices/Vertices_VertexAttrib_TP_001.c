@@ -28,7 +28,7 @@ void Vertices_VertexAttrib_TC_001(void) {
 		    "VertexAttrib", "Vertices_VertexAttrib_TC_001",
 		    "max_attribs indeksinde GL_INVALID_VALUE beklendi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttrib",
 				 "Vertices_VertexAttrib_TC_001");
@@ -58,7 +58,7 @@ void Vertices_VertexAttrib_TC_002(void) {
 			      "Vertices_VertexAttrib_TC_002",
 			      "NaN/Inf değerlerinde tanımsız hata kodu."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttrib",
 				 "Vertices_VertexAttrib_TC_002");
@@ -84,7 +84,7 @@ void Vertices_VertexAttrib_TC_003(void) {
 		TEST_LOG_FAIL("VertexAttrib", "Vertices_VertexAttrib_TC_003",
 			      "Geçerli ayarlama hata üretmemeli iken üretdi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttrib", "Vertices_VertexAttrib_TC_003");
 	}
@@ -111,7 +111,7 @@ void Vertices_VertexAttrib_TC_004(void) {
 		    "VertexAttrib", "Vertices_VertexAttrib_TC_004",
 		    "Aşırı büyük indeks (0xFFFFFFFF) GL_INVALID_VALUE "
 		    "üretmedi. Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttrib",
 				 "Vertices_VertexAttrib_TC_004");

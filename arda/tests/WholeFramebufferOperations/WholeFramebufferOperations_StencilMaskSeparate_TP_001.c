@@ -27,7 +27,7 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_001(void) {
 		    "WholeFramebufferOperations_StencilMaskSeparate_TC_001",
 		    "Geçersiz face parametresi (GL_TEXTURE_2D) reddedilmedi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_StencilMaskSeparate_TC_001");
@@ -53,7 +53,7 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_002(void) {
 		    "WholeFramebufferOperations_StencilMaskSeparate_TC_002",
 		    "Gecerli GL_FRONT_AND_BACK degeri reddedildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS(
 		    "WholeFramebufferOperations",
@@ -98,7 +98,7 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_003(void) {
 		    "WholeFramebufferOperations_StencilMaskSeparate_TC_003",
 		    "Ayri yüz atamalari sirasinda beklenmedik hata olustu."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS(
 		    "WholeFramebufferOperations",
@@ -142,7 +142,7 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_004(void) {
 			      "En yüksek bit set edilmis gecerli bir maske "
 			      "reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(
 		    "WholeFramebufferOperations",

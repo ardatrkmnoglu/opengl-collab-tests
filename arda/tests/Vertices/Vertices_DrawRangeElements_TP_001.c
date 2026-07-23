@@ -26,7 +26,7 @@ void Vertices_DrawRangeElements_TC_001(void) {
 		TEST_LOG_FAIL("DrawRangeElements",
 			      "Vertices_DrawRangeElements_TC_001",
 			      "end < start durumu GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawRangeElements",
 				 "Vertices_DrawRangeElements_TC_001");
@@ -56,7 +56,7 @@ void Vertices_DrawRangeElements_TC_002(void) {
 		TEST_LOG_FAIL("DrawRangeElements",
 			      "Vertices_DrawRangeElements_TC_002",
 			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawRangeElements",
 				 "Vertices_DrawRangeElements_TC_002");
@@ -85,7 +85,7 @@ void Vertices_DrawRangeElements_TC_003(void) {
 		TEST_LOG_FAIL("DrawRangeElements",
 			      "Vertices_DrawRangeElements_TC_003",
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawRangeElements",
 				 "Vertices_DrawRangeElements_TC_003");

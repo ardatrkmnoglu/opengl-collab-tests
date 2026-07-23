@@ -27,7 +27,7 @@ void Vertices_DisableVertexAttribArray_TC_001(void) {
 			      "Vertices_DisableVertexAttribArray_TC_001",
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("DisableVertexAttrib",
 				 "Vertices_DisableVertexAttribArray_TC_001");
@@ -54,7 +54,7 @@ void Vertices_DisableVertexAttribArray_TC_002(void) {
 		    "Vertices_DisableVertexAttribArray_TC_002",
 		    "Geçerli indeks devre dışı bırakılırken hata oluştu."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("DisableVertexAttrib",
 				 "Vertices_DisableVertexAttribArray_TC_002");
@@ -81,7 +81,7 @@ void Vertices_DisableVertexAttribArray_TC_003(void) {
 			      "Vertices_DisableVertexAttribArray_TC_003",
 			      "Çift devre dışı bırakma hata üretti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("DisableVertexAttrib",
 				 "Vertices_DisableVertexAttribArray_TC_003");
@@ -109,7 +109,7 @@ void Vertices_DisableVertexAttribArray_TC_004(void) {
 		    "DisableVertexAttrib", "Vertices_DisableVertexAttribArray_TC_004",
 		    "Son geçerli indeks devre dışı bırakılırken hata oluştu."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("DisableVertexAttrib",
 				 "Vertices_DisableVertexAttribArray_TC_004");

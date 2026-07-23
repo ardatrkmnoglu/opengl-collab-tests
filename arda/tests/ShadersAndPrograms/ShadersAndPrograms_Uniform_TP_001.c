@@ -28,7 +28,7 @@ void ShadersAndPrograms_Uniform_TC_001(void) {
 	if (!(err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_001",
 			      "'int' değişkene 'float' atanması engellenmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_001");
 	}
@@ -56,7 +56,7 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	if (!(err1 == GL_NO_ERROR)) {
 		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_002",
 			      "-1 lokasyonu sessizce yutulmalıydı (Spec kuralı)."
-			      " Actual: 0x%04X", (unsigned int)err1);
+			      " Actual: 0x%04X", err1);
 	} else {
 		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_002[-1]");
 	}
@@ -68,7 +68,7 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	if (!(err2 == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_002",
 			      "Devasa geçersiz lokasyon ID'si reddedilmedi."
-			      " Actual: 0x%04X", (unsigned int)err2);
+			      " Actual: 0x%04X", err2);
 	} else {
 		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_002[0x7FFFFFFF]");
 	}
@@ -98,7 +98,7 @@ void ShadersAndPrograms_Uniform_TC_003(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_003",
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_003");
 	}
@@ -130,7 +130,7 @@ void ShadersAndPrograms_Uniform_TC_004(void) {
 	if (!(err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_004",
 			      "Array OOB (count=4, boyut=3) engellenemedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_004");
 	}

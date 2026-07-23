@@ -61,7 +61,7 @@ void Rasterizaton_FrontFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_CW))
+    if(!checkIntState(test_case_1, test_procedure, GL_FRONT_FACE, GL_CW))
         return;
 
     resetState_FrontFace();
@@ -174,12 +174,12 @@ void Rasterizaton_FrontFace_TC_003(void)
         }
         if(value==GL_CW)
         {
-            if(!checkIntState(test_case_3,GL_CW))
+            if(!checkIntState(test_case_3, test_procedure, GL_FRONT_FACE, GL_CW))
                 return;
         }
         if(value==GL_CCW)
         {
-            if(!checkIntState(test_case_3,GL_CCW))
+            if(!checkIntState(test_case_3, test_procedure, GL_FRONT_FACE, GL_CW))
                 return;
         }
     }
@@ -229,7 +229,7 @@ void Rasterizaton_FrontFace_TC_004(void)
         TEST_LOG_FAIL(test_case_4, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_4,GL_CW))
+    if(!checkIntState(test_case_4, test_procedure, GL_FRONT_FACE, GL_CW))
         return;
 
     for(i=0;i<count;i++)
@@ -245,7 +245,7 @@ void Rasterizaton_FrontFace_TC_004(void)
                           err);
             return;
         }
-        if(!checkIntState(test_case_4,GL_CW))
+        if(!checkIntState(test_case_4, test_procedure, GL_FRONT_FACE, GL_CW))
             return;
     }
 
@@ -386,7 +386,7 @@ void Rasterizaton_FrontFace_TC_006(void)
                           err);
             return;
         }
-        if(!checkIntState(test_case_6,GL_CCW))
+        if(!checkIntState(test_case_6, test_procedure, GL_FRONT_FACE, GL_CCW))
             return;
     }
 
@@ -427,7 +427,7 @@ void Rasterizaton_FrontFace_TC_007(void)
         TEST_LOG_FAIL(test_case_7, test_procedure, "Yogun kullanim sonrasi hata olustu.");
         return;
     }
-    if(!checkIntState(test_case_7,GL_CCW))
+    if(!checkIntState(test_case_7, test_procedure, GL_FRONT_FACE, GL_CCW))
         return;
 
     resetState_FrontFace();

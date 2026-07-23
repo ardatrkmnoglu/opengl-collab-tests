@@ -27,7 +27,7 @@ void WholeFramebufferOperations_StencilMask_TC_001(void) {
 		    "WholeFramebufferOperations_StencilMask_TC_001",
 		    "Tüm bitleri 1 olan maske (0xFFFFFFFF) reddedildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err1);
+		    err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_StencilMask_TC_001");
@@ -55,7 +55,7 @@ void WholeFramebufferOperations_StencilMask_TC_001(void) {
 			      "WholeFramebufferOperations_StencilMask_TC_001",
 			      "Sifir maske (0x00000000) reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err2);
+			      err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_StencilMask_TC_001");
@@ -94,7 +94,7 @@ void WholeFramebufferOperations_StencilMask_TC_002(void) {
 			      "WholeFramebufferOperations_StencilMask_TC_002",
 			      "Gecerli bir desen maskesi reddedildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_StencilMask_TC_002");
@@ -169,7 +169,7 @@ void WholeFramebufferOperations_StencilMask_TC_004(void) {
 			      "WholeFramebufferOperations_StencilMask_TC_004",
 			      "Zikzak desen döngüsü hata birikimine yol acti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_StencilMask_TC_004");

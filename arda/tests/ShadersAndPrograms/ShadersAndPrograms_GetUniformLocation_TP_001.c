@@ -76,7 +76,7 @@ void ShadersAndPrograms_GetUniformLocation_TC_003(void) {
 		TEST_LOG_FAIL("GetUniformLocation",
 			      "ShadersAndPrograms_GetUniformLocation_TC_003",
 			      "Boş string için -1 ya da hata dönmedi."
-			      " loc=%d, err=0x%04X", loc, (unsigned int)err);
+			      " loc=%d, err=0x%04X", loc, err);
 	} else {
 		TEST_LOG_SUCCESS("GetUniformLocation",
 				 "ShadersAndPrograms_GetUniformLocation_TC_003");
@@ -104,7 +104,7 @@ void ShadersAndPrograms_GetUniformLocation_TC_004(void) {
 		TEST_LOG_FAIL("GetUniformLocation",
 			      "ShadersAndPrograms_GetUniformLocation_TC_004",
 			      "Geçersiz (0) program ID'si reddedilmedi."
-			      " loc=%d, err=0x%04X", loc, (unsigned int)err);
+			      " loc=%d, err=0x%04X", loc, err);
 	} else {
 		TEST_LOG_SUCCESS("GetUniformLocation",
 				 "ShadersAndPrograms_GetUniformLocation_TC_004");

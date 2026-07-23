@@ -23,7 +23,7 @@ void ShadersAndPrograms_UseProgram_TC_001(void) {
 		    "UseProgram", "ShadersAndPrograms_UseProgram_TC_001",
 		    "CRITICAL: Sürücü hiç üretilmemiş bir program ID'sini"
 		    " kabul etti. Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("UseProgram", "ShadersAndPrograms_UseProgram_TC_001");
 	}
@@ -46,7 +46,7 @@ void ShadersAndPrograms_UseProgram_TC_002(void) {
 		TEST_LOG_FAIL("UseProgram", "ShadersAndPrograms_UseProgram_TC_002",
 			      "Shader ID'si Program olarak kabul edildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("UseProgram",
 				 "ShadersAndPrograms_UseProgram_TC_002");
@@ -77,7 +77,7 @@ void ShadersAndPrograms_UseProgram_TC_003(void) {
 		    "UseProgram", "ShadersAndPrograms_UseProgram_TC_003",
 		    "Silinmiş program ID'si ile glUseProgram reddedilmedi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("UseProgram",
 				 "ShadersAndPrograms_UseProgram_TC_003");
@@ -106,7 +106,7 @@ void ShadersAndPrograms_UseProgram_TC_004(void) {
 		TEST_LOG_FAIL("UseProgram", "ShadersAndPrograms_UseProgram_TC_004",
 			      "glUseProgram(0) ile bağ kesme hata üretti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("UseProgram", "ShadersAndPrograms_UseProgram_TC_004");
 	}

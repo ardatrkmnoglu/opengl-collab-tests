@@ -26,7 +26,7 @@ void Vertices_VertexAttribPointer_TC_001(void) {
 			      "Vertices_VertexAttribPointer_TC_001",
 			      "Geçersiz veri tipi (GL_TEXTURE_2D) reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttribPointer",
 				 "Vertices_VertexAttribPointer_TC_001");
@@ -53,7 +53,7 @@ void Vertices_VertexAttribPointer_TC_002(void) {
 			      "Vertices_VertexAttribPointer_TC_002",
 			      "size=5 olan geçersiz boyut reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttribPointer",
 				 "Vertices_VertexAttribPointer_TC_002");
@@ -79,7 +79,7 @@ void Vertices_VertexAttribPointer_TC_003(void) {
 			      "Vertices_VertexAttribPointer_TC_003",
 			      "Negatif stride (-4) reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttribPointer",
 				 "Vertices_VertexAttribPointer_TC_003");
@@ -108,7 +108,7 @@ void Vertices_VertexAttribPointer_TC_004(void) {
 			      "Vertices_VertexAttribPointer_TC_004",
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttribPointer",
 				 "Vertices_VertexAttribPointer_TC_004");
@@ -138,7 +138,7 @@ void Vertices_VertexAttribPointer_TC_005(void) {
 		    "VertexAttribPointer", "Vertices_VertexAttribPointer_TC_005",
 		    "VBO bağlı değilken NULL pointer için hata bekleniyordu."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("VertexAttribPointer",
 				 "Vertices_VertexAttribPointer_TC_005");

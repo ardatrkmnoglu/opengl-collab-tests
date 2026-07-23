@@ -25,7 +25,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 		    "WholeFramebufferOperations_DepthMask_TC_001",
 		    "Bayt sinirindaki tasma degeri (0x100) hata ürettirdi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err1);
+		    err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_DepthMask_TC_001");
@@ -54,7 +54,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 		    "WholeFramebufferOperations_DepthMask_TC_001",
 		    "Bayt sinirindaki tasma degeri (0x101) hata ürettirdi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err2);
+		    err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_DepthMask_TC_001");
@@ -155,7 +155,7 @@ void WholeFramebufferOperations_DepthMask_TC_004(void) {
 		    "Tekrarli deger degisimleri sonrasinda hata durumu "
 		    "biriktirilmis olabilir."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_DepthMask_TC_004");

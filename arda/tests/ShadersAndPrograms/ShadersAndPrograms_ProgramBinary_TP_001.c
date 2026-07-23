@@ -34,7 +34,7 @@ void ShadersAndPrograms_ProgramBinary_TC_001(void) {
 			      "ShadersAndPrograms_ProgramBinary_TC_001",
 			      "Hizasız pointer ile çağrı kabul edildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("ProgramBinary",
 				 "ShadersAndPrograms_ProgramBinary_TC_001");
@@ -74,7 +74,7 @@ void ShadersAndPrograms_ProgramBinary_TC_002(void) {
 		TEST_LOG_FAIL("ProgramBinary", "ShadersAndPrograms_ProgramBinary_TC_002",
 			      "PROT_NONE bellekle çağrı kabul edildi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("ProgramBinary",
 				 "ShadersAndPrograms_ProgramBinary_TC_002");
@@ -117,7 +117,7 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 				      "ShadersAndPrograms_ProgramBinary_TC_003",
 				      "Aşırı yükleme beklenmeyen hata üretti."
 				      " Actual: 0x%04X",
-				      (unsigned int)err);
+				      err);
 			glDeleteProgram(prog);
 			return;
 		}
@@ -163,7 +163,7 @@ void ShadersAndPrograms_ProgramBinary_TC_004(void) {
 			      "ShadersAndPrograms_ProgramBinary_TC_004",
 			      "NULL binary pointer ile çağrı reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("ProgramBinary",
 				 "ShadersAndPrograms_ProgramBinary_TC_004");

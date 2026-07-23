@@ -28,7 +28,7 @@ void ShaderQueries_GetnUniform_TC_001(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_001",
 			      "Negatif bufSize GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_001");
 	}
@@ -55,7 +55,7 @@ void ShaderQueries_GetnUniform_TC_002(void) {
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_002",
 			      "Geçersiz (0) program ID'si reddedilmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_002");
 	}
@@ -83,7 +83,7 @@ void ShaderQueries_GetnUniform_TC_003(void) {
 	      err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_003",
 			      "BufSize=0 için beklenmeyen hata kodu."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_003");
 	}
@@ -112,7 +112,7 @@ void ShaderQueries_GetnUniform_TC_004(void) {
 	if (!(err == GL_INVALID_OPERATION || err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_004",
 			      "Geçersiz lokasyon (0x7FFFFFFF) reddedilmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_004");
 	}

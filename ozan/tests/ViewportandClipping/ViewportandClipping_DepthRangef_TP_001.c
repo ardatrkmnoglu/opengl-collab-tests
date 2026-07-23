@@ -257,9 +257,9 @@ void ViewportandClipping_DepthRangef_TC_004(void)
         }
     }
 
-    if(!checkDoubleState2(test_case_4,0.0,1.0))
+    if(!checkDoubleState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0, 1.0, 1e-6))
         return;
-
+    
     resetState_DepthRange();
 
     TEST_LOG_SUCCESS(test_case_4, test_procedure);

@@ -29,7 +29,7 @@ void ShadersAndPrograms_UniformMatrix_TC_001(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_001",
 			      "GL_TRUE transpose bayrağı kabul edildi (Spec ihlali)."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("UniformMatrix",
 				 "ShadersAndPrograms_UniformMatrix_TC_001");
@@ -61,7 +61,7 @@ void ShadersAndPrograms_UniformMatrix_TC_002(void) {
 	if (!(err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_002",
 			      "Mat3 lokasyonuna Mat4 veri kopyalanamaz (Spec ihlali)."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_002");
 	}
@@ -91,7 +91,7 @@ void ShadersAndPrograms_UniformMatrix_TC_003(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_003",
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_003");
 	}
@@ -122,7 +122,7 @@ void ShadersAndPrograms_UniformMatrix_TC_004(void) {
 	      err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_004",
 			      "NULL value pointer beklenmeyen hata kodu."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("UniformMatrix",
 				 "ShadersAndPrograms_UniformMatrix_TC_004");

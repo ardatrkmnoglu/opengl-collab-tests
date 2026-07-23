@@ -234,7 +234,7 @@ void ErrorsandStatusReset_GetError_TC_005(void)
         }
     }
 
-    if(!checkFloatState(test_case_5, 3.0f))
+    if(!checkFloatState(test_case_5, test_procedure, GL_LINE_WIDTH, 3.0f, 1e-6f))
         return;
 
     glLineWidth(1.0f);

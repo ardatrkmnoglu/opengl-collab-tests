@@ -27,7 +27,7 @@ void Vertices_DrawElements_TC_001(void) {
 	if (!(err == GL_INVALID_ENUM)) {
 		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_001",
 			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_001");
 	}
@@ -54,7 +54,7 @@ void Vertices_DrawElements_TC_002(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_002",
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_002");
 	}
@@ -82,7 +82,7 @@ void Vertices_DrawElements_TC_003(void) {
 	if (!(err == GL_INVALID_ENUM)) {
 		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_003",
 			      "Geçersiz mode GL_INVALID_ENUM üretmedi."
-			      " Actual: 0x%04X", (unsigned int)err);
+			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_003");
 	}

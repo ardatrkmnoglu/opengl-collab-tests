@@ -29,7 +29,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_001(void) {
 			      "Sınır dışı depth atamasında beklenmeyen bir "
 			      "hata fırlatıldı."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearDepthf_TC_001");
@@ -71,7 +71,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_002(void) {
 		    "Sinir disi negatif depth atamasinda beklenmeyen bir "
 		    "hata firlatildi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearDepthf_TC_002");
@@ -151,7 +151,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_004(void) {
 			      "NaN depth degeri atanirken sürücü beklenmedik "
 			      "sekilde davrandi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err1);
+			      err1);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearDepthf_TC_004");
@@ -167,7 +167,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_004(void) {
 		    "Infinity depth degeri atanirken sürücü beklenmedik "
 		    "sekilde davrandi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err2);
+		    err2);
 	} else {
 		TEST_LOG_SUCCESS("WholeFramebufferOperations",
 				 "WholeFramebufferOperations_ClearDepthf_TC_004");

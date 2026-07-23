@@ -42,7 +42,7 @@ void Rasterizaton_CullFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_BACK))
+    if(!checkIntState(test_case_1, test_procedure, GL_CULL_FACE_MODE, GL_BACK))
         return;
 
     glCullFace(GL_FRONT);
@@ -52,7 +52,7 @@ void Rasterizaton_CullFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_FRONT))
+    if(!checkIntState(test_case_1, test_procedure, GL_CULL_FACE_MODE, GL_FRONT))
         return;
 
     glCullFace(GL_FRONT_AND_BACK);
@@ -62,7 +62,7 @@ void Rasterizaton_CullFace_TC_001(void)
         TEST_LOG_FAIL(test_case_1, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_FRONT_AND_BACK))
+    if(!checkIntState(test_case_1, test_procedure, GL_CULL_FACE_MODE, GL_FRONT_AND_BACK))
         return;
 
     glCullFace((GLenum)0x0BAD);
@@ -74,7 +74,7 @@ void Rasterizaton_CullFace_TC_001(void)
                       "Beklenen : 0x%X Gelen : 0x%X",GL_INVALID_ENUM,err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_FRONT_AND_BACK))
+    if(!checkIntState(test_case_1, test_procedure, GL_CULL_FACE_MODE, GL_FRONT_AND_BACK))
         return;
 
     glCullFace(GL_CCW);
@@ -86,7 +86,7 @@ void Rasterizaton_CullFace_TC_001(void)
                       "Beklenen : 0x%X Gelen : 0x%X",GL_INVALID_ENUM,err);
         return;
     }
-    if(!checkIntState(test_case_1,GL_FRONT_AND_BACK))
+    if(!checkIntState(test_case_1, test_procedure, GL_CULL_FACE_MODE, GL_FRONT_AND_BACK))
         return;
 
     resetState_CullFace();
@@ -161,7 +161,7 @@ void Rasterizaton_CullFace_TC_002(void)
 
         if(err==GL_INVALID_ENUM)
         {
-            if(!checkIntState(test_case_2,currentMode))
+            if(!checkIntState(test_case_2, test_procedure, GL_CULL_FACE_MODE, currentMode))
                 return;
         }
     }
@@ -229,7 +229,7 @@ void Rasterizaton_CullFace_TC_003(void)
         TEST_LOG_FAIL(test_case_3, test_procedure, "Beklenmeyen hata : 0x%X",err);
         return;
     }
-    if(!checkIntState(test_case_3,GL_FRONT))
+    if(!checkIntState(test_case_3, test_procedure, GL_CULL_FACE_MODE, GL_FRONT))
         return;
 
     resetState_CullFace();
@@ -341,7 +341,7 @@ void Rasterizaton_CullFace_TC_005(void)
         return;
     }
 
-    if(!checkIntState(test_case_5,GL_FRONT))
+    if(!checkIntState(test_case_5, test_procedure, GL_CULL_FACE_MODE, GL_FRONT) )
         return;
 
     for(i=0;i<count;i++)
@@ -360,7 +360,7 @@ void Rasterizaton_CullFace_TC_005(void)
             return;
         }
 
-        if(!checkIntState(test_case_5,GL_FRONT))
+        if(!checkIntState(test_case_5, test_procedure, GL_CULL_FACE_MODE, GL_FRONT) )
             return;
     }
     resetState_CullFace();
@@ -491,7 +491,7 @@ void Rasterizaton_CullFace_TC_007(void)
                           err);
             return;
         }
-        if(!checkIntState(test_case_7,GL_BACK))
+        if(!checkIntState(test_case_7, test_procedure, GL_CULL_FACE_MODE, GL_BACK))
             return;
     }
 
@@ -531,7 +531,7 @@ void Rasterizaton_CullFace_TC_008(void)
         TEST_LOG_FAIL(test_case_8, test_procedure, "Yogun kullanim sonrasi hata olustu.");
         return;
     }
-    if(!checkIntState(test_case_8,GL_FRONT_AND_BACK))
+    if(!checkIntState(test_case_8, test_procedure, GL_CULL_FACE_MODE, GL_FRONT_AND_BACK))
         return;
 
     resetState_CullFace();
@@ -607,7 +607,7 @@ void Rasterizaton_CullFace_TC_009(void)
 
         if(err == GL_INVALID_ENUM)
         {
-            if(!checkIntState(test_case_9,lastValid))
+            if(!checkIntState(test_case_9, test_procedure, GL_CULL_FACE_MODE, lastValid))
                 return;
         }
     }

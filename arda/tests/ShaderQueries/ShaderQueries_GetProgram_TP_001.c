@@ -25,7 +25,7 @@ void ShaderQueries_GetProgram_TC_001(void) {
 		    "GetProgramiv", "ShaderQueries_GetProgram_TC_001",
 		    "Geçersiz pname (0xDEADBEEF) GL_INVALID_ENUM üretmedi."
 		    " Actual: 0x%04X",
-		    (unsigned int)err);
+		    err);
 	} else {
 		TEST_LOG_SUCCESS("GetProgramiv",
 				 "ShaderQueries_GetProgram_TC_001");
@@ -54,7 +54,7 @@ void ShaderQueries_GetProgram_TC_002(void) {
 			      "ShaderQueries_GetProgram_TC_002",
 			      "Shader nesnesine Program muamelesi engellenmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetProgramiv",
 				 "ShaderQueries_GetProgram_TC_002");
@@ -86,7 +86,7 @@ void ShaderQueries_GetProgram_TC_003(void) {
 			      "ShaderQueries_GetProgram_TC_003",
 			      "Silinmiş program ID'si ile sorgu reddedilmedi."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetProgramiv",
 				 "ShaderQueries_GetProgram_TC_003");
@@ -115,7 +115,7 @@ void ShaderQueries_GetProgram_TC_004(void) {
 			      "ShaderQueries_GetProgram_TC_004",
 			      "NULL params pointer beklenmeyen hata üretti."
 			      " Actual: 0x%04X",
-			      (unsigned int)err);
+			      err);
 	} else {
 		TEST_LOG_SUCCESS("GetProgramiv",
 				 "ShaderQueries_GetProgram_TC_004");

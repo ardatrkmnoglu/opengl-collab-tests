@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 
 #include "macro.h"
-#include "../../../include/macro.h
 
 /* ------------------------------------------------------------------ *
  * createDummyProgram
@@ -43,11 +42,6 @@ void destroyContext(GLFWwindow **window);
  * ------------------------------------------------------------------ */
 void cleanOpenGLState(void);
 
-#endif /* HELPER_H */
-
-#ifndef HELPER_H
-#define HELPER_H
-
 #include <GL/gl.h>
 
 /* ============================================================
@@ -74,34 +68,32 @@ void clearGLErrors(void);
 
 /* GL_VIEWPORT degerini beklenen dortlu ile karsilastirir.
    Kullananlar: Viewport, Flush, Finish */
-int checkViewport(const char* test_case, const char* test_procedure,
-                  GLint x, GLint y, GLsizei width, GLsizei height);
+int checkViewport(const char *test_case, const char *test_procedure, GLint x,
+		  GLint y, GLsizei width, GLsizei height);
 
 /* Tek elemanli tamsayi durum sorgusu.
    Kullananlar: FrontFace (GL_FRONT_FACE),
-                CullFace  (GL_CULL_FACE_MODE),
-                PixelStorei (GL_PACK_ALIGNMENT / GL_UNPACK_ALIGNMENT) */
-int checkIntState(const char* test_case, const char* test_procedure,
-                  GLenum pname, GLint expected);
+		CullFace  (GL_CULL_FACE_MODE),
+		PixelStorei (GL_PACK_ALIGNMENT / GL_UNPACK_ALIGNMENT) */
+int checkIntState(const char *test_case, const char *test_procedure,
+		  GLenum pname, GLint expected);
 
 /* Tek elemanli float durum sorgusu.
    Kullananlar: LineWidth (GL_LINE_WIDTH), GetError (GL_LINE_WIDTH) */
-int checkFloatState(const char* test_case, const char* test_procedure,
-                    GLenum pname, GLfloat expected, GLfloat tolerance);
+int checkFloatState(const char *test_case, const char *test_procedure,
+		    GLenum pname, GLfloat expected, GLfloat tolerance);
 
 /* Iki ayri float durumun ayni anda dogrulanmasi.
    Kullanan: PolygonOffset (factor + units) */
-int checkFloatState2(const char* test_case, const char* test_procedure,
-                     GLenum pnameA, GLfloat expectedA,
-                     GLenum pnameB, GLfloat expectedB,
-                     GLfloat tolerance);
+int checkFloatState2(const char *test_case, const char *test_procedure,
+		     GLenum pnameA, GLfloat expectedA, GLenum pnameB,
+		     GLfloat expectedB, GLfloat tolerance);
 
 /* Iki elemanli double durum sorgusu.
    Kullanan: DepthRange (GL_DEPTH_RANGE) */
-int checkDoubleState2(const char* test_case, const char* test_procedure,
-                      GLenum pname,
-                      GLdouble expectedA, GLdouble expectedB,
-                      GLdouble tolerance);
+int checkDoubleState2(const char *test_case, const char *test_procedure,
+		      GLenum pname, GLdouble expectedA, GLdouble expectedB,
+		      GLdouble tolerance);
 
 /* ---------- Durum sifirlama ---------- */
 
@@ -111,13 +103,13 @@ int checkDoubleState2(const char* test_case, const char* test_procedure,
  * Hepsi islem sonunda hata kuyrugunu bosaltir.
  */
 
-void resetState_Viewport(void);      /* glViewport(0,0,640,480)          */
-void resetState_DepthRange(void);    /* glDepthRange(0.0,1.0)            */
-void resetState_LineWidth(void);     /* glLineWidth(1.0f)                */
-void resetState_FrontFace(void);     /* glFrontFace(GL_CCW)              */
-void resetState_CullFace(void);      /* culling kapali, GL_CCW, GL_BACK  */
-void resetState_PolygonO(void);      /* offset fill / depth test kapali  */
-void resetState_PixelStorei(void);   /* pack / unpack alignment = 4      */
+void resetState_Viewport(void);	   /* glViewport(0,0,640,480)          */
+void resetState_DepthRange(void);  /* glDepthRange(0.0,1.0)            */
+void resetState_LineWidth(void);   /* glLineWidth(1.0f)                */
+void resetState_FrontFace(void);   /* glFrontFace(GL_CCW)              */
+void resetState_CullFace(void);	   /* culling kapali, GL_CCW, GL_BACK  */
+void resetState_PolygonO(void);	   /* offset fill / depth test kapali  */
+void resetState_PixelStorei(void); /* pack / unpack alignment = 4      */
 
 /* ---------- Yardimci ---------- */
 
@@ -129,4 +121,3 @@ void resetState_PixelStorei(void);   /* pack / unpack alignment = 4      */
 GLint randInt32(void);
 
 #endif /* HELPER_H */
-

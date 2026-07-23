@@ -7,103 +7,143 @@
 #include <float.h>
 #include <limits.h>
 #include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-extern int retcode;
+#include "helper.h"
+#include "macro.h"
 
-#define EXPECT_GL_ERROR(actual_err, condition_expr, msg)                       \
-	do {                                                                   \
-		if (!(condition_expr)) {                                       \
-			fprintf(stderr,                                        \
-				"\x1b[33m[FAIL]\x1b[0m %s (Line: %d)\n",       \
-				msg, __LINE__);                                \
-			fprintf(stderr, "   > Expected: %s\n",                 \
-				#condition_expr);                              \
-			fprintf(stderr, "   > Actual  : 0x%04X\n",             \
-				(unsigned int)actual_err);                                   \
-			retcode = 1;                                           \
-			continue;                                              \
-		}                                                              \
-	} while (0)
+extern int retcode;
 
 void init(void);
 void draw(void);
 void cleanup(void);
 
 /* --------------- Shaders and Programs --------------- */
-void rTest_CreateProgram(void);
-void rTest_ProgramBinary_unalignedPtr(void);
-void rTest_ProgramBinary_memRevoke(void);
-void rTest_ProgramBinary_overload(void);
-void rTest_UseProgram_invalidID(void);
-void rTest_UseProgram_typeConfusion(void);
-void rTest_GetAttribLocation_nullPtr(void);
-void rTest_GetAttribLocation_reservedVariable(void);
+void ShadersAndPrograms_CreateProgram_TC_001(void);
+void ShadersAndPrograms_CreateProgram_TC_002(void);
+void ShadersAndPrograms_CreateProgram_TC_003(void);
+void ShadersAndPrograms_CreateProgram_TC_004(void);
+
+void ShadersAndPrograms_ProgramBinary_TC_001(void);
+void ShadersAndPrograms_ProgramBinary_TC_002(void);
+void ShadersAndPrograms_ProgramBinary_TC_003(void);
+void ShadersAndPrograms_ProgramBinary_TC_004(void);
+
+void ShadersAndPrograms_UseProgram_TC_001(void);
+void ShadersAndPrograms_UseProgram_TC_002(void);
+void ShadersAndPrograms_UseProgram_TC_003(void);
+void ShadersAndPrograms_UseProgram_TC_004(void);
+
+void ShadersAndPrograms_GetAttribLocation_TC_001(void);
+void ShadersAndPrograms_GetAttribLocation_TC_002(void);
+void ShadersAndPrograms_GetAttribLocation_TC_003(void);
+void ShadersAndPrograms_GetAttribLocation_TC_004(void);
+
+void ShadersAndPrograms_Uniform_TC_005(void);
+void ShadersAndPrograms_Uniform_TC_006(void);
 
 /* --------------- glGetProgramiv --------------- */
-void rTest_GetProgramiv_invalidEnum(void);
-void rTest_GetProgramiv_typeConfusion(void);
+void ShaderQueries_GetProgram_TC_001(void);
+void ShaderQueries_GetProgram_TC_002(void);
+void ShaderQueries_GetProgram_TC_003(void);
+void ShaderQueries_GetProgram_TC_004(void);
 
 /* --------------- glGetUniformLocation --------------- */
-void rTest_GetUniformLocation_nullPtr(void);
-void rTest_GetUniformLocation_reservedPrefix(void);
+void ShadersAndPrograms_GetUniformLocation_TC_001(void);
+void ShadersAndPrograms_GetUniformLocation_TC_002(void);
+void ShadersAndPrograms_GetUniformLocation_TC_003(void);
+void ShadersAndPrograms_GetUniformLocation_TC_004(void);
 
 /* --------------- glUniform{1234}{if} --------------- */
-void rTest_Uniform_typeConfusion(void);
-void rTest_Uniform_invalidLocation(void);
+void ShadersAndPrograms_Uniform_TC_001(void);
+void ShadersAndPrograms_Uniform_TC_002(void);
 
 /* --------------- glUniform{1234}{if}v --------------- */
-void rTest_Uniformv_negativeCount(void);
-void rTest_Uniformv_arrayOutOfBounds(void);
+void ShadersAndPrograms_Uniform_TC_003(void);
+void ShadersAndPrograms_Uniform_TC_004(void);
 
 /* --------------- glUniformMatrix{234}fv --------------- */
-void rTest_UniformMatrix_invalidTranspose(void);
-void rTest_UniformMatrix_typeMismatch(void);
+void ShadersAndPrograms_UniformMatrix_TC_001(void);
+void ShadersAndPrograms_UniformMatrix_TC_002(void);
+void ShadersAndPrograms_UniformMatrix_TC_003(void);
+void ShadersAndPrograms_UniformMatrix_TC_004(void);
 
 /* --------------- glGetVertexAttribfv / iv / Pointerv --------------- */
-void rTest_GetVertexAttrib_invalidEnum(void);
-void rTest_GetVertexAttrib_indexOutOfBounds(void);
-void rTest_GetVertexAttribPointer_invalidEnum(void);
+void ShaderQueries_GetVertexAttrib_TC_001(void);
+void ShaderQueries_GetVertexAttrib_TC_002(void);
+void ShaderQueries_GetVertexAttrib_TC_003(void);
+void ShaderQueries_GetVertexAttrib_TC_004(void);
 
-/* --------------- glGetnUniformfv / iv (Robustness Extension) --------------- */
-void rTest_GetnUniform_negativeBufSize(void);
-void rTest_GetnUniform_invalidProgram(void);
+void ShaderQueries_GetVertexAttribPointer_TC_001(void);
+void ShaderQueries_GetVertexAttribPointer_TC_002(void);
+void ShaderQueries_GetVertexAttribPointer_TC_003(void);
+void ShaderQueries_GetVertexAttribPointer_TC_004(void);
+
+/* --------------- glGetnUniformfv / iv (Robustness Extension) ---------------
+ */
+void ShaderQueries_GetnUniform_TC_001(void);
+void ShaderQueries_GetnUniform_TC_002(void);
+void ShaderQueries_GetnUniform_TC_003(void);
+void ShaderQueries_GetnUniform_TC_004(void);
 
 /* --------------- glVertexAttrib --------------- */
-void rTest_VertexAttrib_indexOutOfBounds(void);
-void rTest_VertexAttribv_specialFloats(void);
+void Vertices_VertexAttrib_TC_001(void);
+void Vertices_VertexAttrib_TC_002(void);
+void Vertices_VertexAttrib_TC_003(void);
+void Vertices_VertexAttrib_TC_004(void);
 
 /* --------------- glVertexAttribPointer --------------- */
-void rTest_VertexAttribPointer_invalidType(void);
-void rTest_VertexAttribPointer_invalidSize(void);
+void Vertices_VertexAttribPointer_TC_001(void);
+void Vertices_VertexAttribPointer_TC_002(void);
+void Vertices_VertexAttribPointer_TC_003(void);
+void Vertices_VertexAttribPointer_TC_004(void);
+void Vertices_VertexAttribPointer_TC_005(void);
 
 /* --------------- glEnable/DisableVertexAttribArray --------------- */
-void rTest_EnableDisableVertexAttrib_bounds(void);
+void Vertices_EnableVertexAttribArray_TC_001(void);
+void Vertices_EnableVertexAttribArray_TC_002(void);
+void Vertices_EnableVertexAttribArray_TC_003(void);
+void Vertices_EnableVertexAttribArray_TC_004(void);
+void Vertices_DisableVertexAttribArray_TC_001(void);
+void Vertices_DisableVertexAttribArray_TC_002(void);
+void Vertices_DisableVertexAttribArray_TC_003(void);
+void Vertices_DisableVertexAttribArray_TC_004(void);
 
 /* --------------- glDrawArrays --------------- */
-void rTest_DrawArrays_outOfBounds(void);
-void rTest_DrawArrays_guardPageAttack(void);
+void Vertices_DrawArrays_TC_001(void);
+void Vertices_DrawArrays_TC_002(void);
+void Vertices_DrawArrays_TC_003(void);
+void Vertices_DrawArrays_TC_004(void);
+void Vertices_DrawArrays_TC_005(void);
+void Vertices_DrawArrays_TC_006(void);
 
 /* --------------- glDrawElements / glDrawRangeElements --------------- */
-void rTest_DrawElements_invalidType(void);
-void rTest_DrawRangeElements_invalidRange(void);
+void Vertices_DrawElements_TC_001(void);
+void Vertices_DrawElements_TC_002(void);
+void Vertices_DrawElements_TC_003(void);
+void Vertices_DrawElements_TC_004(void);
+
+void Vertices_DrawRangeElements_TC_001(void);
+void Vertices_DrawRangeElements_TC_002(void);
+void Vertices_DrawRangeElements_TC_003(void);
+void Vertices_DrawRangeElements_TC_004(void);
 
 /* --------------- Framebuffer Mask Operations --------------- */
-void rTest_ColorMask_booleanConversion(void);
-void rTest_StencilMaskSeparate_invalidEnum(void);
+void WholeFramebufferOperations_ColorMask_TC_001(void);
+void WholeFramebufferOperations_StencilMaskSeparate_TC_001(void);
 
 /* --------------- Framebuffer Clear Operations --------------- */
-void rTest_Clear_invalidBitmask(void);
-void rTest_ClearColor_specialFloats(void);
-void rTest_ClearDepthf_clamping(void);
-void rTest_ClearStencil_bounds(void);
+void WholeFramebufferOperations_Clear_TC_001(void);
+void WholeFramebufferOperations_ClearColor_TC_001(void);
+void WholeFramebufferOperations_ClearDepthf_TC_001(void);
+void WholeFramebufferOperations_ClearStencil_TC_001(void);
 
 /* --------------- glGenBuffers --------------- */
 void rTest_glGenBuffers_invalid_value(void);
@@ -244,20 +284,263 @@ void test_pixelStore_statePreservation(void);
 void test_pixelStore_errorQueue(void);
 void test_pixelStore_stress(void);
 
-#ifdef RUN_EXTESTS
-void rTest_invalidEnum(void);
-void rTest_invalidValue(void);
-void rTest_invalidPrecision(void);
-void rTest_errorFlood(void);
-void rTest_shaderCompilerError(void);
-void rTest_maxTextureLimit(void);
-void rTest_missingAttrib(void);
-void rTest_NaNVertices(void);
-void rTest_outOfMemory(void);
-void rTest_stateRecovr(void);
-void rTest_drawWOProgram(void);
-void rTest_oobDraw(void);
-void rTest_nullPtr(void);
-#endif
+/* --- Automatically added test declarations --- */
+void BufferObjects_BindBuffer_TC_002(void);
+void BufferObjects_BindBuffer_TC_003(void);
+void BufferObjects_BindBuffer_TC_004(void);
+void BufferObjects_BindBuffer_TC_005(void);
+void BufferObjects_BindBuffer_TC_006(void);
+void BufferObjects_BindBuffer_TC_007(void);
+void BufferObjects_BindBuffer_TC_008(void);
+void BufferObjects_BindBuffer_TC_009(void);
+void BufferObjects_BindBuffer_TC_010(void);
+void BufferObjects_BindBuffer_TC_011(void);
+void BufferObjects_BufferData_TC_001(void);
+void BufferObjects_BufferData_TC_002(void);
+void BufferObjects_BufferData_TC_003(void);
+void BufferObjects_BufferData_TC_004(void);
+void BufferObjects_BufferData_TC_005(void);
+void BufferObjects_BufferData_TC_006(void);
+void BufferObjects_BufferData_TC_007(void);
+void BufferObjects_BufferData_TC_008(void);
+void BufferObjects_BufferData_TC_009(void);
+void BufferObjects_BufferData_TC_010(void);
+void BufferObjects_BufferData_TC_011(void);
+void BufferObjects_BufferData_TC_012(void);
+void BufferObjects_BufferData_TC_013(void);
+void BufferObjects_BufferData_TC_014(void);
+void BufferObjects_BufferSubData_TC_001(void);
+void BufferObjects_BufferSubData_TC_002(void);
+void BufferObjects_BufferSubData_TC_003(void);
+void BufferObjects_BufferSubData_TC_004(void);
+void BufferObjects_BufferSubData_TC_005(void);
+void BufferObjects_BufferSubData_TC_006(void);
+void BufferObjects_BufferSubData_TC_007(void);
+void BufferObjects_BufferSubData_TC_008(void);
+void BufferObjects_BufferSubData_TC_009(void);
+void BufferObjects_BufferSubData_TC_010(void);
+void BufferObjects_BufferSubData_TC_011(void);
+void BufferObjects_BufferSubData_TC_012(void);
+void BufferObjects_BufferSubData_TC_013(void);
+void BufferObjects_BufferSubData_TC_014(void);
+void BufferObjects_GenBuffers_TC_001(void);
+void BufferObjects_GenBuffers_TC_002(void);
+void BufferObjects_GenBuffers_TC_003(void);
+void BufferObjects_GenBuffers_TC_004(void);
+void BufferObjects_GenBuffers_TC_005(void);
+void BufferObjects_GenBuffers_TC_006(void);
+void BufferObjects_GenBuffers_TC_007(void);
+void BufferObjects_GenBuffers_TC_008(void);
+void BufferObjects_GenBuffers_TC_009(void);
+void BufferObjects_GetBufferParameteriv_TC_001(void);
+void BufferObjects_GetBufferParameteriv_TC_002(void);
+void BufferObjects_GetBufferParameteriv_TC_003(void);
+void BufferObjects_GetBufferParameteriv_TC_004(void);
+void BufferObjects_GetBufferParameteriv_TC_005(void);
+void BufferObjects_GetBufferParameteriv_TC_006(void);
+void BufferObjects_GetBufferParameteriv_TC_007(void);
+void BufferObjects_GetBufferParameteriv_TC_008(void);
+void BufferObjects_GetBufferParameteriv_TC_009(void);
+void BufferObjects_GetBufferParameteriv_TC_010(void);
+void BufferObjects_GetBufferParameteriv_TC_011(void);
+void BufferObjects_GetBufferParameteriv_TC_012(void);
+void BufferObjects_GetBufferParameteriv_TC_013(void);
+void BufferObjects_GetBufferParameteriv_TC_014(void);
+void BufferObjects_GetBufferParameteriv_TC_015(void);
+void BufferObjects_GetBufferParameteriv_TC_016(void);
+void FramebufferObjects_BindFramebuffer_TC_001(void);
+void FramebufferObjects_BindFramebuffer_TC_002(void);
+void FramebufferObjects_BindFramebuffer_TC_003(void);
+void FramebufferObjects_BindFramebuffer_TC_004(void);
+void FramebufferObjects_BindFramebuffer_TC_005(void);
+void FramebufferObjects_BindFramebuffer_TC_006(void);
+void FramebufferObjects_BindFramebuffer_TC_007(void);
+void FramebufferObjects_BindFramebuffer_TC_008(void);
+void FramebufferObjects_BindFramebuffer_TC_009(void);
+void FramebufferObjects_BindFramebuffer_TC_010(void);
+void FramebufferObjects_BindFramebuffer_TC_011(void);
+void FramebufferObjects_BindFramebuffer_TC_012(void);
+void FramebufferObjects_GenFramebuffers_TC_001(void);
+void FramebufferObjects_GenFramebuffers_TC_002(void);
+void FramebufferObjects_GenFramebuffers_TC_003(void);
+void FramebufferObjects_GenFramebuffers_TC_004(void);
+void FramebufferObjects_GenFramebuffers_TC_005(void);
+void FramebufferObjects_GenFramebuffers_TC_006(void);
+void FramebufferObjects_GenFramebuffers_TC_007(void);
+void FramebufferObjects_GenFramebuffers_TC_008(void);
+void FramebufferObjects_GenFramebuffers_TC_009(void);
+void FramebufferObjects_GenFramebuffers_TC_010(void);
+void FramebufferObjects_GenFramebuffers_TC_011(void);
+void FramebufferObjects_GenFramebuffers_TC_012(void);
+void FramebufferObjects_GenFramebuffers_TC_013(void);
+void FramebufferObjects_GenFramebuffers_TC_014(void);
+void FramebufferObjects_GenFramebuffers_TC_015(void);
+void PerFragmentOperations_Scissor_TC_001(void);
+void PerFragmentOperations_Scissor_TC_002(void);
+void PerFragmentOperations_Scissor_TC_003(void);
+void PerFragmentOperations_Scissor_TC_004(void);
+void PerFragmentOperations_Scissor_TC_005(void);
+void PerFragmentOperations_Scissor_TC_006(void);
+void PixelRectangles_PixelStorei_TC_001(void);
+void PixelRectangles_PixelStorei_TC_002(void);
+void PixelRectangles_PixelStorei_TC_003(void);
+void PixelRectangles_PixelStorei_TC_004(void);
+void PixelRectangles_PixelStorei_TC_005(void);
+void PixelRectangles_PixelStorei_TC_006(void);
+void Rasterizaton_CullFace_TC_001(void);
+void Rasterizaton_CullFace_TC_002(void);
+void Rasterizaton_CullFace_TC_003(void);
+void Rasterizaton_CullFace_TC_004(void);
+void Rasterizaton_CullFace_TC_005(void);
+void Rasterizaton_CullFace_TC_006(void);
+void Rasterizaton_CullFace_TC_007(void);
+void Rasterizaton_CullFace_TC_008(void);
+void Rasterizaton_CullFace_TC_009(void);
+void Rasterizaton_FrontFace_TC_001(void);
+void Rasterizaton_FrontFace_TC_002(void);
+void Rasterizaton_FrontFace_TC_003(void);
+void Rasterizaton_FrontFace_TC_004(void);
+void Rasterizaton_FrontFace_TC_005(void);
+void Rasterizaton_FrontFace_TC_006(void);
+void Rasterizaton_FrontFace_TC_007(void);
+void Rasterizaton_FrontFace_TC_008(void);
+void Rasterizaton_LineWidth_TC_001(void);
+void Rasterizaton_LineWidth_TC_002(void);
+void Rasterizaton_LineWidth_TC_003(void);
+void Rasterizaton_LineWidth_TC_004(void);
+void Rasterizaton_LineWidth_TC_005(void);
+void Rasterizaton_LineWidth_TC_006(void);
+void Rasterizaton_LineWidth_TC_007(void);
+void Rasterizaton_LineWidth_TC_008(void);
+void Rasterizaton_PolygonOffset_TC_001(void);
+void Rasterizaton_PolygonOffset_TC_002(void);
+void Rasterizaton_PolygonOffset_TC_003(void);
+void Rasterizaton_PolygonOffset_TC_004(void);
+void Rasterizaton_PolygonOffset_TC_005(void);
+void Rasterizaton_PolygonOffset_TC_006(void);
+void Rasterizaton_PolygonOffset_TC_007(void);
+void ReadingPixels_ReadnPixels_TC_001(void);
+void ReadingPixels_ReadnPixels_TC_002(void);
+void ReadingPixels_ReadnPixels_TC_003(void);
+void ReadingPixels_ReadnPixels_TC_004(void);
+void Run_glCullFace_Robustness(void);
+void Run_glDepthRange_Robustness(void);
+void Run_glFinish_Robustness(void);
+void Run_glFlush_Robustness(void);
+void Run_glFrontFace_Robustness(void);
+void Run_glGetError_Robustness(void);
+void Run_glLineWidth_Robustness(void);
+void Run_glPixelStorei_Robustness(void);
+void Run_glViewport_Robustness(void);
+void SpecialFunctions_Finish_TC_001(void);
+void SpecialFunctions_Finish_TC_002(void);
+void SpecialFunctions_Finish_TC_003(void);
+void SpecialFunctions_Finish_TC_004(void);
+void SpecialFunctions_Finish_TC_005(void);
+void SpecialFunctions_Finish_TC_006(void);
+void SpecialFunctions_Finish_TC_007(void);
+void Texturing_BindTexture_TC_001(void);
+void Texturing_BindTexture_TC_002(void);
+void Texturing_BindTexture_TC_003(void);
+void Texturing_BindTexture_TC_004(void);
+void Texturing_BindTexture_TC_005(void);
+void Texturing_BindTexture_TC_006(void);
+void Texturing_BindTexture_TC_007(void);
+void Texturing_BindTexture_TC_008(void);
+void Texturing_GenTextures_TC_001(void);
+void Texturing_GenTextures_TC_002(void);
+void Texturing_GenTextures_TC_003(void);
+void Texturing_GenTextures_TC_004(void);
+void Texturing_GenTextures_TC_005(void);
+void Texturing_GenTextures_TC_006(void);
+void Texturing_GenTextures_TC_007(void);
+void Texturing_GenTextures_TC_008(void);
+void Texturing_GenTextures_TC_009(void);
+void Texturing_GenTextures_TC_010(void);
+void Texturing_GenTextures_TC_011(void);
+void Texturing_GenTextures_TC_012(void);
+void Texturing_GenerateMipmap_TC_001(void);
+void Texturing_GenerateMipmap_TC_002(void);
+void Texturing_GenerateMipmap_TC_003(void);
+void Texturing_GenerateMipmap_TC_004(void);
+void Texturing_GenerateMipmap_TC_005(void);
+void Texturing_GenerateMipmap_TC_006(void);
+void Texturing_GenerateMipmap_TC_007(void);
+void Texturing_GenerateMipmap_TC_008(void);
+void Texturing_GenerateMipmap_TC_009(void);
+void Texturing_GenerateMipmap_TC_010(void);
+void Texturing_GenerateMipmap_TC_011(void);
+void Texturing_GenerateMipmap_TC_012(void);
+void Texturing_GenerateMipmap_TC_013(void);
+void Texturing_GenerateMipmap_TC_014(void);
+void Texturing_GenerateMipmap_TC_015(void);
+void Texturing_TexStorage2D_TC_001(void);
+void Texturing_TexStorage2D_TC_002(void);
+void Texturing_TexStorage2D_TC_003(void);
+void Texturing_TexStorage2D_TC_004(void);
+void Texturing_TexStorage2D_TC_005(void);
+void Texturing_TexSubImage2D_TC_001(void);
+void Texturing_TexSubImage2D_TC_002(void);
+void Texturing_TexSubImage2D_TC_003(void);
+void Texturing_TexSubImage2D_TC_004(void);
+void Texturing_TexSubImage2D_TC_005(void);
+void ViewportandClipping_DepthRangef_TC_001(void);
+void ViewportandClipping_DepthRangef_TC_002(void);
+void ViewportandClipping_DepthRangef_TC_003(void);
+void ViewportandClipping_DepthRangef_TC_004(void);
+void ViewportandClipping_DepthRangef_TC_005(void);
+void ViewportandClipping_DepthRangef_TC_006(void);
+void ViewportandClipping_Viewport_TC_001(void);
+void ViewportandClipping_Viewport_TC_002(void);
+void ViewportandClipping_Viewport_TC_003(void);
+void ViewportandClipping_Viewport_TC_004(void);
+void ViewportandClipping_Viewport_TC_005(void);
+void ViewportandClipping_Viewport_TC_006(void);
+void WholeFramebufferOperations_ClearColor_TC_002(void);
+void WholeFramebufferOperations_ClearColor_TC_003(void);
+void WholeFramebufferOperations_ClearColor_TC_004(void);
+void WholeFramebufferOperations_ClearColor_TC_005(void);
+void WholeFramebufferOperations_ClearDepthf_TC_002(void);
+void WholeFramebufferOperations_ClearDepthf_TC_003(void);
+void WholeFramebufferOperations_ClearDepthf_TC_004(void);
+void WholeFramebufferOperations_ClearDepthf_TC_005(void);
+void WholeFramebufferOperations_ClearStencil_TC_002(void);
+void WholeFramebufferOperations_ClearStencil_TC_003(void);
+void WholeFramebufferOperations_ClearStencil_TC_004(void);
+void WholeFramebufferOperations_ClearStencil_TC_005(void);
+void WholeFramebufferOperations_Clear_TC_002(void);
+void WholeFramebufferOperations_Clear_TC_003(void);
+void WholeFramebufferOperations_Clear_TC_004(void);
+void WholeFramebufferOperations_Clear_TC_005(void);
+void WholeFramebufferOperations_ColorMask_TC_002(void);
+void WholeFramebufferOperations_ColorMask_TC_003(void);
+void WholeFramebufferOperations_ColorMask_TC_004(void);
+void WholeFramebufferOperations_ColorMask_TC_005(void);
+void WholeFramebufferOperations_DepthMask_TC_001(void);
+void WholeFramebufferOperations_DepthMask_TC_002(void);
+void WholeFramebufferOperations_DepthMask_TC_003(void);
+void WholeFramebufferOperations_DepthMask_TC_004(void);
+void WholeFramebufferOperations_StencilMaskSeparate_TC_002(void);
+void WholeFramebufferOperations_StencilMaskSeparate_TC_003(void);
+void WholeFramebufferOperations_StencilMaskSeparate_TC_004(void);
+void WholeFramebufferOperations_StencilMaskSeparate_TC_005(void);
+void WholeFramebufferOperations_StencilMask_TC_001(void);
+void WholeFramebufferOperations_StencilMask_TC_002(void);
+void WholeFramebufferOperations_StencilMask_TC_003(void);
+void WholeFramebufferOperations_StencilMask_TC_004(void);
+void SpecialFunctions_Flush_TC_001(void);
+void SpecialFunctions_Flush_TC_002(void);
+void SpecialFunctions_Flush_TC_003(void);
+void SpecialFunctions_Flush_TC_004(void);
+void SpecialFunctions_Flush_TC_005(void);
+void SpecialFunctions_Flush_TC_006(void);
+void SpecialFunctions_Flush_TC_007(void);
+void ErrorsandStatusReset_GetError_TC_001(void);
+void ErrorsandStatusReset_GetError_TC_002(void);
+void ErrorsandStatusReset_GetError_TC_003(void);
+void ErrorsandStatusReset_GetError_TC_004(void);
+void ErrorsandStatusReset_GetError_TC_005(void);
+void ErrorsandStatusReset_GetError_TC_006(void);
+void ErrorsandStatusReset_GetError_TC_007(void);
 
-#endif // RTESTS_H
+#endif /* RTESTS_H */

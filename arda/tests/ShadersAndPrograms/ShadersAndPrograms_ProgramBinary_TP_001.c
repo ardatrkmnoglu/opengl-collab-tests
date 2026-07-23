@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "ShadersAndPrograms_ProgramBinary_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_ProgramBinary_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_ProgramBinary_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_ProgramBinary_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_ProgramBinary_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glProgramBinary
  * ============================================================ */
@@ -30,14 +37,12 @@ void ShadersAndPrograms_ProgramBinary_TC_001(void) {
 
 	if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("ProgramBinary",
-			      "ShadersAndPrograms_ProgramBinary_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Hizasız pointer ile çağrı kabul edildi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("ProgramBinary",
-				 "ShadersAndPrograms_ProgramBinary_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	free(valid_memblock);
@@ -71,13 +76,12 @@ void ShadersAndPrograms_ProgramBinary_TC_002(void) {
 
 	if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("ProgramBinary", "ShadersAndPrograms_ProgramBinary_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "PROT_NONE bellekle çağrı kabul edildi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("ProgramBinary",
-				 "ShadersAndPrograms_ProgramBinary_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	munmap(mapped_memory, page_size);
@@ -113,8 +117,7 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 	if (err != GL_NO_ERROR) {
 		if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 		      err == GL_INVALID_OPERATION)) {
-			TEST_LOG_FAIL("ProgramBinary",
-				      "ShadersAndPrograms_ProgramBinary_TC_003",
+			TEST_LOG_FAIL(test_case_1, test_procedure, 
 				      "Aşırı yükleme beklenmeyen hata üretti."
 				      " Actual: 0x%04X",
 				      err);
@@ -127,14 +130,12 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 	glGetProgramiv(prog, GL_LINK_STATUS, &link_status);
 
 	if (!(link_status == GL_FALSE)) {
-		TEST_LOG_FAIL(
-		    "ProgramBinary", "ShadersAndPrograms_ProgramBinary_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "CRITICAL: Sürücü çöp veriyi geçerli Program Binary "
 		    "olarak kabul etti! link_status=%d",
 		    link_status);
 	} else {
-		TEST_LOG_SUCCESS("ProgramBinary",
-				 "ShadersAndPrograms_ProgramBinary_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -159,14 +160,12 @@ void ShadersAndPrograms_ProgramBinary_TC_004(void) {
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION ||
 	      err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL("ProgramBinary",
-			      "ShadersAndPrograms_ProgramBinary_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "NULL binary pointer ile çağrı reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("ProgramBinary",
-				 "ShadersAndPrograms_ProgramBinary_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

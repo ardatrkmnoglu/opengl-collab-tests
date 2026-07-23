@@ -2,6 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "ShadersAndPrograms_GetUniformLocation_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_GetUniformLocation_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_GetUniformLocation_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_GetUniformLocation_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_GetUniformLocation_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glGetUniformLocation
  * ============================================================ */
@@ -20,12 +27,10 @@ void ShadersAndPrograms_GetUniformLocation_TC_001(void) {
 	GLint loc = glGetUniformLocation(prog, NULL);
 
 	if (!(loc == -1)) {
-		TEST_LOG_FAIL("GetUniformLocation",
-			      "ShadersAndPrograms_GetUniformLocation_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "NULL pointer için -1 dönmedi. Actual: %d", loc);
 	} else {
-		TEST_LOG_SUCCESS("GetUniformLocation",
-				 "ShadersAndPrograms_GetUniformLocation_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -46,12 +51,10 @@ void ShadersAndPrograms_GetUniformLocation_TC_002(void) {
 	GLint loc = glGetUniformLocation(prog, "gl_DepthRange");
 
 	if (!(loc == -1)) {
-		TEST_LOG_FAIL("GetUniformLocation",
-			      "ShadersAndPrograms_GetUniformLocation_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Yasaklı 'gl_' ön eki ifşa edildi. Actual: %d", loc);
 	} else {
-		TEST_LOG_SUCCESS("GetUniformLocation",
-				 "ShadersAndPrograms_GetUniformLocation_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -73,13 +76,11 @@ void ShadersAndPrograms_GetUniformLocation_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(loc == -1 || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("GetUniformLocation",
-			      "ShadersAndPrograms_GetUniformLocation_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Boş string için -1 ya da hata dönmedi."
 			      " loc=%d, err=0x%04X", loc, err);
 	} else {
-		TEST_LOG_SUCCESS("GetUniformLocation",
-				 "ShadersAndPrograms_GetUniformLocation_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -101,12 +102,10 @@ void ShadersAndPrograms_GetUniformLocation_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("GetUniformLocation",
-			      "ShadersAndPrograms_GetUniformLocation_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz (0) program ID'si reddedilmedi."
 			      " loc=%d, err=0x%04X", loc, err);
 	} else {
-		TEST_LOG_SUCCESS("GetUniformLocation",
-				 "ShadersAndPrograms_GetUniformLocation_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

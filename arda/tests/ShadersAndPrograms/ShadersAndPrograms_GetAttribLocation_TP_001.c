@@ -2,6 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "ShadersAndPrograms_GetAttribLocation_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_GetAttribLocation_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_GetAttribLocation_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_GetAttribLocation_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_GetAttribLocation_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glGetAttribLocation
  * ============================================================ */
@@ -19,12 +26,10 @@ void ShadersAndPrograms_GetAttribLocation_TC_001(void) {
 	GLint loc = glGetAttribLocation(prog, NULL);
 
 	if (!(loc == -1)) {
-		TEST_LOG_FAIL("GetAttribLocation",
-			      "ShadersAndPrograms_GetAttribLocation_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "NULL pointer için -1 dönmedi. Actual: %d", loc);
 	} else {
-		TEST_LOG_SUCCESS("GetAttribLocation",
-				 "ShadersAndPrograms_GetAttribLocation_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -44,13 +49,11 @@ void ShadersAndPrograms_GetAttribLocation_TC_002(void) {
 	GLint loc = glGetAttribLocation(prog, "gl_Position");
 
 	if (!(loc == -1)) {
-		TEST_LOG_FAIL("GetAttribLocation",
-			      "ShadersAndPrograms_GetAttribLocation_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Rezerve 'gl_Position' ismi için -1 dönmedi."
 			      " Actual: %d", loc);
 	} else {
-		TEST_LOG_SUCCESS("GetAttribLocation",
-				 "ShadersAndPrograms_GetAttribLocation_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -69,12 +72,10 @@ void ShadersAndPrograms_GetAttribLocation_TC_003(void) {
 	GLint loc = glGetAttribLocation(prog, "");
 
 	if (!(loc == -1)) {
-		TEST_LOG_FAIL("GetAttribLocation",
-			      "ShadersAndPrograms_GetAttribLocation_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Boş string için -1 dönmedi. Actual: %d", loc);
 	} else {
-		TEST_LOG_SUCCESS("GetAttribLocation",
-				 "ShadersAndPrograms_GetAttribLocation_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -98,14 +99,12 @@ void ShadersAndPrograms_GetAttribLocation_TC_004(void) {
 
 	/* Link edilmemiş program: GL_INVALID_OPERATION veya -1 dönmeli */
 	if (!(err == GL_INVALID_OPERATION || loc == -1)) {
-		TEST_LOG_FAIL("GetAttribLocation",
-			      "ShadersAndPrograms_GetAttribLocation_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Link edilmemiş program için GL_INVALID_OPERATION "
 			      "beklendi. err=0x%04X, loc=%d",
 			      err, loc);
 	} else {
-		TEST_LOG_SUCCESS("GetAttribLocation",
-				 "ShadersAndPrograms_GetAttribLocation_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

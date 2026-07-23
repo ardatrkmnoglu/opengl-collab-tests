@@ -1,6 +1,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "Vertices_VertexAttribPointer_TP_001";
+static const char* test_case_1 = "Vertices_VertexAttribPointer_TC_001";
+static const char* test_case_2 = "Vertices_VertexAttribPointer_TC_002";
+static const char* test_case_3 = "Vertices_VertexAttribPointer_TC_003";
+static const char* test_case_4 = "Vertices_VertexAttribPointer_TC_004";
+static const char* test_case_5 = "Vertices_VertexAttribPointer_TC_005";
+
+
 /* ============================================================
  * TEST GRUBU: glVertexAttribPointer
  * ============================================================ */
@@ -22,14 +30,12 @@ void Vertices_VertexAttribPointer_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL("VertexAttribPointer",
-			      "Vertices_VertexAttribPointer_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz veri tipi (GL_TEXTURE_2D) reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("VertexAttribPointer",
-				 "Vertices_VertexAttribPointer_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -49,14 +55,12 @@ void Vertices_VertexAttribPointer_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("VertexAttribPointer",
-			      "Vertices_VertexAttribPointer_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "size=5 olan geçersiz boyut reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("VertexAttribPointer",
-				 "Vertices_VertexAttribPointer_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -75,14 +79,12 @@ void Vertices_VertexAttribPointer_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("VertexAttribPointer",
-			      "Vertices_VertexAttribPointer_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Negatif stride (-4) reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("VertexAttribPointer",
-				 "Vertices_VertexAttribPointer_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -104,14 +106,12 @@ void Vertices_VertexAttribPointer_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("VertexAttribPointer",
-			      "Vertices_VertexAttribPointer_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("VertexAttribPointer",
-				 "Vertices_VertexAttribPointer_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -134,13 +134,11 @@ void Vertices_VertexAttribPointer_TC_005(void) {
 
 	/* rTest_nullPtr'deki orijinal test (err != GL_NO_ERROR) bekliyordu */
 	if (!(err != GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "VertexAttribPointer", "Vertices_VertexAttribPointer_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "VBO bağlı değilken NULL pointer için hata bekleniyordu."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("VertexAttribPointer",
-				 "Vertices_VertexAttribPointer_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

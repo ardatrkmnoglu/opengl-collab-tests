@@ -1,6 +1,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "WholeFramebufferOperations_ColorMask_TP_001";
+static const char* test_case_1 = "WholeFramebufferOperations_ColorMask_TC_001";
+static const char* test_case_2 = "WholeFramebufferOperations_ColorMask_TC_002";
+static const char* test_case_3 = "WholeFramebufferOperations_ColorMask_TC_003";
+static const char* test_case_4 = "WholeFramebufferOperations_ColorMask_TC_004";
+static const char* test_case_5 = "WholeFramebufferOperations_ColorMask_TC_005";
+
+
 /* ============================================================
  * ============================================================
  *   TEST GRUBU: glColorMask
@@ -20,16 +28,13 @@ void WholeFramebufferOperations_ColorMask_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ColorMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Standart dışı değerler girildiğinde hata üretildi "
 		    "(Spesifikasyona aykırı)."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	// Sürücü gerçekten bu değerleri GL_TRUE ve GL_FALSE olarak kırptı mı?
@@ -38,16 +43,13 @@ void WholeFramebufferOperations_ColorMask_TC_001(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_TRUE && mask[2] == GL_FALSE &&
 	      mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ColorMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Sürücü '!= 0' kuralını ihlal etti veya değerleri "
 		    "doğru cast etmedi."
 		    " Actual: 0x%04X",
 		    (unsigned int)mask[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -69,14 +71,12 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ColorMask_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Bayt sinirindaki tasma degerleri hata ürettirdi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLboolean mask[4];
@@ -84,16 +84,13 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_TRUE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ColorMask_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Sürücü bayt sinirindaki tasmayi dogru yorumlamadi "
 		    "(0x100 -> FALSE, 0x101 -> TRUE olmali)."
 		    " Actual: 0x%04X",
 		    (unsigned int)mask[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -117,16 +114,13 @@ void WholeFramebufferOperations_ColorMask_TC_003(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_FALSE && mask[2] == GL_TRUE &&
 	      mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ColorMask_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu "
 		    "veya tutarsiz hale geldi."
 		    " Actual: 0x%04X",
 		    (unsigned int)mask[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -146,15 +140,13 @@ void WholeFramebufferOperations_ColorMask_TC_004(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ColorMask_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Yalnizca R kanali TRUE olmali, digerleri FALSE "
 			      "kalmaliydi (kanal karismasi olabilir)."
 			      " Actual: 0x%04X",
 			      (unsigned int)mask[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	// Sadece Alpha kanali acik
@@ -163,15 +155,13 @@ void WholeFramebufferOperations_ColorMask_TC_004(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ColorMask_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Yalnizca A kanali TRUE olmali, digerleri FALSE "
 			      "kalmaliydi (R/A karismasi supheli)."
 			      " Actual: 0x%04X",
 			      (unsigned int)mask[3]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -192,15 +182,13 @@ void WholeFramebufferOperations_ColorMask_TC_005(void) {
 
 	GLenum err = glGetError();
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ColorMask_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Tekrarli uc deger degisimleri sonrasinda hata "
 			      "durumu biriktirilmis olabilir."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	// Son iterasyon (i=1023, tek) 0x00 yollamis olmali -> hepsi FALSE
@@ -209,14 +197,11 @@ void WholeFramebufferOperations_ColorMask_TC_005(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ColorMask_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Stres döngüsü sonrasi son state beklenenle uyusmuyor."
 		    " Actual: 0x%04X",
 		    (unsigned int)mask[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ColorMask_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

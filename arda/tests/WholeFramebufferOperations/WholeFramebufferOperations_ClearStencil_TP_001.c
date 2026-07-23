@@ -1,6 +1,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "WholeFramebufferOperations_ClearStencil_TP_001";
+static const char* test_case_1 = "WholeFramebufferOperations_ClearStencil_TC_001";
+static const char* test_case_2 = "WholeFramebufferOperations_ClearStencil_TC_002";
+static const char* test_case_3 = "WholeFramebufferOperations_ClearStencil_TC_003";
+static const char* test_case_4 = "WholeFramebufferOperations_ClearStencil_TC_004";
+static const char* test_case_5 = "WholeFramebufferOperations_ClearStencil_TC_005";
+
+
 /* ============================================================
  * ============================================================
  *   TEST GRUBU: glClearStencil
@@ -24,14 +32,12 @@ void WholeFramebufferOperations_ClearStencil_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ClearStencil_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Negatif değer atamasında hata fırlatıldı."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -50,28 +56,24 @@ void WholeFramebufferOperations_ClearStencil_TC_002(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ClearStencil_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "INT_MIN degeri atanirken hata firlatildi."
 			      " Actual: 0x%04X",
 			      err1);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glClearStencil(INT_MAX);
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ClearStencil_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "INT_MAX degeri atanirken hata firlatildi."
 			      " Actual: 0x%04X",
 			      err2);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -96,16 +98,13 @@ void WholeFramebufferOperations_ClearStencil_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearStencil_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Buffer bit derinliginin bir üstündeki sinir degeri "
 		    "reddedildi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -121,29 +120,24 @@ void WholeFramebufferOperations_ClearStencil_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearStencil_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Sifir degeri atanirken beklenmedik bir hata döndü."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLint val = -99;
 	glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &val);
 
 	if (!(val == 0)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ClearStencil_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Sifir degeri birebir geri okunamadi."
 			      " Actual: 0x%04X",
 			      (unsigned int)val);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -163,14 +157,11 @@ void WholeFramebufferOperations_ClearStencil_TC_005(void) {
 	glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &val);
 
 	if (!(val == 7)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearStencil_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)val);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearStencil_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

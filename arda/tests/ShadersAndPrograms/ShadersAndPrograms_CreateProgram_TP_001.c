@@ -1,6 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "ShadersAndPrograms_CreateProgram_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_CreateProgram_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_CreateProgram_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_CreateProgram_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_CreateProgram_TC_004";
+
 /* ============================================================
  * TEST GRUBU: glCreateProgram
  * ============================================================ */
@@ -24,7 +30,7 @@ void ShadersAndPrograms_CreateProgram_TC_001(void) {
 			break;
 
 		if (!(err == GL_NO_ERROR)) {
-			TEST_LOG_FAIL("CreateProgram", "ShadersAndPrograms_CreateProgram_TC_001",
+			TEST_LOG_FAIL(test_case_1, test_procedure,
 				      "glCreateProgram beklenmedik hata üretti."
 				      " Actual: 0x%04X",
 				      err);
@@ -36,7 +42,7 @@ void ShadersAndPrograms_CreateProgram_TC_001(void) {
 		p_count++;
 	}
 
-	TEST_LOG_SUCCESS("CreateProgram", "ShadersAndPrograms_CreateProgram_TC_001");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 /* ============================================================
@@ -53,8 +59,8 @@ void ShadersAndPrograms_CreateProgram_TC_002(void) {
 
 		if (prog == 0) {
 			TEST_LOG_FAIL(
-			    "CreateProgram",
-			    "ShadersAndPrograms_CreateProgram_TC_002",
+			    test_case_2,
+			    test_procedure,
 			    "Yeniden oluşturmada 0 ID döndü (iterasyon %d).",
 			    i);
 			return;
@@ -63,8 +69,8 @@ void ShadersAndPrograms_CreateProgram_TC_002(void) {
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
 			TEST_LOG_FAIL(
-			    "CreateProgram",
-			    "ShadersAndPrograms_CreateProgram_TC_002",
+			    test_case_2,
+			    test_procedure,
 			    "Yeniden oluşturmada hata üretti. Actual: 0x%04X",
 			    err);
 			glDeleteProgram(prog);
@@ -76,8 +82,7 @@ void ShadersAndPrograms_CreateProgram_TC_002(void) {
 		}
 	}
 
-	TEST_LOG_SUCCESS("CreateProgram",
-			 "ShadersAndPrograms_CreateProgram_TC_002");
+	TEST_LOG_SUCCESS(test_case_2, test_procedure);
 }
 
 /* ============================================================
@@ -99,13 +104,12 @@ void ShadersAndPrograms_CreateProgram_TC_003(void) {
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL(
-		    "CreateProgram", "ShadersAndPrograms_CreateProgram_TC_003",
+		    test_case_3, test_procedure,
 		    "Program ID'si Shader gibi silinebildi (tip karışıklığı)."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("CreateProgram",
-				 "ShadersAndPrograms_CreateProgram_TC_003");
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -128,20 +132,18 @@ void ShadersAndPrograms_CreateProgram_TC_004(void) {
 
 	if (err == GL_OUT_OF_MEMORY) {
 		/* Bellek yetersizliği: çökmesiz kabul */
-		TEST_LOG_INFO("ShadersAndPrograms_CreateProgram_TC_004: "
-			      "GL_OUT_OF_MEMORY — bellek yok.");
+		TEST_LOG_INFO("%s: GL_OUT_OF_MEMORY — bellek yok.", test_case_4);
 		return;
 	}
 
 	if (!(prog != 0 && err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("CreateProgram",
-			      "ShadersAndPrograms_CreateProgram_TC_004",
+		TEST_LOG_FAIL(test_case_4,
+			      test_procedure,
 			      "glCreateProgram 0 ID döndürdü (OOM değilken)."
 			      " prog=%u, err=0x%04X",
 			      prog, err);
 	} else {
-		TEST_LOG_SUCCESS("CreateProgram",
-				 "ShadersAndPrograms_CreateProgram_TC_004");
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	}
 
 	if (prog != 0)

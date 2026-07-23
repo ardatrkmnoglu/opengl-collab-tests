@@ -2,6 +2,15 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "Vertices_DrawArrays_TP_001";
+static const char* test_case_1 = "Vertices_DrawArrays_TC_001";
+static const char* test_case_2 = "Vertices_DrawArrays_TC_002";
+static const char* test_case_3 = "Vertices_DrawArrays_TC_003";
+static const char* test_case_4 = "Vertices_DrawArrays_TC_004";
+static const char* test_case_5 = "Vertices_DrawArrays_TC_005";
+static const char* test_case_6 = "Vertices_DrawArrays_TC_006";
+
+
 /* ============================================================
  * TEST GRUBU: glDrawArrays
  * ============================================================ */
@@ -35,7 +44,7 @@ void Vertices_DrawArrays_TC_001(void) {
 	GLenum err = glGetError();
 
 	/* Çökmediyse başarılıdır. Hata döndürebilir veya döndürmeyebilir (undefined) */
-	TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_001");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -87,7 +96,7 @@ void Vertices_DrawArrays_TC_002(void) {
 	GLenum err = glGetError();
 
 	/* Çökmezse başarılıdır */
-	TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_002");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDisableVertexAttribArray(0);
 	glDeleteProgram(prog);
@@ -112,7 +121,7 @@ void Vertices_DrawArrays_TC_003(void) {
 	GLenum err = glGetError();
 
 	/* Sürücü çökmemeli. GL_INVALID_OPERATION fırlatabilir veya yutabilir */
-	TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_003");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDeleteProgram(prog);
 }
@@ -143,7 +152,7 @@ void Vertices_DrawArrays_TC_004(void) {
 	glDrawArrays(GL_POINTS, 0, 1);
 	GLenum err = glGetError();
 
-	TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_004");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -167,11 +176,11 @@ void Vertices_DrawArrays_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("DrawArrays", "Vertices_DrawArrays_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Programsız çizimde GL_INVALID_OPERATION bekleniyordu."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -193,11 +202,11 @@ void Vertices_DrawArrays_TC_006(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("DrawArrays", "Vertices_DrawArrays_TC_006",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("DrawArrays", "Vertices_DrawArrays_TC_006");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

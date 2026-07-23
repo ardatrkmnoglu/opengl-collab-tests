@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "WholeFramebufferOperations_DepthMask_TP_001";
+static const char* test_case_1 = "WholeFramebufferOperations_DepthMask_TC_001";
+static const char* test_case_2 = "WholeFramebufferOperations_DepthMask_TC_002";
+static const char* test_case_3 = "WholeFramebufferOperations_DepthMask_TC_003";
+static const char* test_case_4 = "WholeFramebufferOperations_DepthMask_TC_004";
+
+
 /* ============================================================
  * ============================================================
  *   TEST GRUBU: glDepthMask
@@ -20,57 +27,47 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Bayt sinirindaki tasma degeri (0x100) hata ürettirdi."
 		    " Actual: 0x%04X",
 		    err1);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLboolean d = GL_TRUE;
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_DepthMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "0x100 alt bayta sarip 0x00 (FALSE) olmaliydi."
 			      " Actual: 0x%04X",
 			      (unsigned int)d);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDepthMask((GLboolean)0x101);
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Bayt sinirindaki tasma degeri (0x101) hata ürettirdi."
 		    " Actual: 0x%04X",
 		    err2);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_TRUE)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_DepthMask_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "0x101 alt bayta sarip 0x01 (TRUE) olmaliydi."
 			      " Actual: 0x%04X",
 			      (unsigned int)d);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -91,15 +88,12 @@ void WholeFramebufferOperations_DepthMask_TC_002(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_TRUE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)d);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -121,16 +115,13 @@ void WholeFramebufferOperations_DepthMask_TC_003(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Alakasiz cagrilar (ColorMask/Clear) DEPTH_WRITEMASK "
 		    "state'ini etkilememeliydi."
 		    " Actual: 0x%04X",
 		    (unsigned int)d);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -149,16 +140,13 @@ void WholeFramebufferOperations_DepthMask_TC_004(void) {
 
 	GLenum err = glGetError();
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Tekrarli deger degisimleri sonrasinda hata durumu "
 		    "biriktirilmis olabilir."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	// Son iterasyon i=2047, 2047 % 3 == 1 (!=0) -> 0x00 gönderilmis ->
@@ -167,14 +155,11 @@ void WholeFramebufferOperations_DepthMask_TC_004(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_DepthMask_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Stres döngüsü sonrasi son state beklenenle uyusmuyor."
 		    " Actual: 0x%04X",
 		    (unsigned int)d);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_DepthMask_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

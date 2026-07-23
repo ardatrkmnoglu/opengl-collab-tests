@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "ShadersAndPrograms_UseProgram_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_UseProgram_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_UseProgram_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_UseProgram_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_UseProgram_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glUseProgram
  * ============================================================ */
@@ -19,13 +26,12 @@ void ShadersAndPrograms_UseProgram_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(
-		    "UseProgram", "ShadersAndPrograms_UseProgram_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "CRITICAL: Sürücü hiç üretilmemiş bir program ID'sini"
 		    " kabul etti. Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("UseProgram", "ShadersAndPrograms_UseProgram_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -43,13 +49,12 @@ void ShadersAndPrograms_UseProgram_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("UseProgram", "ShadersAndPrograms_UseProgram_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Shader ID'si Program olarak kabul edildi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("UseProgram",
-				 "ShadersAndPrograms_UseProgram_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteShader(shader);
@@ -73,14 +78,12 @@ void ShadersAndPrograms_UseProgram_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(
-		    "UseProgram", "ShadersAndPrograms_UseProgram_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Silinmiş program ID'si ile glUseProgram reddedilmedi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("UseProgram",
-				 "ShadersAndPrograms_UseProgram_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -103,12 +106,12 @@ void ShadersAndPrograms_UseProgram_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("UseProgram", "ShadersAndPrograms_UseProgram_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "glUseProgram(0) ile bağ kesme hata üretti."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("UseProgram", "ShadersAndPrograms_UseProgram_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

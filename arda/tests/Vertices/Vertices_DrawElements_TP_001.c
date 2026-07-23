@@ -2,6 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "Vertices_DrawElements_TP_001";
+static const char* test_case_1 = "Vertices_DrawElements_TC_001";
+static const char* test_case_2 = "Vertices_DrawElements_TC_002";
+static const char* test_case_3 = "Vertices_DrawElements_TC_003";
+static const char* test_case_4 = "Vertices_DrawElements_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glDrawElements
  * ============================================================ */
@@ -25,11 +32,11 @@ void Vertices_DrawElements_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -52,11 +59,11 @@ void Vertices_DrawElements_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -80,11 +87,11 @@ void Vertices_DrawElements_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL("DrawElements", "Vertices_DrawElements_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz mode GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -109,7 +116,7 @@ void Vertices_DrawElements_TC_004(void) {
 	GLenum err = glGetError();
 
 	/* Çökmemesi yeterlidir */
-	TEST_LOG_SUCCESS("DrawElements", "Vertices_DrawElements_TC_004");
+	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDeleteProgram(prog);
 }

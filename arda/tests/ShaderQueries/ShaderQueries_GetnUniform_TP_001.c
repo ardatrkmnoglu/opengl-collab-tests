@@ -2,6 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "ShaderQueries_GetnUniform_TP_001";
+static const char* test_case_1 = "ShaderQueries_GetnUniform_TC_001";
+static const char* test_case_2 = "ShaderQueries_GetnUniform_TC_002";
+static const char* test_case_3 = "ShaderQueries_GetnUniform_TC_003";
+static const char* test_case_4 = "ShaderQueries_GetnUniform_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glGetnUniformfv / glGetnUniformiv
  * (KHR_robustness Extension)
@@ -26,11 +33,11 @@ void ShaderQueries_GetnUniform_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Negatif bufSize GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -53,11 +60,11 @@ void ShaderQueries_GetnUniform_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz (0) program ID'si reddedilmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -81,11 +88,11 @@ void ShaderQueries_GetnUniform_TC_003(void) {
 
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "BufSize=0 için beklenmeyen hata kodu."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -110,11 +117,11 @@ void ShaderQueries_GetnUniform_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("GetnUniform", "ShaderQueries_GetnUniform_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz lokasyon (0x7FFFFFFF) reddedilmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("GetnUniform", "ShaderQueries_GetnUniform_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

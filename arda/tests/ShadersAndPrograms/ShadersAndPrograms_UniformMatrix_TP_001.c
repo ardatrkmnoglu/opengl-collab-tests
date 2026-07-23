@@ -2,6 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "ShadersAndPrograms_UniformMatrix_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_UniformMatrix_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_UniformMatrix_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_UniformMatrix_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_UniformMatrix_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glUniformMatrix{234}fv
  * ============================================================ */
@@ -27,12 +34,11 @@ void ShadersAndPrograms_UniformMatrix_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "GL_TRUE transpose bayrağı kabul edildi (Spec ihlali)."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("UniformMatrix",
-				 "ShadersAndPrograms_UniformMatrix_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -59,11 +65,11 @@ void ShadersAndPrograms_UniformMatrix_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Mat3 lokasyonuna Mat4 veri kopyalanamaz (Spec ihlali)."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -89,11 +95,11 @@ void ShadersAndPrograms_UniformMatrix_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -120,12 +126,11 @@ void ShadersAndPrograms_UniformMatrix_TC_004(void) {
 	/* Hata üretse de üretmese de çökmeme koşulunu geçer */
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("UniformMatrix", "ShadersAndPrograms_UniformMatrix_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "NULL value pointer beklenmeyen hata kodu."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("UniformMatrix",
-				 "ShadersAndPrograms_UniformMatrix_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);

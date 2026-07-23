@@ -1,6 +1,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "WholeFramebufferOperations_ClearColor_TP_001";
+static const char* test_case_1 = "WholeFramebufferOperations_ClearColor_TC_001";
+static const char* test_case_2 = "WholeFramebufferOperations_ClearColor_TC_002";
+static const char* test_case_3 = "WholeFramebufferOperations_ClearColor_TC_003";
+static const char* test_case_4 = "WholeFramebufferOperations_ClearColor_TC_004";
+static const char* test_case_5 = "WholeFramebufferOperations_ClearColor_TC_005";
+
+
 /* ============================================================
  * ============================================================
  *   TEST GRUBU: glClearColor
@@ -25,16 +33,13 @@ void WholeFramebufferOperations_ClearColor_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NaN/Inf değerleri atanırken beklenmeyen bir hata kodu "
 		    "döndü veya sürücü kilitlendi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -52,16 +57,13 @@ void WholeFramebufferOperations_ClearColor_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Asiri uc (FLT_MAX) degerleri atanirken beklenmeyen "
 		    "bir hata döndü."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLfloat color[4];
@@ -69,16 +71,13 @@ void WholeFramebufferOperations_ClearColor_TC_002(void) {
 
 	if (!(color[0] == FLT_MAX && color[1] == -FLT_MAX &&
 	      color[2] == FLT_MAX && color[3] == -FLT_MAX)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Sürücü set-zamaninda deger kirpmis olabilir; state "
 		    "oldugu gibi saklanmaliydi."
 		    " Actual: 0x%04X",
 		    (unsigned int)color[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -95,14 +94,12 @@ void WholeFramebufferOperations_ClearColor_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_ClearColor_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Tam sinir degerleri (0.0 / 1.0) reddedildi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLfloat color[4];
@@ -110,16 +107,13 @@ void WholeFramebufferOperations_ClearColor_TC_003(void) {
 
 	if (!(color[0] == 0.0f && color[1] == 1.0f && color[2] == 0.0f &&
 	      color[3] == 1.0f)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Tam sinir degerlerinde hassasiyet kaymasi tespit "
 		    "edildi."
 		    " Actual: 0x%04X",
 		    (unsigned int)color[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -140,15 +134,12 @@ void WholeFramebufferOperations_ClearColor_TC_004(void) {
 
 	if (!(color[0] == 0.25f && color[1] == 0.5f && color[2] == 0.75f &&
 	      color[3] == 1.0f)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)color[0]);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -169,15 +160,12 @@ void WholeFramebufferOperations_ClearColor_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_ClearColor_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Subnormal (denormal) degerler atanirken beklenmeyen "
 		    "bir hata döndü (flush-to-zero istisnasi olabilir)."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_ClearColor_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "Vertices_DisableVertexAttribArray_TP_001";
+static const char* test_case_1 = "Vertices_DisableVertexAttribArray_TC_001";
+static const char* test_case_2 = "Vertices_DisableVertexAttribArray_TC_002";
+static const char* test_case_3 = "Vertices_DisableVertexAttribArray_TC_003";
+static const char* test_case_4 = "Vertices_DisableVertexAttribArray_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glDisableVertexAttribArray
  * ============================================================ */
@@ -23,14 +30,12 @@ void Vertices_DisableVertexAttribArray_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("DisableVertexAttrib",
-			      "Vertices_DisableVertexAttribArray_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("DisableVertexAttrib",
-				 "Vertices_DisableVertexAttribArray_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -49,15 +54,12 @@ void Vertices_DisableVertexAttribArray_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "DisableVertexAttrib",
-		    "Vertices_DisableVertexAttribArray_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Geçerli indeks devre dışı bırakılırken hata oluştu."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("DisableVertexAttrib",
-				 "Vertices_DisableVertexAttribArray_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -77,14 +79,12 @@ void Vertices_DisableVertexAttribArray_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("DisableVertexAttrib",
-			      "Vertices_DisableVertexAttribArray_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Çift devre dışı bırakma hata üretti."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("DisableVertexAttrib",
-				 "Vertices_DisableVertexAttribArray_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -105,13 +105,11 @@ void Vertices_DisableVertexAttribArray_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "DisableVertexAttrib", "Vertices_DisableVertexAttribArray_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Son geçerli indeks devre dışı bırakılırken hata oluştu."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("DisableVertexAttrib",
-				 "Vertices_DisableVertexAttribArray_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

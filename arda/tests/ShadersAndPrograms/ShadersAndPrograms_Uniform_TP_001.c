@@ -2,6 +2,15 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
+static const char* test_procedure = "ShadersAndPrograms_Uniform_TP_001";
+static const char* test_case_1 = "ShadersAndPrograms_Uniform_TC_001";
+static const char* test_case_2 = "ShadersAndPrograms_Uniform_TC_002";
+static const char* test_case_3 = "ShadersAndPrograms_Uniform_TC_003";
+static const char* test_case_4 = "ShadersAndPrograms_Uniform_TC_004";
+static const char* test_case_5 = "ShadersAndPrograms_Uniform_TC_005";
+static const char* test_case_6 = "ShadersAndPrograms_Uniform_TC_006";
+
+
 /* ============================================================
  * TEST GRUBU: glUniform{1234}{if} / glUniform{1234}{if}v
  * ============================================================ */
@@ -26,11 +35,11 @@ void ShadersAndPrograms_Uniform_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "'int' değişkene 'float' atanması engellenmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -54,11 +63,11 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "-1 lokasyonu sessizce yutulmalıydı (Spec kuralı)."
 			      " Actual: 0x%04X", err1);
 	} else {
-		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_002[-1]");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	/* Geçersiz ama -1 olmayan lokasyon: GL_INVALID_OPERATION beklenir */
@@ -66,11 +75,11 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Devasa geçersiz lokasyon ID'si reddedilmedi."
 			      " Actual: 0x%04X", err2);
 	} else {
-		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_002[0x7FFFFFFF]");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -96,11 +105,11 @@ void ShadersAndPrograms_Uniform_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -128,11 +137,11 @@ void ShadersAndPrograms_Uniform_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("Uniform", "ShadersAndPrograms_Uniform_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Array OOB (count=4, boyut=3) engellenemedi."
 			      " Actual: 0x%04X", err);
 	} else {
-		TEST_LOG_SUCCESS("Uniform", "ShadersAndPrograms_Uniform_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -158,13 +167,11 @@ void ShadersAndPrograms_Uniform_TC_005(void) {
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
 
 	if (!(status == GL_FALSE)) {
-		TEST_LOG_FAIL("ShadersAndPrograms",
-			      "ShadersAndPrograms_Uniform_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Hatalı shader başarıyla derlendi (derleme kabul edilmemeli)."
 			      " status=%d", status);
 	} else {
-		TEST_LOG_SUCCESS("ShadersAndPrograms",
-				 "ShadersAndPrograms_Uniform_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteShader(s);
@@ -189,13 +196,11 @@ void ShadersAndPrograms_Uniform_TC_006(void) {
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
 
 	if (!(status == GL_FALSE)) {
-		TEST_LOG_FAIL("ShadersAndPrograms",
-			      "ShadersAndPrograms_Uniform_TC_006",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçersiz precision qualifier ile shader derlendi."
 			      " status=%d", status);
 	} else {
-		TEST_LOG_SUCCESS("ShadersAndPrograms",
-				 "ShadersAndPrograms_Uniform_TC_006");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteShader(s);

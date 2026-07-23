@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "ShaderQueries_GetVertexAttribPointer_TP_001";
+static const char* test_case_1 = "ShaderQueries_GetVertexAttribPointer_TC_001";
+static const char* test_case_2 = "ShaderQueries_GetVertexAttribPointer_TC_002";
+static const char* test_case_3 = "ShaderQueries_GetVertexAttribPointer_TC_003";
+static const char* test_case_4 = "ShaderQueries_GetVertexAttribPointer_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glGetVertexAttribPointerv
  * ============================================================ */
@@ -21,14 +28,12 @@ void ShaderQueries_GetVertexAttribPointer_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL("GetVertexAttribPointer",
-			      "ShaderQueries_GetVertexAttribPointer_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "GL_FLOAT pname GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetVertexAttribPointer",
-				 "ShaderQueries_GetVertexAttribPointer_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -48,14 +53,12 @@ void ShaderQueries_GetVertexAttribPointer_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("GetVertexAttribPointer",
-			      "ShaderQueries_GetVertexAttribPointer_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "Geçerli sorgu hata üretmemeli iken üretdi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetVertexAttribPointer",
-				 "ShaderQueries_GetVertexAttribPointer_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -79,15 +82,12 @@ void ShaderQueries_GetVertexAttribPointer_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(
-		    "GetVertexAttribPointer",
-		    "ShaderQueries_GetVertexAttribPointer_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "max_attribs indeksinde GL_INVALID_VALUE beklendi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("GetVertexAttribPointer",
-				 "ShaderQueries_GetVertexAttribPointer_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -109,13 +109,11 @@ void ShaderQueries_GetVertexAttribPointer_TC_004(void) {
 
 	/* Hata üretse de üretmese de çökmeme koşulunu geçer */
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("GetVertexAttribPointer",
-			      "ShaderQueries_GetVertexAttribPointer_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "NULL pointer beklenmeyen hata kodu üretdi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetVertexAttribPointer",
-				 "ShaderQueries_GetVertexAttribPointer_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

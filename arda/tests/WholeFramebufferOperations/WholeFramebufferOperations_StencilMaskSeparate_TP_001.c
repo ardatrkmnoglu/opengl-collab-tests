@@ -1,6 +1,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "WholeFramebufferOperations_StencilMaskSeparate_TP_001";
+static const char* test_case_1 = "WholeFramebufferOperations_StencilMaskSeparate_TC_001";
+static const char* test_case_2 = "WholeFramebufferOperations_StencilMaskSeparate_TC_002";
+static const char* test_case_3 = "WholeFramebufferOperations_StencilMaskSeparate_TC_003";
+static const char* test_case_4 = "WholeFramebufferOperations_StencilMaskSeparate_TC_004";
+static const char* test_case_5 = "WholeFramebufferOperations_StencilMaskSeparate_TC_005";
+
+
 /* ============================================================
  * ============================================================
  *   TEST GRUBU: glStencilMaskSeparate
@@ -22,15 +30,12 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Geçersiz face parametresi (GL_TEXTURE_2D) reddedilmedi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("WholeFramebufferOperations",
-				 "WholeFramebufferOperations_StencilMaskSeparate_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -48,16 +53,12 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Gecerli GL_FRONT_AND_BACK degeri reddedildi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLint front = 0, back = 0;
@@ -65,17 +66,13 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_002(void) {
 	glGetIntegerv(GL_STENCIL_BACK_WRITEMASK, &back);
 
 	if (!(front == 0x0F0F0F0F && back == 0x0F0F0F0F)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_002",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "GL_FRONT_AND_BACK her iki yüzü de ayni degere "
 		    "ayarlamadi."
 		    " Actual: 0x%04X",
 		    (unsigned int)front);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_002");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -93,16 +90,12 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Ayri yüz atamalari sirasinda beklenmedik hata olustu."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLint front = 0, back = -1;
@@ -110,17 +103,13 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_003(void) {
 	glGetIntegerv(GL_STENCIL_BACK_WRITEMASK, &back);
 
 	if (!(front == -1 && back == 0)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_003",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "GL_BACK atamasi GL_FRONT degerini ezmis olabilir "
 		    "(ya da tam tersi)."
 		    " Actual: 0x%04X",
 		    (unsigned int)front);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_003");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -137,16 +126,13 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_StencilMaskSeparate_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "En yüksek bit set edilmis gecerli bir maske "
 			      "reddedildi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	GLint front = 0;
@@ -154,16 +140,13 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_004(void) {
 	GLint expected = (GLint)0x80000000u;
 
 	if (!(front == expected)) {
-		TEST_LOG_FAIL("WholeFramebufferOperations",
-			      "WholeFramebufferOperations_StencilMaskSeparate_TC_004",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 			      "0x80000000 degeri isaretli/isaretsiz yorumlama "
 			      "hatasiyla bozulmus olabilir."
 			      " Actual: 0x%04X",
 			      (unsigned int)front);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_004");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }
 
@@ -183,15 +166,11 @@ void WholeFramebufferOperations_StencilMaskSeparate_TC_005(void) {
 	glGetIntegerv(GL_STENCIL_BACK_WRITEMASK, &val);
 
 	if (!(val == 0x2222)) {
-		TEST_LOG_FAIL(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_005",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)val);
 	} else {
-		TEST_LOG_SUCCESS(
-		    "WholeFramebufferOperations",
-		    "WholeFramebufferOperations_StencilMaskSeparate_TC_005");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 }

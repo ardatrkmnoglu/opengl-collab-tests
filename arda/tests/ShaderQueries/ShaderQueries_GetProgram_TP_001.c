@@ -1,6 +1,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
+static const char* test_procedure = "ShaderQueries_GetProgram_TP_001";
+static const char* test_case_1 = "ShaderQueries_GetProgram_TC_001";
+static const char* test_case_2 = "ShaderQueries_GetProgram_TC_002";
+static const char* test_case_3 = "ShaderQueries_GetProgram_TC_003";
+static const char* test_case_4 = "ShaderQueries_GetProgram_TC_004";
+
+
 /* ============================================================
  * TEST GRUBU: glGetProgramiv
  * ============================================================ */
@@ -21,14 +28,12 @@ void ShaderQueries_GetProgram_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(
-		    "GetProgramiv", "ShaderQueries_GetProgram_TC_001",
+		TEST_LOG_FAIL(test_case_1, test_procedure, 
 		    "Geçersiz pname (0xDEADBEEF) GL_INVALID_ENUM üretmedi."
 		    " Actual: 0x%04X",
 		    err);
 	} else {
-		TEST_LOG_SUCCESS("GetProgramiv",
-				 "ShaderQueries_GetProgram_TC_001");
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
 	glDeleteProgram(prog);
@@ -50,14 +55,12 @@ void ShaderQueries_GetProgram_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("GetProgramiv",
-			      "ShaderQueries_GetProgram_TC_002",
+		TEST_LOG_FAIL(test_case_2, test_procedure, 
 			      "Shader nesnesine Program muamelesi engellenmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetProgramiv",
-				 "ShaderQueries_GetProgram_TC_002");
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	}
 
 	glDeleteShader(shader);
@@ -82,14 +85,12 @@ void ShaderQueries_GetProgram_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL("GetProgramiv",
-			      "ShaderQueries_GetProgram_TC_003",
+		TEST_LOG_FAIL(test_case_3, test_procedure, 
 			      "Silinmiş program ID'si ile sorgu reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetProgramiv",
-				 "ShaderQueries_GetProgram_TC_003");
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	}
 }
 
@@ -111,14 +112,12 @@ void ShaderQueries_GetProgram_TC_004(void) {
 
 	/* Hata üretilmese de çökmeme koşulu yeterlidir */
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL("GetProgramiv",
-			      "ShaderQueries_GetProgram_TC_004",
+		TEST_LOG_FAIL(test_case_4, test_procedure, 
 			      "NULL params pointer beklenmeyen hata üretti."
 			      " Actual: 0x%04X",
 			      err);
 	} else {
-		TEST_LOG_SUCCESS("GetProgramiv",
-				 "ShaderQueries_GetProgram_TC_004");
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	}
 
 	glDeleteProgram(prog);

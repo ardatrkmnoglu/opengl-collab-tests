@@ -5,11 +5,31 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include "../../../include/macro.h"
 
 // void glGenFramebuffers(GLsizei n, GLuint * framebuffers);
 // OpenGL’den senin için yeni framebuffer ID numaraları üretmesini ister.
 // n: Kaç tane framebuffer ID’si istiyorsun.
 // framebuffers: Bu ID’lerin yazılacağı GLuint dizisinin adresi
+
+
+static const char* test_procedure = "FramebufferObjects_GenFramebuffers_TP_001";
+static const char* test_case_1 = "FramebufferObjects_GenFramebuffers_TC_001";
+static const char* test_case_2 = "FramebufferObjects_GenFramebuffers_TC_002";
+static const char* test_case_3 = "FramebufferObjects_GenFramebuffers_TC_003";
+static const char* test_case_4 = "FramebufferObjects_GenFramebuffers_TC_004";
+static const char* test_case_5 = "FramebufferObjects_GenFramebuffers_TC_005";
+static const char* test_case_6 = "FramebufferObjects_GenFramebuffers_TC_006";
+static const char* test_case_7 = "FramebufferObjects_GenFramebuffers_TC_007";
+static const char* test_case_8 = "FramebufferObjects_GenFramebuffers_TC_008";
+static const char* test_case_9 = "FramebufferObjects_GenFramebuffers_TC_009";
+static const char* test_case_10 = "FramebufferObjects_GenFramebuffers_TC_010";
+static const char* test_case_11 = "FramebufferObjects_GenFramebuffers_TC_011";
+static const char* test_case_12 = "FramebufferObjects_GenFramebuffers_TC_012";
+static const char* test_case_13 = "FramebufferObjects_GenFramebuffers_TC_013";
+static const char* test_case_14 = "FramebufferObjects_GenFramebuffers_TC_014";
+static const char* test_case_15 = "FramebufferObjects_GenFramebuffers_TC_015";
+
 
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if n is negative.
@@ -21,9 +41,10 @@ void FramebufferObjects_GenFramebuffers_TC_001()
 
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE){
-        printf("[FAIL] Expected GL_INVALID_VALUE, but got 0x%X\n", err);
+        TEST_LOG_FAIL(test_case_1, test_procedure, "Expected GL_INVALID_VALUE, but got 0x%x.", err);
+        return;
     }
-    printf("[PASS] rTest_glGenFramebuffers_invalid_value()\n");
+    TEST_LOG_SUCCESS(test_case_1, test_procedure);
 }
 
 
@@ -40,9 +61,15 @@ void FramebufferObjects_GenFramebuffers_TC_002()
     glGenFramebuffers(-1, &buf);
 
     GLenum err = glGetError();
-    if (err != GL_INVALID_VALUE) {printf("[FAIL] Expected GL_INVALID_VALUE for negative n, got 0x%X\n", err);}
-    else if (buf != sentinel) {printf("[FAIL] Output buffer modified despite GL_INVALID_VALUE (buf=0x%X)\n", buf);}
-    else {printf("[PASS] Negative n correctly rejected, output untouched.\n");}
+    if (err != GL_INVALID_VALUE) {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Expected GL_INVALID_VALUE for negative n, got 0x%x.", err);
+    }
+    else if (buf != sentinel) {
+        TEST_LOG_FAIL(test_case_2, test_procedure, "Output buffer modified despite GL_INVALID_VALUE (buf=0x%X)\n", buf);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_2, test_procedure);
+    }
 }
 
 // n = INT_MIN gibi asiri negatif bir degerle (olasi integer overflow'a
@@ -55,10 +82,13 @@ void FramebufferObjects_GenFramebuffers_TC_003()
     glGenFramebuffers(INT_MIN, &buf);
 
     GLenum err = glGetError();
-    printf("[INFO] n=INT_MIN => err=0x%X, buf unchanged=%s\n",
-    err, (buf == 0x12345678) ? "yes" : "no");
-    if (err == GL_NO_ERROR) {printf("[FAIL] INT_MIN accepted without error - potential overflow risk.\n");}
-    else {printf("[PASS] Implementation survived INT_MIN without crash.\n");}
+
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_FAIL(test_case_3, test_procedure, "INT_MIN accepted without error - potential overflow risk.");
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_3, test_procedure);
+    }
 }
 
 // n = 0 ve framebuffers = NULL kombinasyonunun crash olmadan/hatasiz
@@ -70,8 +100,12 @@ void FramebufferObjects_GenFramebuffers_TC_004()
     glGenFramebuffers(0, NULL);
 
     GLenum err = glGetError();
-    if (err != GL_NO_ERROR) {printf("[FAIL] glGenFramebuffers(0, NULL) produced unexpected error 0x%X\n", err);}
-    else {printf("[PASS] glGenFramebuffers(0, NULL) did not crash and produced no error.\n");}
+    if (err != GL_NO_ERROR) {
+        TEST_LOG_FAIL(test_case_4, test_procedure, "glGenFramebuffers(0, NULL) produced unexpected error 0x%x.", err);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_4, test_procedure);
+    }
 }
 
 // n > 0 iken framebuffers = NULL verildiginde (spesifikasyon tanimsiz
@@ -84,8 +118,12 @@ void FramebufferObjects_GenFramebuffers_TC_005()
     glGenFramebuffers(4, NULL);
 
     GLenum err = glGetError();
-    printf("[INFO] glGenFramebuffers(4, NULL) survived. err=0x%X\n", err);
-    printf("[PASS] Implementation did not crash on NULL output pointer (n>0).\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_5, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_5, test_procedure, "error = 0x%x.", err);
+    }
 }
 
 // Dangling bir pointer'a yazma denemesinin implementasyonun bellek korumasina karsi davranisini test eder.
@@ -98,8 +136,12 @@ void FramebufferObjects_GenFramebuffers_TC_006()
     glGenFramebuffers(4, freedPtr);
 
     GLenum err = glGetError();
-    printf("[INFO] Call with dangling pointer completed. err=0x%X\n", err);
-    printf("[PASS] Implementation did not crash on dangling pointer (best-effort check).\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_6, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
+    }
 }
 
 // glGenFramebuffers'in yalnizca kendisine ayrilan alana yazip yazmadigini
@@ -123,10 +165,15 @@ void FramebufferObjects_GenFramebuffers_TC_007()
     glGenFramebuffers(4, cb.data);
 
     GLenum err = glGetError();
-    if (cb.before != 0xCAFEBABE || cb.after != 0xCAFEBABE) {printf("[FAIL] Buffer overflow detected! before=0x%X after=0x%X\n", cb.before, cb.after);}
-    else if (err != GL_NO_ERROR) {printf("[FAIL] Unexpected error: 0x%X\n", err);}
-    else {printf("[PASS] No overflow into adjacent memory detected, canaries intact.\n");}
-
+    if (cb.before != 0xCAFEBABE || cb.after != 0xCAFEBABE) {
+        TEST_LOG_FAIL(test_case_7, test_procedure, "Buffer overflow detected! before=0x%X after=0x%X\n", cb.before, cb.after);
+    }
+    else if (err != GL_NO_ERROR) {
+        TEST_LOG_FAIL(test_case_7, test_procedure, "Unexpected error: 0x%x.", err);
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_7, test_procedure);
+    }
     glDeleteFramebuffers(4, cb.data);
 }
 
@@ -139,15 +186,19 @@ void FramebufferObjects_GenFramebuffers_TC_008()
     const GLsizei HUGE_N = INT_MAX;
     GLuint *framebuffers = (GLuint *)malloc((size_t)HUGE_N * sizeof(GLuint));
     if (!framebuffers) {
-    printf("[INFO] Host allocation failed before even calling GL - skipping.\n");
-    return;
+        TEST_LOG_FAIL(test_case_8, test_procedure, "Host allocation failed before even calling GL - skipping");
+        return;
     }
 
     glGenFramebuffers(HUGE_N, framebuffers);
 
     GLenum err = glGetError();
-    printf("[INFO] glGenFramebuffers(INT_MAX, ...) => err=0x%X\n", err);
-    printf("[PASS] Implementation handled huge n without crashing process.\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_8, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+    }
 
     free(framebuffers);
 }
@@ -166,8 +217,12 @@ void FramebufferObjects_GenFramebuffers_TC_009()
     glGenFramebuffers(8, smallArray);
     GLenum err2 = glGetError();
 
-    printf("[INFO] Correct-size call err=0x%X, oversized call err=0x%X\n", err1, err2);
-    printf("[PASS] Test completed without process crash (best-effort detection).\n");
+    if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_9, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_9, test_procedure, "error1 = 0x%x, error2 = 0x%x", err1, err2);
+    }
 
     glDeleteFramebuffers(2, smallArray);
 }
@@ -192,10 +247,12 @@ void FramebufferObjects_GenFramebuffers_TC_010()
         }
         glDeleteFramebuffers(BATCH, batch);
     }
-    if (failedAt >= 0) printf("[INFO] Name generation failed at iteration %d\n", failedAt);
-    else printf("[INFO] Completed %d iterations without failure.\n", ITERATIONS);
-
-    printf("[PASS] No crash observed during repeated generate/delete cycles.\n");
+    if (failedAt >= 0) {
+        TEST_LOG_FAIL(test_case_10, test_procedure, "Name generation failed at iteration");
+    }
+    else {
+        TEST_LOG_SUCCESS(test_case_10, test_procedure);
+    }
 }
 
 // Uretilen isimlerin, hic bind edilmeden silinip silinemedigini ve
@@ -211,11 +268,13 @@ void FramebufferObjects_GenFramebuffers_TC_011()
     glDeleteFramebuffers(1, &fbo);
 
     GLenum err = glGetError();
-    printf("[INFO] glIsFramebuffer before any bind=%s (expect GL_FALSE per spec), delete err=0x%X\n",
-    isFboBeforeBind ? "GL_TRUE" : "GL_FALSE", err);
 
-    if (isFboBeforeBind == GL_FALSE && err == GL_NO_ERROR) {printf("[PASS] Unbound name correctly reported as non-framebuffer, deleted cleanly.\n");}
-    else {printf("[FAIL] Unexpected lifecycle behavior for never-bound name.\n");}
+    if (isFboBeforeBind == GL_FALSE && err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_11, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_11, test_procedure, "Unexpected lifecycle behavior for never-bound name");
+    }
 }
 
 // Ayni ismin silme sonrasi tekrar uretilip uretilmedigini (isim geri
@@ -231,9 +290,13 @@ void FramebufferObjects_GenFramebuffers_TC_012()
     GLuint second;
     glGenFramebuffers(1, &second);
 
-    printf("[INFO] first=%u, second=%u (reuse=%s)\n", first, second, (first == second) ? "yes" : "no");
-    printf("[PASS] No crash across generate-delete-generate cycle.\n");
-
+    GLenum err = glGetError();
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_12, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_12, test_procedure, "error = 0x%x.", err);
+    }
     glDeleteFramebuffers(1, &second);
 }
 
@@ -250,8 +313,12 @@ void FramebufferObjects_GenFramebuffers_TC_013()
     glGenFramebuffers(4, unaligned);
 
     GLenum err = glGetError();
-    printf("[INFO] Unaligned pointer call => err=0x%X\n", err);
-    printf("[PASS] Implementation did not crash with unaligned pointer.\n");
+    if (err == GL_NO_ERROR) {
+        TEST_LOG_SUCCESS(test_case_13, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_13, test_procedure, "error = 0x%x.", err);
+    }
 }
 
 // Farkli n degerleriyle (gecerli/gecersiz karisik) art arda cagrilarak
@@ -268,14 +335,22 @@ void FramebufferObjects_GenFramebuffers_TC_014()
         GLuint *arr = (n > 0) ? (GLuint *)malloc(sizeof(GLuint) * (size_t)n) : NULL;
 
         glGenFramebuffers(n, arr);
+
         GLenum err = glGetError();
-        printf("[INFO] n=%d => err=0x%X\n", n, err);
+        if ((n >= 0 && err != GL_NO_ERROR) || (n<0 && err != GL_INVALID_VALUE)) {
+            TEST_LOG_FAIL(test_case_14, test_procedure, "error = 0x%x.", err);
+            if (arr) {
+                glDeleteFramebuffers(n, arr);
+                free(arr);
+            }
+            return;
+        }
         if (arr) {
             glDeleteFramebuffers(n, arr);
             free(arr);
         }
     }
-    printf("[PASS] Varying n sequence completed without crash.\n");
+    TEST_LOG_SUCCESS(test_case_14, test_procedure);
 }
 
 // glGenFramebuffers ve glGenRenderbuffers'in (ve varsa glGenBuffers'in)
@@ -296,14 +371,14 @@ void FramebufferObjects_GenFramebuffers_TC_015()
     GLboolean fboIsRb = glIsRenderbuffer(fbo);
     GLboolean rbIsFbo = glIsFramebuffer(rb);
 
-    printf("[INFO] fbo(%u) as renderbuffer=%s, rb(%u) as framebuffer=%s\n",
-    fbo, fboIsRb ? "GL_TRUE" : "GL_FALSE",
-    rb, rbIsFbo ? "GL_TRUE" : "GL_FALSE");
-
     // Isimler numerik olarak ortusebilir (her ikisi de kucuk sayidan
     // baslayabilir) ama tur olarak birbirine karismamalidir.
-    if (fboIsRb == GL_FALSE && rbIsFbo == GL_FALSE) {printf("[PASS] Namespace correctly isolated between object types.\n");}
-    else {printf("[FAIL] Cross-type namespace confusion detected - potential type-safety bug.\n");}
+    if (fboIsRb == GL_FALSE && rbIsFbo == GL_FALSE) {
+        TEST_LOG_SUCCESS(test_case_15, test_procedure);
+    }
+    else {
+        TEST_LOG_FAIL(test_case_15, test_procedure, "Cross-type namespace confusion detected - potential type-safety bug");
+    }
 
     glDeleteFramebuffers(1, &fbo);
     glDeleteRenderbuffers(1, &rb);

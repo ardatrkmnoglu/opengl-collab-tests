@@ -2,7 +2,7 @@
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
 #include "tests/BufferObjects/tests.h"
-#include "tests/Framebuffer Objects/frameBuffer_tests.h"
+#include "tests/FramebufferObjects/frameBuffer_tests.h"
 
 const char* vertexShaderSource = "#version 100\n"
 "attribute vec3 aPos;\n"

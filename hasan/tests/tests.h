@@ -34,4 +34,11 @@ void Texturing_TexStorage2D_TC_003(void);
 void Texturing_TexStorage2D_TC_004(void);
 void Texturing_TexStorage2D_TC_005(void);
 
+/* --------------- Texturing - TexSubImage2D --------------- */
+void Texturing_TexSubImage2D_TC_001(void);
+void Texturing_TexSubImage2D_TC_002(void);
+void Texturing_TexSubImage2D_TC_003(void);
+void Texturing_TexSubImage2D_TC_004(void);
+void Texturing_TexSubImage2D_TC_005(void);
+
 #endif

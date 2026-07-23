@@ -75,6 +75,13 @@ void init(void) {
     Texturing_TexStorage2D_TC_003();
     Texturing_TexStorage2D_TC_004();
     Texturing_TexStorage2D_TC_005();
+
+    /* --------------- Texturing - TexSubImage2D --------------- */
+    Texturing_TexSubImage2D_TC_001();
+    Texturing_TexSubImage2D_TC_002();
+    Texturing_TexSubImage2D_TC_003();
+    Texturing_TexSubImage2D_TC_004();
+    Texturing_TexSubImage2D_TC_005();
 }
 
 void draw(void) {

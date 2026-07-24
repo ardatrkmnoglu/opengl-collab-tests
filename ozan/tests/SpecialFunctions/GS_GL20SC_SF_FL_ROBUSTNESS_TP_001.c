@@ -2,14 +2,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "SpecialFunctions_Flush_TP_001";
-static const char *test_case_1 = "SpecialFunctions_Flush_TC_001";
-static const char *test_case_2 = "SpecialFunctions_Flush_TC_002";
-static const char *test_case_3 = "SpecialFunctions_Flush_TC_003";
-static const char *test_case_4 = "SpecialFunctions_Flush_TC_004";
-static const char *test_case_5 = "SpecialFunctions_Flush_TC_005";
-static const char *test_case_6 = "SpecialFunctions_Flush_TC_006";
-static const char *test_case_7 = "SpecialFunctions_Flush_TC_007";
+static const char *test_procedure = "GS_GL20SC_SF_FL_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_SF_FL_ROBUSTNESS_TC_007";
 /* ============================================================
  * TEST 1 : Basic Robustness
  * ============================================================
@@ -24,7 +24,7 @@ static const char *test_case_7 = "SpecialFunctions_Flush_TC_007";
  * GL_NO_ERROR döndürmelidir.
  */
 
-void SpecialFunctions_Flush_TC_001(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_001(void) {
 	GLenum err;
 
 	clearGLErrors();
@@ -52,7 +52,6 @@ void SpecialFunctions_Flush_TC_001(void) {
 /*
  * glFlush() yalnızca komutların yürütülmesini
  * başlatmalıdır.
- *
  * OpenGL state'ini değiştirmemelidir.
  *
  * Viewport ayarlanır.
@@ -61,7 +60,7 @@ void SpecialFunctions_Flush_TC_001(void) {
  * Viewport'un aynı kaldığı doğrulanır.
  */
 
-void SpecialFunctions_Flush_TC_002(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_002(void) {
 	GLenum err;
 
 	clearGLErrors();
@@ -100,7 +99,7 @@ void SpecialFunctions_Flush_TC_002(void) {
  * bozmamalıdır.
  */
 
-void SpecialFunctions_Flush_TC_003(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_003(void) {
 	GLenum err;
 
 	clearGLErrors();
@@ -145,7 +144,7 @@ void SpecialFunctions_Flush_TC_003(void) {
  * herhangi bir OpenGL hatası üretmemelidir.
  */
 
-void SpecialFunctions_Flush_TC_004(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_004(void) {
 	unsigned int i;
 	GLenum err;
 
@@ -186,7 +185,7 @@ void SpecialFunctions_Flush_TC_004(void) {
  *   oluşmadığını doğrulamaktır.
  */
 
-void SpecialFunctions_Flush_TC_005(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_005(void) {
 	unsigned int i;
 	GLenum err;
 
@@ -230,7 +229,7 @@ void SpecialFunctions_Flush_TC_005(void) {
  * Her çağrı GL_NO_ERROR üretmelidir.
  */
 
-void SpecialFunctions_Flush_TC_006(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_006(void) {
 	unsigned int i;
 	GLenum err;
 
@@ -268,7 +267,7 @@ void SpecialFunctions_Flush_TC_006(void) {
  * sürücünün kararlı kaldığını doğrulamaktır.
  */
 
-void SpecialFunctions_Flush_TC_007(void) {
+void GS_GL20SC_SF_FL_ROBUSTNESS_TC_007(void) {
 	unsigned int i;
 	GLenum err;
 

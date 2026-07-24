@@ -111,13 +111,4 @@ void resetState_CullFace(void);	   /* culling kapali, GL_CCW, GL_BACK  */
 void resetState_PolygonO(void);	   /* offset fill / depth test kapali  */
 void resetState_PixelStorei(void); /* pack / unpack alignment = 4      */
 
-/* ---------- Yardimci ---------- */
-
-/*
- * rand() bazi platformlarda yalnizca 15 bit uretir.
- * Tam 32-bit aralikta rastgele deger elde etmek icin
- * birden fazla cagri birlestirilir.
- */
-GLint randInt32(void);
-
 #endif /* HELPER_H */

@@ -2,13 +2,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "ViewportandClipping_Viewport_TP_001";
-static const char *test_case_1 = "ViewportandClipping_Viewport_TC_001";
-static const char *test_case_2 = "ViewportandClipping_Viewport_TC_002";
-static const char *test_case_3 = "ViewportandClipping_Viewport_TC_003";
-static const char *test_case_4 = "ViewportandClipping_Viewport_TC_004";
-static const char *test_case_5 = "ViewportandClipping_Viewport_TC_005";
-static const char *test_case_6 = "ViewportandClipping_Viewport_TC_006";
+static const char *test_procedure = "GS_GL20SC_VC_V_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_VC_V_ROBUSTNESS_TC_006";
 
 /* ============================================================
  * TEST 1: Temel Robustness Dogrulamasi
@@ -20,7 +20,7 @@ static const char *test_case_6 = "ViewportandClipping_Viewport_TC_006";
  * ile reddedilmeli ve state korunmalidir.
  */
 
-void ViewportandClipping_Viewport_TC_001(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_001(void) {
 	GLint viewport[4];
 	GLenum err;
 	resetState_Viewport();
@@ -86,7 +86,7 @@ void ViewportandClipping_Viewport_TC_001(void) {
  * GL_INVALID_VALUE beklenir.
  */
 
-void ViewportandClipping_Viewport_TC_002(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_002(void) {
 	int w, h;
 	int passCount = 0;
 	int failCount = 0;
@@ -141,7 +141,7 @@ void ViewportandClipping_Viewport_TC_002(void) {
  * sinirlandirilmistir.
  * ============================================================ */
 
-void ViewportandClipping_Viewport_TC_003(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_003(void) {
 	GLint viewport[4];
 	GLenum err;
 	GLint coordinates[][2] = {{0, 0},
@@ -197,7 +197,7 @@ void ViewportandClipping_Viewport_TC_003(void) {
  * ve INT_MAX ile davranis gozlemlenir.
  * ============================================================ */
 
-void ViewportandClipping_Viewport_TC_004(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_004(void) {
 	GLint maxViewport[2];
 	GLenum err;
 
@@ -248,7 +248,7 @@ void ViewportandClipping_Viewport_TC_004(void) {
  * degistirmedigini dogrular.
  * ============================================================ */
 
-void ViewportandClipping_Viewport_TC_005(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_005(void) {
 	GLenum err;
 
 	resetState_Viewport();
@@ -297,26 +297,24 @@ void ViewportandClipping_Viewport_TC_005(void) {
  * cagrilar birlikte taranir.
  * ============================================================ */
 
-void ViewportandClipping_Viewport_TC_006(void) {
+void GS_GL20SC_VC_V_ROBUSTNESS_TC_006(void) {
 	unsigned int i;
 	unsigned int validCount = 0;
 	unsigned int invalidCount = 0;
 
 	resetState_Viewport();
 
-	srand(12345);
-
 	for (i = 0; i < 1000000; i++) {
-		GLint x = randInt32();
-		GLint y = randInt32();
-		GLsizei width = (GLsizei)(randInt32() % 4096);
-		GLsizei height = (GLsizei)(randInt32() % 4096);
+		GLint x = (GLint)((i % 200003) - 100000);
+		GLint y = (GLint)((i % 199999) - 100000);
+		GLsizei width = (GLsizei)((i % 8191) - 4095);
+		GLsizei height = (GLsizei)((i % 8087) - 4043);
 
 		GLenum expected;
 		GLenum err;
 
 		expected =
-		    (width < 0 || height < 0) ? GL_INVALID_VALUE : GL_NO_ERROR;
+			(width < 0 || height < 0) ? GL_INVALID_VALUE : GL_NO_ERROR;
 
 		if (expected == GL_NO_ERROR)
 			validCount++;
@@ -328,9 +326,9 @@ void ViewportandClipping_Viewport_TC_006(void) {
 
 		if (err != expected) {
 			TEST_LOG_FAIL(test_case_6, test_procedure,
-				      "Iteration=%u Viewport=(%d,%d,%d,%d) "
-				      "Beklenen=0x%X Gelen=0x%X",
-				      i, x, y, width, height, expected, err);
+					  "Iteration=%u Viewport=(%d,%d,%d,%d) "
+					  "Beklenen=0x%X Gelen=0x%X",
+					  i, x, y, width, height, expected, err);
 			return;
 		}
 	}
@@ -338,7 +336,7 @@ void ViewportandClipping_Viewport_TC_006(void) {
 	resetState_Viewport();
 
 	TEST_LOG_INFO(
-	    "1000000 rastgele cagri tamamlandi (gecerli: %u, gecersiz: %u)",
-	    validCount, invalidCount);
+		"1000000 cagri tamamlandi (gecerli: %u, gecersiz: %u)",
+		validCount, invalidCount);
 	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }

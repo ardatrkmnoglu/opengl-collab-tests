@@ -2,13 +2,13 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "PixelRectangles_PixelStorei_TP_001";
-static const char *test_case_1 = "PixelRectangles_PixelStorei_TC_001";
-static const char *test_case_2 = "PixelRectangles_PixelStorei_TC_002";
-static const char *test_case_3 = "PixelRectangles_PixelStorei_TC_003";
-static const char *test_case_4 = "PixelRectangles_PixelStorei_TC_004";
-static const char *test_case_5 = "PixelRectangles_PixelStorei_TC_005";
-static const char *test_case_6 = "PixelRectangles_PixelStorei_TC_006";
+static const char *test_procedure = "GS_GL20SC_PR_PS_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_PR_PS_ROBUSTNESS_TC_006";
 
 /* ============================================================
  * TEST 1: Temel Robustness Doğrulaması
@@ -33,7 +33,7 @@ static const char *test_case_6 = "PixelRectangles_PixelStorei_TC_006";
  * oluşmadığı doğrulanır.
  */
 
-void PixelRectangles_PixelStorei_TC_001(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_001(void) {
 	GLenum err;
 	int i;
 	GLint validValues[] = {1, 2, 4, 8};
@@ -99,7 +99,7 @@ void PixelRectangles_PixelStorei_TC_001(void) {
  * doğrulanır.
  */
 
-void PixelRectangles_PixelStorei_TC_002(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_002(void) {
 	GLenum err;
 	int i;
 	int count;
@@ -156,7 +156,7 @@ void PixelRectangles_PixelStorei_TC_002(void) {
  * doğrulanmaktadır.
  */
 
-void PixelRectangles_PixelStorei_TC_003(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_003(void) {
 	GLenum err;
 	GLenum pname;
 
@@ -223,7 +223,7 @@ void PixelRectangles_PixelStorei_TC_003(void) {
  * değiştirmemesi beklenmektedir.
  */
 
-void PixelRectangles_PixelStorei_TC_004(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_004(void) {
 	GLenum err;
 	GLint value;
 
@@ -334,7 +334,7 @@ void PixelRectangles_PixelStorei_TC_004(void) {
  * hata kuyruğunun doğru çalıştığını doğrulamaktır.
  */
 
-void PixelRectangles_PixelStorei_TC_005(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_005(void) {
 	GLenum err;
 
 	resetState_PixelStorei();
@@ -418,43 +418,41 @@ void PixelRectangles_PixelStorei_TC_005(void) {
  * Bunların dışındaki herhangi bir hata FAIL kabul edilir.
  */
 
-void PixelRectangles_PixelStorei_TC_006(void) {
+void GS_GL20SC_PR_PS_ROBUSTNESS_TC_006(void) {
 	unsigned int i;
 
 	GLenum validPnames[] = {GL_PACK_ALIGNMENT, GL_UNPACK_ALIGNMENT};
 
 	resetState_PixelStorei();
 
-	srand(12345);
-
 	for (i = 0; i < 1000000; i++) {
 		GLenum pname;
 		GLint value;
 		GLenum err;
 
-		if (rand() % 2)
-			pname = validPnames[rand() % 2];
+		if (i % 2)
+			pname = validPnames[(i / 2) % 2];
 		else
-			pname = (GLenum)rand();
+			pname = (GLenum)(i % 65536);
 
-		value = (rand() % 200) - 100;
+		value = (GLint)((i % 199) - 100);
 
 		glPixelStorei(pname, value);
 
 		err = glGetError();
 
 		if (err != GL_NO_ERROR && err != GL_INVALID_ENUM &&
-		    err != GL_INVALID_VALUE) {
+			err != GL_INVALID_VALUE) {
 			TEST_LOG_FAIL(test_case_6, test_procedure,
-				      "Iteration : %u pname : 0x%X value : %d "
-				      "Error : 0x%X",
-				      i, pname, value, err);
+					  "Iteration : %u pname : 0x%X value : %d "
+					  "Error : 0x%X",
+					  i, pname, value, err);
 			return;
-		}
+			}
 	}
 
 	resetState_PixelStorei();
 
-	TEST_LOG_INFO("1,000,000 rastgele test basariyla tamamlandi.");
+	TEST_LOG_INFO("1,000,000 test basariyla tamamlandi.");
 	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }

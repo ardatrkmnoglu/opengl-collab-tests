@@ -2,14 +2,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "ErrorsandStatusReset_GetError_TP_001";
-static const char *test_case_1 = "ErrorsandStatusReset_GetError_TC_001";
-static const char *test_case_2 = "ErrorsandStatusReset_GetError_TC_002";
-static const char *test_case_3 = "ErrorsandStatusReset_GetError_TC_003";
-static const char *test_case_4 = "ErrorsandStatusReset_GetError_TC_004";
-static const char *test_case_5 = "ErrorsandStatusReset_GetError_TC_005";
-static const char *test_case_6 = "ErrorsandStatusReset_GetError_TC_006";
-static const char *test_case_7 = "ErrorsandStatusReset_GetError_TC_007";
+static const char *test_procedure = "GS_GL20SC_ESR_GE_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_ESR_GE_ROBUSTNESS_TC_007";
 
 /* ============================================================
  * TEST 1: Basic Robustness
@@ -24,7 +24,7 @@ static const char *test_case_7 = "ErrorsandStatusReset_GetError_TC_007";
  * herhangi bir hata üretmemelidir.
  */
 
-void ErrorsandStatusReset_GetError_TC_001(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_001(void) {
 	GLenum err;
 	clearGLErrors();
 
@@ -67,7 +67,7 @@ void ErrorsandStatusReset_GetError_TC_001(void) {
  * GL_NO_ERROR döndürmelidir.
  */
 
-void ErrorsandStatusReset_GetError_TC_002(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_002(void) {
 	GLenum err;
 	clearGLErrors();
 
@@ -105,7 +105,7 @@ void ErrorsandStatusReset_GetError_TC_002(void) {
  * döndürmelidir.
  */
 
-void ErrorsandStatusReset_GetError_TC_003(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_003(void) {
 	unsigned int i;
 	GLenum err;
 	clearGLErrors();
@@ -138,7 +138,7 @@ void ErrorsandStatusReset_GetError_TC_003(void) {
  * Son çağrı mutlaka GL_NO_ERROR döndürmelidir.
  */
 
-void ErrorsandStatusReset_GetError_TC_004(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_004(void) {
 	GLenum err;
 	int errorCount = 0;
 	clearGLErrors();
@@ -191,7 +191,7 @@ void ErrorsandStatusReset_GetError_TC_004(void) {
  * ve state'in korunup korunmadığı doğrulanır.
  */
 
-void ErrorsandStatusReset_GetError_TC_005(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_005(void) {
 	GLenum err;
 	unsigned int i;
 	GLfloat width;
@@ -254,7 +254,7 @@ void ErrorsandStatusReset_GetError_TC_005(void) {
  * GL_NO_ERROR döndürmelidir.
  */
 
-void ErrorsandStatusReset_GetError_TC_006(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_006(void) {
 	unsigned int i;
 	GLenum err;
 	clearGLErrors();
@@ -286,7 +286,7 @@ void ErrorsandStatusReset_GetError_TC_006(void) {
  * tekrar GL_NO_ERROR döndürdüğü kontrol edilir.
  */
 
-void ErrorsandStatusReset_GetError_TC_007(void) {
+void GS_GL20SC_ESR_GE_ROBUSTNESS_TC_007(void) {
 	GLenum err;
 	int i;
 	clearGLErrors();

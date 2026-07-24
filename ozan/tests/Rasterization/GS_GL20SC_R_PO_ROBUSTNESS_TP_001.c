@@ -2,14 +2,14 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "Rasterizaton_PolygonOffset_TP_001";
-static const char *test_case_1 = "Rasterizaton_PolygonOffset_TC_001";
-static const char *test_case_2 = "Rasterizaton_PolygonOffset_TC_002";
-static const char *test_case_3 = "Rasterizaton_PolygonOffset_TC_003";
-static const char *test_case_4 = "Rasterizaton_PolygonOffset_TC_004";
-static const char *test_case_5 = "Rasterizaton_PolygonOffset_TC_005";
-static const char *test_case_6 = "Rasterizaton_PolygonOffset_TC_006";
-static const char *test_case_7 = "Rasterizaton_PolygonOffset_TC_007";
+static const char *test_procedure = "GS_GL20SC_R_PO_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_R_PO_ROBUSTNESS_TC_007";
 
 /*
  * Ortak checkFloatState2 helper'i icin dosyaya ozel kisayol.
@@ -32,7 +32,7 @@ static int checkOffset(const char *test_case, GLfloat factor, GLfloat units) {
  * alinabilmelidir.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_001(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_001(void) {
 	GLenum err;
 
 	resetState_PolygonO();
@@ -88,7 +88,7 @@ void Rasterizaton_PolygonOffset_TC_001(void) {
  * Tum cagrilar GL_NO_ERROR donmelidir.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_002(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_002(void) {
 	int i;
 	int passCount = 0;
 	int failCount = 0;
@@ -135,7 +135,7 @@ void Rasterizaton_PolygonOffset_TC_002(void) {
  * fonksiyon hata uretmez; kuyruk temiz kalmalidir.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_003(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_003(void) {
 	int i;
 	GLenum err;
 
@@ -166,7 +166,7 @@ void Rasterizaton_PolygonOffset_TC_003(void) {
  * glPolygonOffset durumunun degismedigini dogrular.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_004(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_004(void) {
 	GLenum err;
 
 	resetState_PolygonO();
@@ -212,7 +212,7 @@ void Rasterizaton_PolygonOffset_TC_004(void) {
  * tanimlamaz. Test bilgilendiricidir.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_005(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_005(void) {
 	GLenum err;
 	GLfloat factor, units;
 
@@ -249,7 +249,7 @@ void Rasterizaton_PolygonOffset_TC_005(void) {
  * Her gecisten sonra durum sorgulanir.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_006(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_006(void) {
 	int i;
 	const int tekrar = 10000;
 
@@ -287,7 +287,7 @@ void Rasterizaton_PolygonOffset_TC_006(void) {
  * korunup korunmadigini dogrular.
  * ============================================================ */
 
-void Rasterizaton_PolygonOffset_TC_007(void) {
+void GS_GL20SC_R_PO_ROBUSTNESS_TC_007(void) {
 	GLenum err;
 
 	resetState_PolygonO();

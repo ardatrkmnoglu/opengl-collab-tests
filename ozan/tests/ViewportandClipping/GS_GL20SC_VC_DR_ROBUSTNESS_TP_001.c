@@ -2,26 +2,26 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "ViewportandClipping_DepthRangef_TP_001";
-static const char *test_case_1 = "ViewportandClipping_DepthRangef_TC_001";
-static const char *test_case_2 = "ViewportandClipping_DepthRangef_TC_002";
-static const char *test_case_3 = "ViewportandClipping_DepthRangef_TC_003";
-static const char *test_case_4 = "ViewportandClipping_DepthRangef_TC_004";
-static const char *test_case_5 = "ViewportandClipping_DepthRangef_TC_005";
-static const char *test_case_6 = "ViewportandClipping_DepthRangef_TC_006";
+static const char *test_procedure = "GS_GL20SC_VC_DR_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_VC_DR_ROBUSTNESS_TC_006";
 /* ============================================================
  * TEST 1: Sozlesme dogrulama
  * ============================================================ */
 
 /*
  * glDepthRange'in temel sozlesmesini dogrular.
- * Tum double degerler kabul edilmeli ve GL_NO_ERROR
+ * Tum float degerler kabul edilmeli ve GL_NO_ERROR
  * dondurmelidir. Spec'e gore near/far degerleri gerekirse
  * [0,1] araligina clamp edilir; hata olusmaz.
  */
 
-void ViewportandClipping_DepthRangef_TC_001(void) {
-	GLdouble depthRange[2];
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_001(void) {
+	GLfloat depthRange[2];
 	GLenum err;
 
 	resetState_DepthRange();
@@ -36,7 +36,7 @@ void ViewportandClipping_DepthRangef_TC_001(void) {
 		return;
 	}
 
-	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	glGetfloatv(GL_DEPTH_RANGE, depthRange);
 
 	if (fabs(depthRange[0] - 0.0) > 1e-6 ||
 	    fabs(depthRange[1] - 1.0) > 1e-6) {
@@ -56,7 +56,7 @@ void ViewportandClipping_DepthRangef_TC_001(void) {
 		return;
 	}
 
-	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	glGetfloatv(GL_DEPTH_RANGE, depthRange);
 
 	if (fabs(depthRange[0] - 1.0) > 1e-6 ||
 	    fabs(depthRange[1] - 0.0) > 1e-6) {
@@ -82,7 +82,7 @@ void ViewportandClipping_DepthRangef_TC_001(void) {
  * korumalidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_002(void) {
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_002(void) {
 	int nearStep;
 	int farStep;
 	int passCount = 0;
@@ -92,8 +92,8 @@ void ViewportandClipping_DepthRangef_TC_002(void) {
 
 	for (nearStep = -10; nearStep <= 20; nearStep++) {
 		for (farStep = -10; farStep <= 20; farStep++) {
-			GLdouble nearVal = nearStep / 10.0;
-			GLdouble farVal = farStep / 10.0;
+			GLfloat nearVal = nearStep / 10.0;
+			GLfloat farVal = farStep / 10.0;
 			GLenum err;
 
 			glDepthRange(nearVal, farVal);
@@ -135,15 +135,15 @@ void ViewportandClipping_DepthRangef_TC_002(void) {
  * hale getirmemelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_003(void) {
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_003(void) {
 	GLenum err;
-	GLdouble tests[][2] = {{0.0, 1.0},
+	GLfloat tests[][2] = {{0.0, 1.0},
 			       {1.0, 0.0},
 			       {-1.0, 2.0},
-			       {-DBL_MAX, DBL_MAX},
-			       {DBL_MAX, -DBL_MAX},
-			       {DBL_MIN, DBL_MAX},
-			       {-DBL_MIN, DBL_MIN},
+			       {-FLT_MAX, FLT_MAX},
+			       {FLT_MAX, -FLT_MAX},
+			       {FLT_MIN, FLT_MAX},
+			       {-FLT_MIN, FLT_MIN},
 			       {1000000.0, -1000000.0},
 			       {NAN, NAN},
 			       {INFINITY, INFINITY},
@@ -185,11 +185,11 @@ void ViewportandClipping_DepthRangef_TC_003(void) {
  * degerleri dondurmelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_004(void) {
-	GLdouble depthRange[2];
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_004(void) {
+	GLfloat depthRange[2];
 	GLenum err;
 
-	GLdouble values[][2] = {
+	GLfloat values[][2] = {
 	    {0.0, 1.0}, {1.0, 0.0}, {0.25, 0.75}, {-1.0, 2.0}, {5.0, -5.0}};
 
 	int count = sizeof(values) / sizeof(values[0]);
@@ -208,7 +208,7 @@ void ViewportandClipping_DepthRangef_TC_004(void) {
 			return;
 		}
 
-		glGetDoublev(GL_DEPTH_RANGE, depthRange);
+		glGetfloatv(GL_DEPTH_RANGE, depthRange);
 
 		if (depthRange[0] < 0.0 || depthRange[0] > 1.0) {
 			TEST_LOG_FAIL(test_case_4, test_procedure,
@@ -223,8 +223,8 @@ void ViewportandClipping_DepthRangef_TC_004(void) {
 			return;
 		}
 	}
-
-	if (!checkDoubleState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0,
+// TEST EDİLMESİ ŞART
+	if (!checkFloatState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0,
 			       1.0, 1e-6))
 		return;
 
@@ -243,8 +243,8 @@ void ViewportandClipping_DepthRangef_TC_004(void) {
  * temiz kalmali ve state dogru sekilde guncellenmelidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_005(void) {
-	GLdouble depthRange[2];
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_005(void) {
+	GLfloat depthRange[2];
 	GLenum err;
 
 	resetState_DepthRange();
@@ -258,7 +258,7 @@ void ViewportandClipping_DepthRangef_TC_005(void) {
 		return;
 	}
 
-	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	glGetfloatv(GL_DEPTH_RANGE, depthRange);
 
 	if (depthRange[0] < 0.0 || depthRange[0] > 1.0 || depthRange[1] < 0.0 ||
 	    depthRange[1] > 1.0) {
@@ -277,7 +277,7 @@ void ViewportandClipping_DepthRangef_TC_005(void) {
 		return;
 	}
 
-	glGetDoublev(GL_DEPTH_RANGE, depthRange);
+	glGetfloatv(GL_DEPTH_RANGE, depthRange);
 
 	if (depthRange[0] < 0.0 || depthRange[0] > 1.0 || depthRange[1] < 0.0 ||
 	    depthRange[1] > 1.0) {
@@ -301,17 +301,14 @@ void ViewportandClipping_DepthRangef_TC_005(void) {
  * Beklenmeyen GL hatasi, context kaybi veya crash olmamalidir.
  */
 
-void ViewportandClipping_DepthRangef_TC_006(void) {
+void GS_GL20SC_VC_DR_ROBUSTNESS_TC_006(void) {
 	unsigned int i;
 
 	resetState_DepthRange();
 
-	srand(12345);
-
 	for (i = 0; i < 1000000; i++) {
-		GLdouble nearValue =
-		    ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
-		GLdouble farValue = ((GLdouble)rand() / RAND_MAX) * 20.0 - 10.0;
+		GLfloat nearValue = -10.0f + (GLfloat)(i % 2001) * 0.01f;
+		GLfloat farValue = 10.0f - (GLfloat)(i % 1999) * 0.01f;
 
 		GLenum err;
 
@@ -320,14 +317,11 @@ void ViewportandClipping_DepthRangef_TC_006(void) {
 		err = glGetError();
 
 		if (err != GL_NO_ERROR) {
-			TEST_LOG_FAIL(
-			    test_case_6, test_procedure,
-			    "Iteration: %u Near: %lf Far: %lf Error: 0x%X", i,
-			    nearValue, farValue, err);
+			TEST_LOG_FAIL( test_case_6, test_procedure, "Iteration: %u Near: %f Far: %f Error: 0x%X", i,
+				nearValue, farValue, err);
 			return;
 		}
 	}
-
 	resetState_DepthRange();
 	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }

@@ -2,15 +2,15 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char *test_procedure = "Rasterizaton_FrontFace_TP_001";
-static const char *test_case_1 = "Rasterizaton_FrontFace_TC_001";
-static const char *test_case_2 = "Rasterizaton_FrontFace_TC_002";
-static const char *test_case_3 = "Rasterizaton_FrontFace_TC_003";
-static const char *test_case_4 = "Rasterizaton_FrontFace_TC_004";
-static const char *test_case_5 = "Rasterizaton_FrontFace_TC_005";
-static const char *test_case_6 = "Rasterizaton_FrontFace_TC_006";
-static const char *test_case_7 = "Rasterizaton_FrontFace_TC_007";
-static const char *test_case_8 = "Rasterizaton_FrontFace_TC_008";
+static const char *test_procedure = "GS_GL20SC_R_FF_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_007";
+static const char *test_case_8 = "GS_GL20SC_R_FF_ROBUSTNESS_TC_008";
 
 /* ============================================================
  * TEST 1 : Error Queue Management
@@ -25,7 +25,7 @@ static const char *test_case_8 = "Rasterizaton_FrontFace_TC_008";
  * normal çalışmaya döndüğü kontrol edilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_001(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_001(void) {
 	GLenum err;
 	int errorCount = 0;
 	int i;
@@ -75,7 +75,7 @@ void Rasterizaton_FrontFace_TC_001(void) {
  * Her çağrı sonrasında GL_FRONT_FACE sorgulanır.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_002(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_002(void) {
 	const int repeat = 100000;
 	int i;
 
@@ -119,7 +119,7 @@ void Rasterizaton_FrontFace_TC_002(void) {
  * değişmediği de kontrol edilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_003(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_003(void) {
 	GLenum sequence[] = {GL_CW, 0x1111, GL_CCW, 0x2222,
 			     GL_CW, 0x3333, GL_CCW, 0x4444};
 
@@ -175,7 +175,7 @@ void Rasterizaton_FrontFace_TC_003(void) {
  * değerinin değişmediği kontrol edilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_004(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_004(void) {
 	GLenum err;
 	GLenum invalidEnums[] = {0, 1, 2, 1234, 9999, 0xFFFF, 0xFFFFFFFF};
 
@@ -225,7 +225,7 @@ void Rasterizaton_FrontFace_TC_004(void) {
  * sonrasında OpenGL state'i kontrol edilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_005(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_005(void) {
 	GLenum frontModes[] = {GL_CCW, GL_CW};
 
 	GLenum cullModes[] = {GL_FRONT, GL_BACK, GL_FRONT_AND_BACK};
@@ -301,7 +301,7 @@ void Rasterizaton_FrontFace_TC_005(void) {
  * değiştirmediği de kontrol edilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_006(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_006(void) {
 	GLenum values[] = {(GLenum)0x10000, (GLenum)0x7FFFFFFF,
 			   (GLenum)0x80000000, (GLenum)0xFFFFFFFF};
 
@@ -344,7 +344,7 @@ void Rasterizaton_FrontFace_TC_006(void) {
  * ve son durum doğru şekilde korunmalıdır.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_007(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_007(void) {
 	const unsigned int repeat = 1000000;
 	unsigned int i;
 
@@ -388,39 +388,38 @@ void Rasterizaton_FrontFace_TC_007(void) {
  * olarak değerlendirilir.
  * ============================================================ */
 
-void Rasterizaton_FrontFace_TC_008(void) {
+void GS_GL20SC_R_FF_ROBUSTNESS_TC_008(void) {
 	unsigned int i;
 
 	resetState_FrontFace();
-	srand(12345);
 
 	for (i = 0; i < 1000000; i++) {
 		GLenum value;
 		GLenum err;
-		switch (rand() % 4) {
-		case 0:
-			value = GL_CW;
-			break;
-		case 1:
-			value = GL_CCW;
-			break;
-		default:
-			value = (GLenum)rand();
-			break;
+		switch (i % 4) {
+			case 0:
+				value = GL_CW;
+				break;
+			case 1:
+				value = GL_CCW;
+				break;
+			default:
+				value = (GLenum)(i % 65536);
+				break;
 		}
 
 		glFrontFace(value);
 		err = glGetError();
 		if (err != GL_NO_ERROR && err != GL_INVALID_ENUM) {
 			TEST_LOG_FAIL(test_case_8, test_procedure,
-				      "Iteration : %u Enum : 0x%X Error : 0x%X",
-				      i, value, err);
+					  "Iteration : %u Enum : 0x%X Error : 0x%X",
+					  i, value, err);
 			return;
 		}
 	}
 
 	resetState_FrontFace();
 
-	TEST_LOG_INFO("1,000,000 rastgele test tamamlandi.");
+	TEST_LOG_INFO("1,000,000 test tamamlandi.");
 	TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }

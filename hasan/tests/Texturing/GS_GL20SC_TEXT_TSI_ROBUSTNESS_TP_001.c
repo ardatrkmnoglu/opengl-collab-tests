@@ -2,13 +2,13 @@
 #include "../../include/macro.h"
 #include "../../include/rtests.h"
 
-static const char *test_case1 = "Texturing_TexSubImage2D_TC_001";
-static const char *test_case2 = "Texturing_TexSubImage2D_TC_002";
-static const char *test_case3 = "Texturing_TexSubImage2D_TC_003";
-static const char *test_case4 = "Texturing_TexSubImage2D_TC_004";
-static const char *test_case5 = "Texturing_TexSubImage2D_TC_005";
+static const char *test_case_1 = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_005";
 
-static const char *test_procedure = "Texturing_TexSubImage2D_TP_001";
+static const char *test_procedure = "GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001";
 
 static GLuint g_tex1 = 0;
 static GLuint g_tex2 = 0;
@@ -16,8 +16,11 @@ static GLuint g_tex3 = 0;
 static GLuint g_tex4 = 0;
 static GLuint g_tex5 = 0;
 
+/* Forward declaration for close */
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001_close(void);
+
 // --- TEST 1: Negatif Boyut Testi (Invalid Value) ---
-void Texturing_TexSubImage2D_TC_001(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -35,16 +38,16 @@ void Texturing_TexSubImage2D_TC_001(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_VALUE) {
-		TEST_LOG_SUCCESS(test_case1, test_procedure);
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case1, test_procedure,
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X",
 			      err);
 	}
 }
 
 // --- TEST 2: Sınır Aşımı (Out of Bounds) Testi ---
-void Texturing_TexSubImage2D_TC_002(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -62,16 +65,16 @@ void Texturing_TexSubImage2D_TC_002(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_VALUE) {
-		TEST_LOG_SUCCESS(test_case2, test_procedure);
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case2, test_procedure,
+		TEST_LOG_FAIL(test_case_2, test_procedure,
 			      "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X",
 			      err);
 	}
 }
 
 // --- TEST 3: Format Uyuşmazlığı Testi ---
-void Texturing_TexSubImage2D_TC_003(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -89,16 +92,16 @@ void Texturing_TexSubImage2D_TC_003(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_OPERATION) {
-		TEST_LOG_SUCCESS(test_case3, test_procedure);
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	} else {
 		TEST_LOG_FAIL(
-		    test_case3, test_procedure,
+		    test_case_3, test_procedure,
 		    "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
 	}
 }
 
 // --- TEST 4: Geçersiz Hedef (Enum) Testi ---
-void Texturing_TexSubImage2D_TC_004(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -116,16 +119,16 @@ void Texturing_TexSubImage2D_TC_004(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_ENUM) {
-		TEST_LOG_SUCCESS(test_case4, test_procedure);
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case4, test_procedure,
+		TEST_LOG_FAIL(test_case_4, test_procedure,
 			      "Beklenen GL_INVALID_ENUM (0x500), alinan: 0x%X",
 			      err);
 	}
 }
 
 // --- TEST 5: Sürekli Güncelleme Stres Testi ---
-void Texturing_TexSubImage2D_TC_005(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -179,16 +182,36 @@ void Texturing_TexSubImage2D_TC_005(void) {
 	}
 
 	if (!error_occurred) {
-		TEST_LOG_SUCCESS(test_case5, test_procedure);
+		TEST_LOG_SUCCESS(test_case_5, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case5, test_procedure,
+		TEST_LOG_FAIL(test_case_5, test_procedure,
 			      "Surekli glTexSubImage2D guncellemesi sirasinda "
 			      "hata olustu");
 	}
 }
 
+/* Initialization */
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001_init(void) {
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_001();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_002();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_003();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_004();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TC_005();
+	//CHECK_ERROR(test_procedure);
+
+	GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001_close();
+}
+
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001_draw(void) {
+}
+
 /* Cleanup */
-void Texturing_TexSubImage2D_close(void) {
+void GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001_close(void) {
 #ifdef __ubuntu__
 	if (g_tex1)
 		glDeleteTextures(1, &g_tex1);
@@ -201,4 +224,5 @@ void Texturing_TexSubImage2D_close(void) {
 	if (g_tex5)
 		glDeleteTextures(1, &g_tex5);
 #endif
+	//CHECK_ERROR(test_procedure);
 }

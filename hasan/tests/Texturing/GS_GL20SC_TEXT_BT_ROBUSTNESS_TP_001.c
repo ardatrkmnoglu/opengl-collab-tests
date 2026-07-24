@@ -2,16 +2,16 @@
 #include "../../include/macro.h"
 #include "../../include/rtests.h"
 
-static const char *test_case1 = "Texturing_BindTexture_TC_001";
-static const char *test_case2 = "Texturing_BindTexture_TC_002";
-static const char *test_case3 = "Texturing_BindTexture_TC_003";
-static const char *test_case4 = "Texturing_BindTexture_TC_004";
-static const char *test_case5 = "Texturing_BindTexture_TC_005";
-static const char *test_case6 = "Texturing_BindTexture_TC_006";
-static const char *test_case7 = "Texturing_BindTexture_TC_007";
-static const char *test_case8 = "Texturing_BindTexture_TC_008";
+static const char *test_case_1 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_007";
+static const char *test_case_8 = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_008";
 
-static const char *test_procedure = "Texturing_BindTexture_TP_001";
+static const char *test_procedure = "GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001";
 
 // Static texture handles for cleanup in close()
 static GLuint g_tex1 = 0;
@@ -21,6 +21,9 @@ static GLuint g_tex4[2] = {0};
 static GLuint g_tex5 = 0;
 static GLuint g_tex6 = 0;
 static GLuint g_tex7 = 0;
+
+/* Forward declaration for close */
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001_close(void);
 
 /*
  * glBindTexture Robustness Test Suite
@@ -36,7 +39,7 @@ static GLuint g_tex7 = 0;
 // TEXTURE_2D ve TEXTURE_CUBE_MAP disindaki hedeflere texture
 // baglamaya calismanin GL_INVALID_ENUM uretip uretmedigi test edilir.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_001(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -57,9 +60,9 @@ void Texturing_BindTexture_TC_001(void) {
 	}
 
 	if (all_invalid_enum)
-		TEST_LOG_SUCCESS(test_case1, test_procedure);
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case1, test_procedure,
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Gecersiz hedefler reddedilmedi");
 }
 
@@ -68,7 +71,7 @@ void Texturing_BindTexture_TC_001(void) {
 // glGenTextures ile olusturulmamis rastgele bir ID'nin bind
 // edilmesi. ES 2.0'da bu gecerli bir islemdir ve yeni bir texture olusturur.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_002(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -83,10 +86,10 @@ void Texturing_BindTexture_TC_002(void) {
 	GLboolean is_tex_after = glIsTexture(g_tex2_random);
 
 	if (!is_tex_before && is_tex_after && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case2, test_procedure);
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case2, test_procedure,
+		    test_case_2, test_procedure,
 		    "Name adoption calismadi: before=%d, after=%d, err=0x%X",
 		    is_tex_before, is_tex_after, err);
 }
@@ -97,7 +100,7 @@ void Texturing_BindTexture_TC_002(void) {
 // bir ID'nin TEXTURE_CUBE_MAP'e bind edilmeye calisilmasi durumu.
 // GL_INVALID_OPERATION firlatilmalidir.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_003(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -112,9 +115,9 @@ void Texturing_BindTexture_TC_003(void) {
 	GLenum err2 = glGetError();
 
 	if (err1 == GL_NO_ERROR && err2 == GL_INVALID_OPERATION)
-		TEST_LOG_SUCCESS(test_case3, test_procedure);
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case3, test_procedure,
+		TEST_LOG_FAIL(test_case_3, test_procedure,
 			      "Capraz hedef hatasi: err1=0x%X, err2=0x%X "
 			      "(0x502 beklenir)",
 			      err1, err2);
@@ -125,7 +128,7 @@ void Texturing_BindTexture_TC_003(void) {
 // Texture0 ve Texture1 unitlerine ayri ID'ler bind edildiginde
 // birbirlerini etkileyip etkilemediklerini kontrol eder.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_004(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -154,9 +157,9 @@ void Texturing_BindTexture_TC_004(void) {
 
 	if ((GLuint)bound_t0 == g_tex4[0] && (GLuint)bound_t1 == g_tex4[1] &&
 	    err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case4, test_procedure);
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case4, test_procedure,
+		TEST_LOG_FAIL(test_case_4, test_procedure,
 			      "Izolasyon bozuk: t0=%d (beklenen %u), t1=%d "
 			      "(beklenen %u), err=0x%X",
 			      bound_t0, g_tex4[0], bound_t1, g_tex4[1], err);
@@ -167,7 +170,7 @@ void Texturing_BindTexture_TC_004(void) {
 // Bir texture ozellestirildikten (GL_LINEAR yapildiktan) sonra tekrar
 // bind edildiginde parametrelerinin korundugu doğrulanir.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_005(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -187,21 +190,20 @@ void Texturing_BindTexture_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (min_filter == GL_LINEAR && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case5, test_procedure);
+		TEST_LOG_SUCCESS(test_case_5, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case5, test_procedure,
+		TEST_LOG_FAIL(test_case_5, test_procedure,
 			      "Re-bind durumunda parametre korunamadi: "
 			      "min_filter=0x%X (0x2601 beklenir), err=0x%X",
 			      min_filter, err);
 }
-
 
 // ---------------------------------------------------------------
 // TEST 6: Varsayilan Texture'a (ID 0) Donus
 // 0 ID'sini bind etmek, aktif texture'i deaktif etmeli ve varsayilan
 // texture state'ine dondurmelidir. Sifir bind etmek hata uretmez.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_006(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_006(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -216,10 +218,10 @@ void Texturing_BindTexture_TC_006(void) {
 	GLenum err = glGetError();
 
 	if (current_bind == 0 && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case6, test_procedure);
+		TEST_LOG_SUCCESS(test_case_6, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case6, test_procedure,
+		    test_case_6, test_procedure,
 		    "Sifir bind hatasi: bind=%d (0 beklenir), err=0x%X",
 		    current_bind, err);
 }
@@ -230,7 +232,7 @@ void Texturing_BindTexture_TC_006(void) {
 // Surucunun state degisikligi olmadigini anlayip cokmeden calismasi test
 // edilir.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_007(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_007(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -244,9 +246,9 @@ void Texturing_BindTexture_TC_007(void) {
 	GLenum err = glGetError();
 
 	if (err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case7, test_procedure);
+		TEST_LOG_SUCCESS(test_case_7, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case7, test_procedure,
+		TEST_LOG_FAIL(test_case_7, test_procedure,
 			      "Tekrarli bind stresi sirasinda hata: 0x%X", err);
 }
 
@@ -256,7 +258,7 @@ void Texturing_BindTexture_TC_007(void) {
 // degerleriyle (UINT_MAX) kullanilmasi. Surucunun bunlari
 // handle edebildigini veya reddebildigini izleriz.
 // ---------------------------------------------------------------
-void Texturing_BindTexture_TC_008(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_008(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -281,14 +283,40 @@ void Texturing_BindTexture_TC_008(void) {
 	}
 
 	if (all_ok)
-		TEST_LOG_SUCCESS(test_case8, test_procedure);
+		TEST_LOG_SUCCESS(test_case_8, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case8, test_procedure,
+		TEST_LOG_FAIL(test_case_8, test_procedure,
 			      "Bazi ucbirim ID'ler tam desteklenmiyor");
 }
 
+/* Initialization */
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001_init(void) {
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_001();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_002();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_003();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_004();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_005();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_006();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_007();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TC_008();
+	//CHECK_ERROR(test_procedure);
+
+	GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001_close();
+}
+
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001_draw(void) {
+}
+
 /* Cleanup */
-void Texturing_BindTexture_close(void) {
+void GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001_close(void) {
 #ifdef __ubuntu__
 	if (g_tex1)
 		glDeleteTextures(1, &g_tex1);
@@ -305,4 +333,5 @@ void Texturing_BindTexture_close(void) {
 	if (g_tex7)
 		glDeleteTextures(1, &g_tex7);
 #endif
+	//CHECK_ERROR(test_procedure);
 }

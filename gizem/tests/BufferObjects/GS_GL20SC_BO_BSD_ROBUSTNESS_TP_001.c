@@ -2,31 +2,29 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-// void glBufferSubData (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid * data);
-// Daha önceden oluşturulmuş bir buffer’ın içindeki belirli bir kısmı günceller
-// Yeni bellek ayırmaz, var olan glBufferData ile oluşturulmuş data store’un içini kısmen değiştirir
-// target ile belirtilen ve şu an glBindBuffer ile bağlanmış buffer’ı kullanır
-// Buffer’ın offset byte’tan başlayan kısmına, size byte uzunluğunda data pointer’ındaki veriyi kopyalar.
+/*
+GL20SC - BufferObjects - BufferSubData - ROBUSTNESS
+*/
 
-static const char* test_procedure = "BufferObjects_BufferSubData_TP_001";
-static const char* test_case_1 = "BufferObjects_BufferSubData_TC_001";
-static const char* test_case_2 = "BufferObjects_BufferSubData_TC_002";
-static const char* test_case_3 = "BufferObjects_BufferSubData_TC_003";
-static const char* test_case_4 = "BufferObjects_BufferSubData_TC_004";
-static const char* test_case_5 = "BufferObjects_BufferSubData_TC_005";
-static const char* test_case_6 = "BufferObjects_BufferSubData_TC_006";
-static const char* test_case_7 = "BufferObjects_BufferSubData_TC_007";
-static const char* test_case_8 = "BufferObjects_BufferSubData_TC_008";
-static const char* test_case_9 = "BufferObjects_BufferSubData_TC_009";
-static const char* test_case_10 = "BufferObjects_BufferSubData_TC_010";
-static const char* test_case_11 = "BufferObjects_BufferSubData_TC_011";
-static const char* test_case_12 = "BufferObjects_BufferSubData_TC_012";
-static const char* test_case_13 = "BufferObjects_BufferSubData_TC_013";
-static const char* test_case_14 = "BufferObjects_BufferSubData_TC_014";
+static const char* test_procedure = "GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_006";
+static const char* test_case_7 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_007";
+static const char* test_case_8 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_008";
+static const char* test_case_9 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_009";
+static const char* test_case_10 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_010";
+static const char* test_case_11 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_011";
+static const char* test_case_12 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_012";
+static const char* test_case_13 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_013";
+static const char* test_case_14 = "GS_GL20SC_BO_BSD_ROBUSTNESS_TC_014";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
-void BufferObjects_BufferSubData_TC_001()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -42,7 +40,7 @@ void BufferObjects_BufferSubData_TC_001()
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if offset is negative.
-void BufferObjects_BufferSubData_TC_002()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR){}
 
@@ -60,11 +58,10 @@ void BufferObjects_BufferSubData_TC_002()
     else {
         TEST_LOG_SUCCESS(test_case_2, test_procedure);
     }
-    glDeleteBuffers(1, &buffer);
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
-void BufferObjects_BufferSubData_TC_003()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR){}
 
@@ -82,11 +79,10 @@ void BufferObjects_BufferSubData_TC_003()
     else {
         TEST_LOG_SUCCESS(test_case_3, test_procedure);
     }
-    glDeleteBuffers(1, &buffer);
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if offset and size together define a region beyond the allocated data store.
-void BufferObjects_BufferSubData_TC_004()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_004()
 {
     while (glGetError() != GL_NO_ERROR){}
 
@@ -104,11 +100,10 @@ void BufferObjects_BufferSubData_TC_004()
     else {
         TEST_LOG_SUCCESS(test_case_4, test_procedure);
     }
-    glDeleteBuffers(1, &buffer);
 }
 
 // Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer object name 0 is bound to target.
-void BufferObjects_BufferSubData_TC_005()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR){}
 
@@ -126,13 +121,12 @@ void BufferObjects_BufferSubData_TC_005()
 }
 
 
-
 // belirtilmeyen hatalar ------------------------
 
 // Offset ve size değerlerinin toplamında oluşabilecek integer overflow durumunda
 // implementasyonun sınır kontrollerini güvenli şekilde yapıp yapmadığını gözlemler.
 // GLsizeptr 32 bit ise LLONG_MAX yerine INT_MAX kullanmak gerekebilir
-void BufferObjects_BufferSubData_TC_006()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -158,7 +152,7 @@ void BufferObjects_BufferSubData_TC_006()
 
 // Buffer sınırının tam bitiş noktası ve bir byte ötesi kullanılarak
 // implementasyonun sınır kontrollerindeki kararlılığı gözlemlenir.
-void BufferObjects_BufferSubData_TC_007()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -189,7 +183,7 @@ void BufferObjects_BufferSubData_TC_007()
 
 // Negatif offset değerinin büyük bir size ile "telafi edildiği" durumda implementasyonun offset
 // doğrulamasını bağımsız olarak yapıp yapmadığını ve sınır kontrollerindeki kararlılığını gözlemler
-void BufferObjects_BufferSubData_TC_008()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -218,7 +212,7 @@ void BufferObjects_BufferSubData_TC_008()
 
 // Sıfır byte güncelleme isteğinde implementasyonun gereksiz bellek erişimi
 // yapmadan çağrıyı güvenli şekilde tamamlayıp tamamlamadığını gözlemler.
-void BufferObjects_BufferSubData_TC_009()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -240,7 +234,7 @@ void BufferObjects_BufferSubData_TC_009()
 
 // Hedefe herhangi bir buffer bağlı değilken glBufferSubData çağrısının implementasyon
 // tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
-void BufferObjects_BufferSubData_TC_010()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -260,7 +254,7 @@ void BufferObjects_BufferSubData_TC_010()
 
 // Data store'u henüz oluşturulmamış (0 byte) bir buffer nesnesine yazma isteğinin
 // implementasyon tarafından güvenli şekilde ele alınıp alınmadığını gözlemler
-void BufferObjects_BufferSubData_TC_011()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -283,7 +277,7 @@ void BufferObjects_BufferSubData_TC_011()
 
 // Kaynak veri tamponunun belirtilen size değerinden küçük olduğu hatalı API kullanımına
 // karşı implementasyonun dayanıklılığını gözlemler.
-void BufferObjects_BufferSubData_TC_012()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -307,7 +301,7 @@ void BufferObjects_BufferSubData_TC_012()
 
 // Serbest bırakılmış bir istemci bellek işaretçisi kullanılarak implementasyonun
 // geçersiz veri kaynağı karşısındaki davranışı gözlemlenir.
-void BufferObjects_BufferSubData_TC_013(void)
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_013(void)
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -332,7 +326,7 @@ void BufferObjects_BufferSubData_TC_013(void)
 
 // Aynı buffer bölgesine çakışan ve hizasız güncellemeleri art arda gerçekleştirerek
 // implementasyonun yoğun bellek kopyalama yükü altındaki kararlılığını gözlemler.
-void BufferObjects_BufferSubData_TC_014()
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -360,4 +354,47 @@ void BufferObjects_BufferSubData_TC_014()
     }
     // Spec alignment gereksinimini not olarak belirtiyor ama ihlali için hata tanımlamıyor;
     // burada amaç implementasyonun iç kopyalama rutininin (örn. SIMD/vektörize memcpy) hizasız erişimde çökmesi
+}
+
+
+/* Initialization */
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_init(void) {
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_001();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_002();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_003();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_004();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_005();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_006();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_007();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_008();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_009();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_010();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_011();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_012();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_013();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BSD_ROBUSTNESS_TC_014();
+    CHECK_ERROR(test_procedure);
+}
+
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_draw(void) {
+
+}
+
+/* Cleanup */
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_close(void) {
+    CHECK_ERROR(test_procedure);
 }

@@ -2,25 +2,24 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-// glGenBuffers: yeni buffer nesneleri için ID üretir
-// n: Kaç tane buffer ismi üretileceği.
-// buffers: Üretilen buffer ID’lerinin yazılacağı dizi.
+/*
+GL20SC - BufferObjects - GenBuffers - ROBUSTNESS
+*/
 
-static const char* test_procedure = "BufferObjects_GenBuffers_TP_001";
-static const char* test_case_1 = "BufferObjects_GenBuffers_TC_001";
-static const char* test_case_2 = "BufferObjects_GenBuffers_TC_002";
-static const char* test_case_3 = "BufferObjects_GenBuffers_TC_003";
-static const char* test_case_4 = "BufferObjects_GenBuffers_TC_004";
-static const char* test_case_5 = "BufferObjects_GenBuffers_TC_005";
-static const char* test_case_6 = "BufferObjects_GenBuffers_TC_006";
-static const char* test_case_7 = "BufferObjects_GenBuffers_TC_007";
-static const char* test_case_8 = "BufferObjects_GenBuffers_TC_008";
-static const char* test_case_9 = "BufferObjects_GenBuffers_TC_009";
+static const char* test_procedure = "GS_GL20SC_BO_GB_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_006";
+static const char* test_case_7 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_007";
+static const char* test_case_8 = "GS_GL20SC_BO_GB_ROBUSTNESS_TC_008";
 
 
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if n is negative
-void BufferObjects_GenBuffers_TC_001()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -40,7 +39,7 @@ void BufferObjects_GenBuffers_TC_001()
 
 
 // n = 0 ile çağrı
-void BufferObjects_GenBuffers_TC_002()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -57,18 +56,18 @@ void BufferObjects_GenBuffers_TC_002()
 }
 
 // buffers = NULL, n > 0 (negative robustness)
-void BufferObjects_GenBuffers_TC_003()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
     glGenBuffers(5, NULL);
 
     GLenum err = glGetError();
-    TEST_LOG_INFO("BufferObjects_GenBuffers_TC_003 -- tanımsız davranış. Gözlem testidir. hata = 0x%X\n", err);
+    TEST_LOG_INFO("GS_GL20SC_BO_GB_ROBUSTNESS_TC_003 -- tanımsız davranış. Gözlem testidir. hata = 0x%X\n", err);
 }
 
 // Aşırı büyük n
-void BufferObjects_GenBuffers_TC_004()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -93,7 +92,7 @@ void BufferObjects_GenBuffers_TC_004()
 
 // Aynı array'i art arda, isim tekilliğini bozmaya çalışarak
 // çağırma (fonksiyon 1000 kez art arda çağrıldığında hata veriyor mu)
-void BufferObjects_GenBuffers_TC_005()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -112,7 +111,7 @@ void BufferObjects_GenBuffers_TC_005()
 
 // Çok sayıda buffer adı üreterek döndürülen isimlerin benzersiz
 // olduğunu ve reserved 0 isminin üretilmediğini doğrular.
-void BufferObjects_GenBuffers_TC_006()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -142,12 +141,11 @@ void BufferObjects_GenBuffers_TC_006()
     else {
         TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
     }
-    glDeleteBuffers(COUNT, buffers);
 }
 
-// Bind edilmemiş buffer isimleri üzerinde glIsBuffer ve glDeleteBuffers
-// çağrılarının spesifikasyona uygun davranıp davranmadığını doğrular.
-void BufferObjects_GenBuffers_TC_007()
+// Bind edilmemiş buffer isimleri üzerinde glIsBuffer
+// çağrısının spesifikasyona uygun davranıp davranmadığını doğrular.
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -155,43 +153,17 @@ void BufferObjects_GenBuffers_TC_007()
     glGenBuffers(1, &buf);
     GLboolean isBuffer = glIsBuffer(buf);
 
-    glDeleteBuffers(1, &buf);
-
-    GLenum err = glGetError();
-    if (isBuffer == GL_FALSE && err == GL_NO_ERROR) {
+    if (isBuffer == GL_FALSE) {
         TEST_LOG_SUCCESS(test_case_7, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_7, test_procedure, "glIsBuffer=%s, glDeleteBuffers error=0x%X\n", isBuffer ? "GL_TRUE" : "GL_FALSE", err);
-    }
-}
-
-// Aynı buffer isminin birden fazla kez silinmesi durumunda
-// implementasyonun kararlılığını test eder.
-void BufferObjects_GenBuffers_TC_008()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-
-    GLuint buf;
-    glGenBuffers(1, &buf);
-
-    glDeleteBuffers(1, &buf);
-    GLenum firstErr = glGetError();
-
-    glDeleteBuffers(1, &buf);
-    GLenum secondErr = glGetError();
-
-    if (firstErr == GL_NO_ERROR && secondErr == GL_NO_ERROR) {
-        TEST_LOG_SUCCESS(test_case_8, test_procedure);
-    }
-    else {
-        TEST_LOG_FAIL(test_case_8, test_procedure, "firstErr=0x%X, secondErr=0x%X\n", firstErr, secondErr);
+        TEST_LOG_FAIL(test_case_7, test_procedure, "glIsBuffer=%s\n", isBuffer ? "GL_TRUE" : "GL_FALSE");
     }
 }
 
 // Büyük 'n' değeri ve kasıtlı olarak yetersiz output buffer kullanılarak implementasyonun
 // geçersiz istemci belleği karşısındaki davranışı test edilir (negative robustness)
-void BufferObjects_GenBuffers_TC_009()
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -204,8 +176,36 @@ void BufferObjects_GenBuffers_TC_009()
     glGenBuffers(huge_n, buffers);
 
     GLenum err = glGetError();
-    TEST_LOG_INFO("BufferObjects_GenBuffers_TC_009 - tamamen tanımsız davranış. Gözlem testidir. error=0x%x\n", err);
+    TEST_LOG_INFO("GS_GL20SC_BO_GB_ROBUSTNESS_TC_008 - tamamen tanımsız davranış. Gözlem testidir. error=0x%x\n", err);
 }
 
 
+/* Initialization */
+void GS_GL20SC_BO_GB_ROBUSTNESS_TP_001_init(void) {
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_001();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_002();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_003();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_004();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_005();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_006();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_007();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_GB_ROBUSTNESS_TC_008();
+    CHECK_ERROR(test_procedure);
+}
 
+void GS_GL20SC_BO_GB_ROBUSTNESS_TP_001_draw(void) {
+
+}
+
+/* Cleanup */
+void GS_GL20SC_BO_GB_ROBUSTNESS_TP_001_close(void) {
+    CHECK_ERROR(test_procedure);
+}

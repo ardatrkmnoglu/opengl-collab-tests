@@ -84,10 +84,19 @@ int main(void)
 void init(void)
 {
     /* TESTLER */
+    /* Test procedure'ları toplu çalıştıran init fonksiyonları örnek olarak yazılmıştır.
+    Tek bir fonksiyonu da çağırabilirsiniz. Test isimlerini tests/../*.h veya tests/../*c dosyalarından bulabilirsiniz
+    Örneğin Buffer Objects - Bind Buffer 001 testi için:
+    GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
+
+    /* --------------- BindRenderbuffer --------------- */
+    // GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init();
 
 
 
 
+    // Alttaki fonksiyonlar, entegre edilmiş fonksiyonlar. Onlarla ileri bittiğinde init içindeki checkerrors fonksiyonları yorum satırı kalsın,
+    // test fonksiyonlarını yorum satırından çıkar, .hh dosyasında ...init() fonksiyonunu tanımla v aşağıdakileri init() fonksiyonu ile çağır.
 
     /* --------------- GenFramebuffer --------------- */
     // GS_GL20SC_FO_GF_ROBUSTNESS_TC_001();
@@ -106,7 +115,6 @@ void init(void)
     // GS_GL20SC_FO_GF_ROBUSTNESS_TC_014();
     // GS_GL20SC_FO_GF_ROBUSTNESS_TC_015();
 
-
     /* --------------- BindFramebuffer --------------- */
     // GS_GL20SC_FO_BF_ROBUSTNESS_TC_001();
     // GS_GL20SC_FO_BF_ROBUSTNESS_TC_002();
@@ -120,12 +128,6 @@ void init(void)
     // GS_GL20SC_FO_BF_ROBUSTNESS_TC_010();
     // GS_GL20SC_FO_BF_ROBUSTNESS_TC_011();
     // GS_GL20SC_FO_BF_ROBUSTNESS_TC_012();
-
-
-
-
-
-
 
     /* --------------- BindBuffer --------------- */
     // GS_GL20SC_BO_BB_ROBUSTNESS_TC_001();

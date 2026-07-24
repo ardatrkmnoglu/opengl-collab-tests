@@ -49,7 +49,14 @@ FRAMEBUFFER OBJECTS ------------------
  framebuffers: Bu ID’lerin yazılacağı GLuint dizisinin adresi
 
 
-
+void glBindRenderbuffer(GLenum target, GLuint renderbuffer);
+içeride “hangi renderbuffer’ın aktif olduğunu” seçmek için kullanılır. Yani:
+glGenRenderbuffers → yeni renderbuffer isimleri üretir (ID verir).
+glBindRenderbuffer(GL_RENDERBUFFER, id) → o ID’li renderbuffer’ı aktif yapar.
+target: OpenGL’e “hangi binding point’i kullanacağım?” bilgisini verir (mutlaka GL_RENDERBUFFER olmalıdır)
+GLuint renderbuffer: Bağlamak istediğin renderbuffer nesnesinin adı/ID’si Bu değer:
+- Bir renderbuffer ID’si ise → o renderbuffer aktif hale gelir.
+- 0 ise → renderbuffer unbind edilir (şu an bağlı renderbuffer yok olur).
 
 
 

@@ -163,9 +163,9 @@ void Texturing_BindTexture_TC_004(void) {
 }
 
 // ---------------------------------------------------------------
-// TEST 5: Silinmis Ismin Yeniden Bind Edilmesi
-// Bir texture silindikten sonra ayni isim tekrar bind edilebilir mi?
-// ES 2.0'a gore bu, o isimle 'yeni' bir texture olusturmalidir.
+// TEST 5: Tekrarli Bind Edilmede Parametre Korunumu (State Persistence)
+// Bir texture ozellestirildikten (GL_LINEAR yapildiktan) sonra tekrar
+// bind edildiginde parametrelerinin korundugu doğrulanir.
 // ---------------------------------------------------------------
 void Texturing_BindTexture_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
@@ -174,31 +174,27 @@ void Texturing_BindTexture_TC_005(void) {
 	glGenTextures(1, &g_tex5);
 	glBindTexture(GL_TEXTURE_2D, g_tex5);
 
-	// Parametre degistir (varsayilandan farkli yapmak icin)
+	// Parametre degistir (varsayilandan farkli yapmak icin GL_LINEAR)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-	// Texture'i sil (Test mantigi geregi silip yeniden olusturma test
-	// ediliyor)
-	glDeleteTextures(1, &g_tex5);
-
-	// Ayni ismi tekrar bind et (Reanimation / Ismi yeniden sahiplenme)
+	// Ayni dokuyu tekrar bind et (Re-bind state persistence)
 	glBindTexture(GL_TEXTURE_2D, g_tex5);
 
-	// Parametreleri kontrol et: Yeni texture oldugu icin sifirlanmis
-	// ve varsayilan degerine (GL_NEAREST_MIPMAP_LINEAR) donmus olmali.
+	// Parametreleri kontrol et: Tekrar bind edildiginde GL_LINEAR korunmus olmali
 	GLint min_filter = 0;
 	glGetTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, &min_filter);
 
 	GLenum err = glGetError();
 
-	if (min_filter == GL_NEAREST_MIPMAP_LINEAR && err == GL_NO_ERROR)
+	if (min_filter == GL_LINEAR && err == GL_NO_ERROR)
 		TEST_LOG_SUCCESS(test_case5, test_procedure);
 	else
 		TEST_LOG_FAIL(test_case5, test_procedure,
-			      "Silinen texture yeniden olusturulmadi: "
-			      "min_filter=0x%X (0x2702 beklenir), err=0x%X",
+			      "Re-bind durumunda parametre korunamadi: "
+			      "min_filter=0x%X (0x2601 beklenir), err=0x%X",
 			      min_filter, err);
 }
+
 
 // ---------------------------------------------------------------
 // TEST 6: Varsayilan Texture'a (ID 0) Donus

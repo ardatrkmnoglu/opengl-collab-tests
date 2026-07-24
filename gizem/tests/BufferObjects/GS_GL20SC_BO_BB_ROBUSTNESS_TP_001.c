@@ -4,27 +4,27 @@
 #include <stdint.h>
 #include "../../../include/macro.h"
 
-// void glBindBuffer(GLenum target, GLuint buffer);
-// Bir buffer nesnesini belirli bir target'a bağlar
-// Bağlandıktan sonra o hedef üzerinde yapılan işlemler artık bu buffer üzerinde gerçekleştirilir
+
+/*
+GL20SC - BufferObjects - BindBuffer - ROBUSTNESS
+*/
 
 
-static const char* test_procedure = "BufferObjects_BindBuffer_TP_001";
-static const char* test_case_1 = "BufferObjects_BindBuffer_TC_001";
-static const char* test_case_2 = "BufferObjects_BindBuffer_TC_002";
-static const char* test_case_3 = "BufferObjects_BindBuffer_TC_003";
-static const char* test_case_4 = "BufferObjects_BindBuffer_TC_004";
-static const char* test_case_5 = "BufferObjects_BindBuffer_TC_005";
-static const char* test_case_6 = "BufferObjects_BindBuffer_TC_006";
-static const char* test_case_7 = "BufferObjects_BindBuffer_TC_007";
-static const char* test_case_8 = "BufferObjects_BindBuffer_TC_008";
-static const char* test_case_9 = "BufferObjects_BindBuffer_TC_009";
-static const char* test_case_10 = "BufferObjects_BindBuffer_TC_010";
-static const char* test_case_11 = "BufferObjects_BindBuffer_TC_011";
+static const char* test_procedure = "GS_GL20SC_BO_BB_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_006";
+static const char* test_case_7 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_007";
+static const char* test_case_8 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_008";
+static const char* test_case_9 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_009";
+static const char* test_case_10 = "GS_GL20SC_BO_BB_ROBUSTNESS_TC_010";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not one of the allowable values.
- void BufferObjects_BindBuffer_TC_001()
+ void GS_GL20SC_BO_BB_ROBUSTNESS_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -42,7 +42,7 @@ static const char* test_case_11 = "BufferObjects_BindBuffer_TC_011";
 
 
 // glGenBuffers ile oluşturulmamış bir ismin bind edilmesi
-void BufferObjects_BindBuffer_TC_002()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -58,29 +58,30 @@ void BufferObjects_BindBuffer_TC_002()
     }
 }
 
-// Silinen bir buffer isminin tekrar bind edilmesiyle yeni bir buffer
-// nesnesi oluşturulup oluşturulmadığını test eder.
-void BufferObjects_BindBuffer_TC_003()
-{
-    while (glGetError() != GL_NO_ERROR) {}
+// Aynı buffer adı ile tekrar glBindBuffer çağırınca GL error oluşup oluşmadığını test eder.
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_003()
+ {
+     while (glGetError() != GL_NO_ERROR) {}
 
-    GLuint buf;
-    glGenBuffers(1, &buf);
-    glBindBuffer(GL_ARRAY_BUFFER, buf);
-    glDeleteBuffers(1, &buf);
-    glBindBuffer(GL_ARRAY_BUFFER, buf);
+     GLuint buf = 0;
 
-    GLenum err = glGetError();
+     glGenBuffers(1, &buf);
+     glBindBuffer(GL_ARRAY_BUFFER, buf);
+
+     // Aynı isim tekrar bağlanıyor
+     glBindBuffer(GL_ARRAY_BUFFER, buf);
+
+     GLenum err = glGetError();
      if (err == GL_NO_ERROR) {
          TEST_LOG_SUCCESS(test_case_3, test_procedure);
      }
      else {
          TEST_LOG_FAIL(test_case_3, test_procedure, "error = 0x%x.", err);
      }
-}
+ }
 
 // Büyük/alışılmadık buffer isimlerinin bind edilmesi
-void BufferObjects_BindBuffer_TC_004()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_004()
 {
     GLuint candidates[] = {
         0xFFFFFFFFu,   // UINT_MAX
@@ -105,7 +106,7 @@ void BufferObjects_BindBuffer_TC_004()
 }
 
 // Geçersiz target enum değerlerine karşı implementasyonun hata kontrolünün testi
-void BufferObjects_BindBuffer_TC_005()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -124,7 +125,7 @@ void BufferObjects_BindBuffer_TC_005()
 
 // Aynı buffer nesnesinin farklı target'lara hızlı ve tekrarlı şekilde
 // bağlanması sırasında implementasyonun kararlılığını test eder.
-void BufferObjects_BindBuffer_TC_006()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -141,45 +142,16 @@ void BufferObjects_BindBuffer_TC_006()
         if (err != GL_NO_ERROR)
         {
             TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
-            glDeleteBuffers(1, &buf);
             return;
         }
     }
      TEST_LOG_SUCCESS(test_case_6, test_procedure);
-    glDeleteBuffers(1, &buf);
 }
 
-// Aynı buffer nesnesi iki target'a bağlıyken silme işlemi sonrası
-// implementasyonun kararlılığını ve hata davranışını test eder
-void BufferObjects_BindBuffer_TC_007()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-
-    GLuint buf;
-    glGenBuffers(1, &buf);
-    glBindBuffer(GL_ARRAY_BUFFER, buf);
-    glBufferData(GL_ARRAY_BUFFER, 256, NULL, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf); // aynı obje şimdi iki target'ta aktif
-    glDeleteBuffers(1, &buf);
-
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 64, NULL);
-    GLenum arrayErr = glGetError();
-
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, 64, NULL);
-    GLenum elementErr = glGetError();
-
-     if (arrayErr == GL_INVALID_OPERATION && elementErr == GL_INVALID_OPERATION){
-         TEST_LOG_SUCCESS(test_case_7, test_procedure);
-     }
-     else {
-         TEST_LOG_FAIL(test_case_7, test_procedure,
-             "(ARRAY_BUFFER=0x%X, ELEMENT_ARRAY_BUFFER=0x%X)\n", arrayErr, elementErr );
-     }
-}
 
 // Buffer'ı tekrar tekrar 0'a bağlayıp bağlama durumunu sorgulayarak
 // implementasyonun state yönetimi kararlılığını test eder.
-void BufferObjects_BindBuffer_TC_008()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -190,21 +162,21 @@ void BufferObjects_BindBuffer_TC_008()
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &binding);
 
         if (binding != 0) {
-            TEST_LOG_FAIL(test_case_8, test_procedure, "GL_ARRAY_BUFFER_BINDING=%d (expected 0)", binding);
+            TEST_LOG_FAIL(test_case_7, test_procedure, "GL_ARRAY_BUFFER_BINDING=%d (expected 0)", binding);
             return;
         }
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
-            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+            TEST_LOG_FAIL(test_case_7, test_procedure, "error = 0x%x.", err);
             return; }
     }
-     TEST_LOG_SUCCESS(test_case_8, test_procedure);
+     TEST_LOG_SUCCESS(test_case_7, test_procedure);
 }
 
 // Çok sayıda buffer ismi üzerinde rastgele bind işlemleri yaparak implementasyonun
 // isim yönetimi ve durum değişikliklerine karşı dayanıklılığını test eder.
-void BufferObjects_BindBuffer_TC_009()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -212,14 +184,14 @@ void BufferObjects_BindBuffer_TC_009()
     GLuint *names = (GLuint *)malloc(sizeof(GLuint) * N);
 
     if (names == NULL) {
-        TEST_LOG_FAIL(test_case_9, test_procedure, "Memory allocation failed");
+        TEST_LOG_FAIL(test_case_8, test_procedure, "Memory allocation failed");
         return;
     }
 
     glGenBuffers(N, names);
     GLenum err = glGetError();
     if (err != GL_NO_ERROR) {
-        TEST_LOG_FAIL(test_case_9, test_procedure, "glGenBuffers failed: error = 0x%x.", err);
+        TEST_LOG_FAIL(test_case_8, test_procedure, "glGenBuffers failed: error = 0x%x.", err);
         free(names);
         return;
     }
@@ -242,22 +214,19 @@ void BufferObjects_BindBuffer_TC_009()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
-            glDeleteBuffers(N, names);
+            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
             free(names);
             return;
         }
     }
-
-    glDeleteBuffers(N, names);
     free(names);
 
-     TEST_LOG_SUCCESS(test_case_9, test_procedure);
+     TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }
 
 // Aynı target üzerinde farklı buffer'lar arasında sürekli geçiş yaparak
 // implementasyonun state yönetimi kararlılığını test eder.
-void BufferObjects_BindBuffer_TC_010()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -273,19 +242,16 @@ void BufferObjects_BindBuffer_TC_010()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            TEST_LOG_FAIL(test_case_10, test_procedure, "error = 0x%x.", err);
-            glDeleteBuffers(2, buffers);
+            TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
             return;
         }
     }
-
-    glDeleteBuffers(2, buffers);
-     TEST_LOG_SUCCESS(test_case_10, test_procedure);
+     TEST_LOG_SUCCESS(test_case_9, test_procedure);
 }
 
 // Buffer nesnelerinin oluşturma, bağlama ve silme yaşam döngüsünü tekrarlı
 // olarak çalıştırarak implementasyonun dayanıklılığını test eder.
-void BufferObjects_BindBuffer_TC_011()
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -295,15 +261,47 @@ void BufferObjects_BindBuffer_TC_011()
         glGenBuffers(1, &buf);
         glBindBuffer(GL_ARRAY_BUFFER, buf);
         glBufferData(GL_ARRAY_BUFFER, 128, NULL, GL_STATIC_DRAW);
-        glDeleteBuffers(1, &buf);
 
         GLenum err = glGetError();
         if (err != GL_NO_ERROR)
         {
-            TEST_LOG_FAIL(test_case_11, test_procedure, "Iteration=%d, glError=0x%X",i, err);
+            TEST_LOG_FAIL(test_case_10, test_procedure, "Iteration=%d, glError=0x%X",i, err);
             return;
         }
     }
-     TEST_LOG_SUCCESS(test_case_11, test_procedure);
+     TEST_LOG_SUCCESS(test_case_10, test_procedure);
 }
 
+/* Initialization */
+void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_init(void) {
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_001();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_002();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_003();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_004();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_005();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_006();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_007();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_008();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_009();
+     CHECK_ERROR(test_procedure);
+     GS_GL20SC_BO_BB_ROBUSTNESS_TC_010();
+     CHECK_ERROR(test_procedure);
+ }
+
+void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_draw(void) {
+
+ }
+
+/* Cleanup */
+void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_close(void) {
+     CHECK_ERROR(test_procedure);
+ }

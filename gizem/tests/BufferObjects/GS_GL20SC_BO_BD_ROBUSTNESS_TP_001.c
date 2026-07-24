@@ -4,31 +4,31 @@
 #include <string.h>
 #include "../../../include/macro.h"
 
-// void glBufferData(GLenum target, GLsizeiptr size, const GLvoid * data, GLenum usage);
-// Target parametresiyle bind ettiğin buffer object için ekran kartı (GPU) üzerinde yeni bir data store oluşturur
-// Eski veriyi tamamen siler
-// İstersen verdiğin data pointer’ındaki veriyi bu yeni belleğe kopyalayarak başlatır
-// usage parametresiyle de bu veriyi nasıl kullanacağını sürücüye ipucu olarak bildirirsin (performans optimizasyonu için)
 
-static const char* test_procedure = "BufferObjects_BufferData_TP_001";
-static const char* test_case_1 = "BufferObjects_BufferData_TC_001";
-static const char* test_case_2 = "BufferObjects_BufferData_TC_002";
-static const char* test_case_3 = "BufferObjects_BufferData_TC_003";
-static const char* test_case_4 = "BufferObjects_BufferData_TC_004";
-static const char* test_case_5 = "BufferObjects_BufferData_TC_005";
-static const char* test_case_6 = "BufferObjects_BufferData_TC_006";
-static const char* test_case_7 = "BufferObjects_BufferData_TC_007";
-static const char* test_case_8 = "BufferObjects_BufferData_TC_008";
-static const char* test_case_9 = "BufferObjects_BufferData_TC_009";
-static const char* test_case_10 = "BufferObjects_BufferData_TC_010";
-static const char* test_case_11 = "BufferObjects_BufferData_TC_011";
-static const char* test_case_12 = "BufferObjects_BufferData_TC_012";
-static const char* test_case_13 = "BufferObjects_BufferData_TC_013";
-static const char* test_case_14 = "BufferObjects_BufferData_TC_014";
+/*
+GL20SC - BufferObjects - BufferData - ROBUSTNESS
+*/
+
+
+static const char* test_procedure = "GS_GL20SC_BO_BD_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_006";
+static const char* test_case_7 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_007";
+static const char* test_case_8 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_008";
+static const char* test_case_9 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_009";
+static const char* test_case_10 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_010";
+static const char* test_case_11 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_011";
+static const char* test_case_12 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_012";
+static const char* test_case_13 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_013";
+static const char* test_case_14 = "GS_GL20SC_BO_BD_ROBUSTNESS_TC_014";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER.
-void BufferObjects_BufferData_TC_001()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -44,7 +44,7 @@ void BufferObjects_BufferData_TC_001()
 }
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if usage is not GL_STREAM_DRAW, GL_STATIC_DRAW, or GL_DYNAMIC_DRAW.
-void BufferObjects_BufferData_TC_002()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -59,12 +59,10 @@ void BufferObjects_BufferData_TC_002()
         return;
     }
     TEST_LOG_SUCCESS(test_case_2, test_procedure);
-
-    glDeleteBuffers(1, &buffer);
 }
 
 // Belirtilen hata: GL_INVALID_VALUE is generated if size is negative.
-void BufferObjects_BufferData_TC_003()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -76,15 +74,13 @@ void BufferObjects_BufferData_TC_003()
     GLenum err = glGetError();
     if (err != GL_INVALID_VALUE) {
         TEST_LOG_FAIL(test_case_3, test_procedure, "Expected GL_INVALID_VALUE, but got 0x%x.", err);
-        glDeleteBuffers(1, &buffer);
         return;
     }
     TEST_LOG_SUCCESS(test_case_3, test_procedure);
-    glDeleteBuffers(1, &buffer);
 }
 
 // Belirtilen hata: GL_INVALID_OPERATION is generated if the reserved buffer object name 0 is bound to target.
-void BufferObjects_BufferData_TC_004()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -101,7 +97,7 @@ void BufferObjects_BufferData_TC_004()
 }
 
 // Belirtilen hata: GL_OUT_OF_MEMORY is generated if the GL is unable to create a data store with the specified size.
-void BufferObjects_BufferData_TC_005()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
     GLuint buffer;
@@ -119,8 +115,6 @@ void BufferObjects_BufferData_TC_005()
     else {
         TEST_LOG_FAIL(test_case_5, test_procedure, "Expected GL_OUT_OF_MEMORY or GL_NO_ERROR, but got 0x%x.", err);
     }
-
-    glDeleteBuffers(1, &buffer);
 }
 
 
@@ -128,7 +122,7 @@ void BufferObjects_BufferData_TC_005()
 
 // Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API
 // kullanımına karşı implementasyonun dayanıklılığını gözlemler.
-void BufferObjects_BufferData_TC_006()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -148,13 +142,12 @@ void BufferObjects_BufferData_TC_006()
     else {
         TEST_LOG_FAIL(test_case_6, test_procedure, "error = 0x%x.", err);
     }
-    glDeleteBuffers(1, &buf);
 }
 
 // size = 0 ama data != NULL
 // Sıfır boyutlu data store oluşturulurken geçerli bir data pointer'ı verilmesinin
 // implementasyon tarafından güvenli şekilde ele alınıp alınmadığını doğrular.
-void BufferObjects_BufferData_TC_007()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -172,12 +165,10 @@ void BufferObjects_BufferData_TC_007()
     else {
         TEST_LOG_FAIL(test_case_7, test_procedure, "error = 0x%x.", err);
     }
-
-    glDeleteBuffers(1, &buf);
 }
 
 // Sınır ve aşırı boyut size değerleri karşısında implementasyonun kararlılığını gözlemler.
-void BufferObjects_BufferData_TC_008()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_008()
 {
     GLsizeiptr candidates[] = { -1, INT_MIN, (GLsizeiptr)INT_MAX + 1, LLONG_MAX };
 
@@ -194,13 +185,12 @@ void BufferObjects_BufferData_TC_008()
             TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
             return;
         }
-        glDeleteBuffers(1, &buf);
     }
     TEST_LOG_SUCCESS(test_case_8, test_procedure);
 }
 
 // Geçersiz ve kirlenmiş usage enum değerleri karşısında implementasyonun kararlılığını gözlemler.
-void BufferObjects_BufferData_TC_009()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_009()
 {
     GLenum candidates[] = {GL_STATIC_DRAW, 0xFFFF0000u, 0xFFFFFFFFu, 0x12345678u, 0xDEADBEEFu};
 
@@ -216,17 +206,15 @@ void BufferObjects_BufferData_TC_009()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
             TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
-            glDeleteBuffers(1, &buf);
             return;
         }
-        glDeleteBuffers(1, &buf);
     }
     TEST_LOG_SUCCESS(test_case_9, test_procedure);
 }
 
 // Hedefe herhangi bir buffer bağlı değilken glBufferData çağrısının implementasyon
 // tarafından güvenli şekilde ele alınıp alınmadığını gözlemler.
-void BufferObjects_BufferData_TC_010()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -244,7 +232,7 @@ void BufferObjects_BufferData_TC_010()
 
 // Aynı buffer üzerinde farklı boyutlarda data store'ları art arda oluşturarak
 // implementasyonun reallocation işlemlerindeki kararlılığını gözlemler.
-void BufferObjects_BufferData_TC_011()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -261,17 +249,15 @@ void BufferObjects_BufferData_TC_011()
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
             TEST_LOG_FAIL(test_case_11, test_procedure, "error = 0x%x.", err);
-            glDeleteBuffers(1, &buf);
             return;
         }
     }
     TEST_LOG_SUCCESS(test_case_11, test_procedure);
-    glDeleteBuffers(1, &buf);
 }
 
 // Hizasız bir kaynak data pointer'ı kullanılarak implementasyonun hatalı
 // istemci girdisi karşısındaki kararlılığı gözlemlenir.
-void BufferObjects_BufferData_TC_012()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -290,12 +276,11 @@ void BufferObjects_BufferData_TC_012()
     else {
         TEST_LOG_FAIL(test_case_12, test_procedure, "error = 0x%x.", err);
     }
-    glDeleteBuffers(1, &buf);
 }
 
 // Serbest bırakılmış (dangling) bir kaynak pointer kullanılarak implementasyonun
 // hatalı istemci girdisi karşısındaki kararlılığı gözlemlenir.
-void BufferObjects_BufferData_TC_013()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_013()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -306,7 +291,6 @@ void BufferObjects_BufferData_TC_013()
     char *heapData = (char *)malloc(256);
     if (heapData == NULL) {
         TEST_LOG_FAIL(test_case_13, test_procedure, "Memory allocation failed");
-        glDeleteBuffers(1, &buf);
         return;
     }
 
@@ -321,12 +305,11 @@ void BufferObjects_BufferData_TC_013()
     else {
         TEST_LOG_FAIL(test_case_13, test_procedure, "error = 0x%x.", err);
     }
-    glDeleteBuffers(1, &buf);
 }
 
 // Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin
 // durumunun korunup korunmadığını gözlemler.
-void BufferObjects_BufferData_TC_014()
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -351,6 +334,47 @@ void BufferObjects_BufferData_TC_014()
     else {
         TEST_LOG_FAIL(test_case_14, test_procedure, "error = 0x%x.", err);
     }
+}
 
-    glDeleteBuffers(1, &buf);
+
+/* Initialization */
+void GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_init(void) {
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_001();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_002();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_003();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_004();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_005();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_006();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_007();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_008();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_009();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_010();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_011();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_012();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_013();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_014();
+    CHECK_ERROR(test_procedure);
+}
+
+void GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_draw(void) {
+
+}
+
+/* Cleanup */
+void GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_close(void) {
+    CHECK_ERROR(test_procedure);
 }

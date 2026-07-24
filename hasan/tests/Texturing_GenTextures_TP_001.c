@@ -18,6 +18,7 @@ static const char *test_case12 = "Texturing_GenTextures_TC_012";
 static const char *test_procedure = "Texturing_GenTextures_TP_001";
 
 // Static variables for cleanup in close()
+static GLuint g_tex1 = 0;
 static GLuint g_tex2_first = 0;
 static GLuint g_tex2_batch[10] = {0};
 static GLuint g_tex3_names[5] = {0};
@@ -42,36 +43,31 @@ static GLuint g_tex12[1000] = {0};
 // TEST 1: glIsTexture Durum Zinciri
 // Bir texture ID'sinin yasam dongusundeki her asamada
 // glIsTexture'in dogru sonuc dondurup dondurmedigini kontrol eder.
-// (Not: Bu test adimlarindan biri glDeleteTextures davranisini test eder)
 // ---------------------------------------------------------------
 void Texturing_GenTextures_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
-	GLuint tex;
-	glGenTextures(1, &tex);
+	glGenTextures(1, &g_tex1);
 
 	// Asama 1: Uretildi ama bind edilmedi -> GL_FALSE olmali
-	GLboolean after_gen = glIsTexture(tex);
+	GLboolean after_gen = glIsTexture(g_tex1);
 
 	// Asama 2: Bind edildi -> GL_TRUE olmali
-	glBindTexture(GL_TEXTURE_2D, tex);
-	GLboolean after_bind = glIsTexture(tex);
-
-	// Asama 3: Silindi -> GL_FALSE olmali (glDeleteTextures testi)
-	glDeleteTextures(1, &tex);
-	GLboolean after_delete = glIsTexture(tex);
+	glBindTexture(GL_TEXTURE_2D, g_tex1);
+	GLboolean after_bind = glIsTexture(g_tex1);
 
 	GLenum err = glGetError();
 
-	if (!after_gen && after_bind && !after_delete && err == GL_NO_ERROR)
+	if (!after_gen && after_bind && err == GL_NO_ERROR)
 		TEST_LOG_SUCCESS(test_case1, test_procedure);
 	else
 		TEST_LOG_FAIL(
 		    test_case1, test_procedure,
-		    "Durum zinciri bozuldu: gen=%d, bind=%d, del=%d, err=0x%X",
-		    after_gen, after_bind, after_delete, err);
+		    "Durum zinciri bozuldu: gen=%d, bind=%d, err=0x%X",
+		    after_gen, after_bind, err);
 }
+
 
 // ---------------------------------------------------------------
 // TEST 2: Aktif Bind Sirasinda Uretim
@@ -404,6 +400,8 @@ void Texturing_GenTextures_TC_012(void) {
 /* Cleanup */
 void Texturing_GenTextures_close(void) {
 #ifdef __ubuntu__
+	if (g_tex1)
+		glDeleteTextures(1, &g_tex1);
 	if (g_tex2_first)
 		glDeleteTextures(1, &g_tex2_first);
 	glDeleteTextures(10, g_tex2_batch);

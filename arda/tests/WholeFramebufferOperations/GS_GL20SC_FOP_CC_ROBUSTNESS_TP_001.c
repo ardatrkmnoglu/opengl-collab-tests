@@ -1,12 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "WholeFramebufferOperations_ClearColor_TP_001";
-static const char* test_case_1 = "WholeFramebufferOperations_ClearColor_TC_001";
-static const char* test_case_2 = "WholeFramebufferOperations_ClearColor_TC_002";
-static const char* test_case_3 = "WholeFramebufferOperations_ClearColor_TC_003";
-static const char* test_case_4 = "WholeFramebufferOperations_ClearColor_TC_004";
-static const char* test_case_5 = "WholeFramebufferOperations_ClearColor_TC_005";
+static const char* test_procedure = "GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FOP_CC_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FOP_CC_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FOP_CC_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FOP_CC_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_FOP_CC_ROBUSTNESS_TC_005";
 
 
 /* ============================================================
@@ -24,7 +24,7 @@ static const char* test_case_5 = "WholeFramebufferOperations_ClearColor_TC_005";
  * sessizce yutmali veya güvenli hale getirmelidir.
  * Kesinlikle ÇÖKMEMELIDIR.
  * ============================================================ */
-void WholeFramebufferOperations_ClearColor_TC_001(void) {
+void GS_GL20SC_FOP_CC_ROBUSTNESS_TC_001(void) {
 	// Kayan nokta zehirlemesi (NaN ve Infinity)
 	// Spec bu konuda çok net olmasa da kaliteli bir SC 2.0 sürücüsü bunu
 	// sessizce yutmalı veya kendi içinde güvenli bir hale getirmelidir
@@ -33,7 +33,7 @@ void WholeFramebufferOperations_ClearColor_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "NaN/Inf değerleri atanırken beklenmeyen bir hata kodu "
 		    "döndü veya sürücü kilitlendi."
 		    " Actual: 0x%04X",
@@ -52,12 +52,12 @@ void WholeFramebufferOperations_ClearColor_TC_001(void) {
  * Dolayisiyla FLT_MAX / -FLT_MAX gibi asiri degerlerin state
  * olarak hatasiz ve oldugu gibi saklanmasi beklenir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearColor_TC_002(void) {
+void GS_GL20SC_FOP_CC_ROBUSTNESS_TC_002(void) {
 	glClearColor(FLT_MAX, -FLT_MAX, FLT_MAX, -FLT_MAX);
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Asiri uc (FLT_MAX) degerleri atanirken beklenmeyen "
 		    "bir hata döndü."
 		    " Actual: 0x%04X",
@@ -71,7 +71,7 @@ void WholeFramebufferOperations_ClearColor_TC_002(void) {
 
 	if (!(color[0] == FLT_MAX && color[1] == -FLT_MAX &&
 	      color[2] == FLT_MAX && color[3] == -FLT_MAX)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Sürücü set-zamaninda deger kirpmis olabilir; state "
 		    "oldugu gibi saklanmaliydi."
 		    " Actual: 0x%04X",
@@ -89,12 +89,12 @@ void WholeFramebufferOperations_ClearColor_TC_002(void) {
  * hassasiyet kaymasi (precision drift) olmadan degerlerin
  * birebir geri okunabildigi dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearColor_TC_003(void) {
+void GS_GL20SC_FOP_CC_ROBUSTNESS_TC_003(void) {
 	glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tam sinir degerleri (0.0 / 1.0) reddedildi."
 			      " Actual: 0x%04X",
 			      err);
@@ -107,7 +107,7 @@ void WholeFramebufferOperations_ClearColor_TC_003(void) {
 
 	if (!(color[0] == 0.0f && color[1] == 1.0f && color[2] == 0.0f &&
 	      color[3] == 1.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Tam sinir degerlerinde hassasiyet kaymasi tespit "
 		    "edildi."
 		    " Actual: 0x%04X",
@@ -124,7 +124,7 @@ void WholeFramebufferOperations_ClearColor_TC_003(void) {
  * GL_COLOR_CLEAR_VALUE sorgusuna NULL isaretçi geçilerek çökme
  * dayanikliligi ve state bütünlügü dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearColor_TC_004(void) {
+void GS_GL20SC_FOP_CC_ROBUSTNESS_TC_004(void) {
 	glGetFloatv(GL_COLOR_CLEAR_VALUE, NULL);
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
@@ -134,7 +134,7 @@ void WholeFramebufferOperations_ClearColor_TC_004(void) {
 
 	if (!(color[0] == 0.25f && color[1] == 0.5f && color[2] == 0.75f &&
 	      color[3] == 1.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)color[0]);
@@ -152,7 +152,7 @@ void WholeFramebufferOperations_ClearColor_TC_004(void) {
  * subnormal float degerler gönderilerek sürücünün bunu sessizce
  * ve güvenli sekilde islemesi dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearColor_TC_005(void) {
+void GS_GL20SC_FOP_CC_ROBUSTNESS_TC_005(void) {
 	GLfloat smallestSubnormal = 1.401298464e-45f;
 
 	glClearColor(smallestSubnormal, -smallestSubnormal, smallestSubnormal,
@@ -160,7 +160,7 @@ void WholeFramebufferOperations_ClearColor_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Subnormal (denormal) degerler atanirken beklenmeyen "
 		    "bir hata döndü (flush-to-zero istisnasi olabilir)."
 		    " Actual: 0x%04X",

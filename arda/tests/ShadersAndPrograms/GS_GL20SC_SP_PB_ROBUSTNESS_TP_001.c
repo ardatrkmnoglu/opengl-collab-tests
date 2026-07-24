@@ -1,11 +1,11 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "ShadersAndPrograms_ProgramBinary_TP_001";
-static const char* test_case_1 = "ShadersAndPrograms_ProgramBinary_TC_001";
-static const char* test_case_2 = "ShadersAndPrograms_ProgramBinary_TC_002";
-static const char* test_case_3 = "ShadersAndPrograms_ProgramBinary_TC_003";
-static const char* test_case_4 = "ShadersAndPrograms_ProgramBinary_TC_004";
+static const char* test_procedure = "GS_GL20SC_SP_PB_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_PB_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_PB_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_PB_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_PB_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -20,14 +20,13 @@ static const char* test_case_4 = "ShadersAndPrograms_ProgramBinary_TC_004";
  * (unaligned) bir bellek adresi verilerek sürücünün geçersiz
  * bellek erişiminde çökmeden hata üretip üretmediği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_ProgramBinary_TC_001(void) {
+void GS_GL20SC_SP_PB_ROBUSTNESS_TC_001(void) {
 	GLuint prog = glCreateProgram();
 
 	void *valid_memblock = malloc(1024);
 	if (!valid_memblock) {
 		TEST_LOG_INFO(
-		    "ShadersAndPrograms_ProgramBinary_TC_001: malloc başarısız.");
-		glDeleteProgram(prog);
+		    "GS_GL20SC_SP_PB_ROBUSTNESS_TC_001: malloc başarısız.");
 		return;
 	}
 	const void *unaligned_ptr = (const void *)((char *)valid_memblock + 1);
@@ -37,7 +36,7 @@ void ShadersAndPrograms_ProgramBinary_TC_001(void) {
 
 	if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Hizasız pointer ile çağrı kabul edildi."
 			      " Actual: 0x%04X",
 			      err);
@@ -46,7 +45,6 @@ void ShadersAndPrograms_ProgramBinary_TC_001(void) {
 	}
 
 	free(valid_memblock);
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -58,15 +56,14 @@ void ShadersAndPrograms_ProgramBinary_TC_001(void) {
  * glProgramBinary'ye verilir. Sürücünün bellek koruma
  * ihlaline karşı dayanıklılığını test eder.
  * ============================================================ */
-void ShadersAndPrograms_ProgramBinary_TC_002(void) {
+void GS_GL20SC_SP_PB_ROBUSTNESS_TC_002(void) {
 	GLuint prog = glCreateProgram();
 
 	size_t page_size = (size_t)sysconf(_SC_PAGESIZE);
 	void *mapped_memory = mmap(NULL, page_size, PROT_READ | PROT_WRITE,
 				   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (mapped_memory == MAP_FAILED) {
-		TEST_LOG_INFO("ShadersAndPrograms_ProgramBinary_TC_002: mmap başarısız.");
-		glDeleteProgram(prog);
+		TEST_LOG_INFO("GS_GL20SC_SP_PB_ROBUSTNESS_TC_002: mmap başarısız.");
 		return;
 	}
 	mprotect(mapped_memory, page_size, PROT_NONE);
@@ -76,7 +73,7 @@ void ShadersAndPrograms_ProgramBinary_TC_002(void) {
 
 	if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "PROT_NONE bellekle çağrı kabul edildi."
 			      " Actual: 0x%04X",
 			      err);
@@ -85,7 +82,6 @@ void ShadersAndPrograms_ProgramBinary_TC_002(void) {
 	}
 
 	munmap(mapped_memory, page_size);
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -97,7 +93,7 @@ void ShadersAndPrograms_ProgramBinary_TC_002(void) {
  * binary'yi kabul edip etmediği doğrulanır. Link durumunun
  * GL_FALSE olması beklenir.
  * ============================================================ */
-void ShadersAndPrograms_ProgramBinary_TC_003(void) {
+void GS_GL20SC_SP_PB_ROBUSTNESS_TC_003(void) {
 	GLuint prog = glCreateProgram();
 
 	GLint num_formats = 0;
@@ -117,11 +113,10 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 	if (err != GL_NO_ERROR) {
 		if (!(err == GL_INVALID_ENUM || err == GL_INVALID_VALUE ||
 		      err == GL_INVALID_OPERATION)) {
-			TEST_LOG_FAIL(test_case_1, test_procedure, 
+			TEST_LOG_FAIL(test_case_1, test_procedure,
 				      "Aşırı yükleme beklenmeyen hata üretti."
 				      " Actual: 0x%04X",
 				      err);
-			glDeleteProgram(prog);
 			return;
 		}
 	}
@@ -130,7 +125,7 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 	glGetProgramiv(prog, GL_LINK_STATUS, &link_status);
 
 	if (!(link_status == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "CRITICAL: Sürücü çöp veriyi geçerli Program Binary "
 		    "olarak kabul etti! link_status=%d",
 		    link_status);
@@ -138,7 +133,6 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -149,7 +143,7 @@ void ShadersAndPrograms_ProgramBinary_TC_003(void) {
  * sürücünün çökmeden hata ürettiği doğrulanır.
  * GL_INVALID_VALUE veya GL_INVALID_OPERATION beklenir.
  * ============================================================ */
-void ShadersAndPrograms_ProgramBinary_TC_004(void) {
+void GS_GL20SC_SP_PB_ROBUSTNESS_TC_004(void) {
 	GLuint prog = glCreateProgram();
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
@@ -160,7 +154,7 @@ void ShadersAndPrograms_ProgramBinary_TC_004(void) {
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION ||
 	      err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "NULL binary pointer ile çağrı reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -168,5 +162,4 @@ void ShadersAndPrograms_ProgramBinary_TC_004(void) {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }

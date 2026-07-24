@@ -1,11 +1,11 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "WholeFramebufferOperations_DepthMask_TP_001";
-static const char* test_case_1 = "WholeFramebufferOperations_DepthMask_TC_001";
-static const char* test_case_2 = "WholeFramebufferOperations_DepthMask_TC_002";
-static const char* test_case_3 = "WholeFramebufferOperations_DepthMask_TC_003";
-static const char* test_case_4 = "WholeFramebufferOperations_DepthMask_TC_004";
+static const char* test_procedure = "GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FOP_DM_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FOP_DM_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FOP_DM_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FOP_DM_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -22,12 +22,12 @@ static const char* test_case_4 = "WholeFramebufferOperations_DepthMask_TC_004";
  * alt bayta sarip 0x00 (FALSE), 0x101 ise 0x01'e sarip TRUE
  * üretmelidir.
  * ============================================================ */
-void WholeFramebufferOperations_DepthMask_TC_001(void) {
+void GS_GL20SC_FOP_DM_ROBUSTNESS_TC_001(void) {
 	glDepthMask((GLboolean)0x100);
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Bayt sinirindaki tasma degeri (0x100) hata ürettirdi."
 		    " Actual: 0x%04X",
 		    err1);
@@ -39,7 +39,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "0x100 alt bayta sarip 0x00 (FALSE) olmaliydi."
 			      " Actual: 0x%04X",
 			      (unsigned int)d);
@@ -51,7 +51,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Bayt sinirindaki tasma degeri (0x101) hata ürettirdi."
 		    " Actual: 0x%04X",
 		    err2);
@@ -62,7 +62,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_TRUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "0x101 alt bayta sarip 0x01 (TRUE) olmaliydi."
 			      " Actual: 0x%04X",
 			      (unsigned int)d);
@@ -79,7 +79,7 @@ void WholeFramebufferOperations_DepthMask_TC_001(void) {
  * çökmedigi ve ardindan gelen gecerli çagrilarin dogru çalistigi
  * dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_DepthMask_TC_002(void) {
+void GS_GL20SC_FOP_DM_ROBUSTNESS_TC_002(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, NULL);
 
 	glDepthMask(GL_TRUE);
@@ -88,7 +88,7 @@ void WholeFramebufferOperations_DepthMask_TC_002(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_TRUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)d);
@@ -106,7 +106,7 @@ void WholeFramebufferOperations_DepthMask_TC_002(void) {
  * cagrilardan etkilenmeden FALSE kalmasi beklenir. State
  * 'sizintisi' (cross-contamination) yakalamayi hedefler.
  * ============================================================ */
-void WholeFramebufferOperations_DepthMask_TC_003(void) {
+void GS_GL20SC_FOP_DM_ROBUSTNESS_TC_003(void) {
 	glDepthMask(GL_FALSE);
 	glColorMask(0xFF, 0x00, 0xFF, 0x00);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -115,7 +115,7 @@ void WholeFramebufferOperations_DepthMask_TC_003(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Alakasiz cagrilar (ColorMask/Clear) DEPTH_WRITEMASK "
 		    "state'ini etkilememeliydi."
 		    " Actual: 0x%04X",
@@ -133,14 +133,14 @@ void WholeFramebufferOperations_DepthMask_TC_003(void) {
  * gidip gelinir. Amac: hata birikmesi ya da yaris durumu
  * (race) benzeri bir tutarsizlik yakalamak.
  * ============================================================ */
-void WholeFramebufferOperations_DepthMask_TC_004(void) {
+void GS_GL20SC_FOP_DM_ROBUSTNESS_TC_004(void) {
 	for (int i = 0; i < 2048; i++) {
 		glDepthMask((i % 3 == 0) ? 0xAB : 0x00);
 	}
 
 	GLenum err = glGetError();
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Tekrarli deger degisimleri sonrasinda hata durumu "
 		    "biriktirilmis olabilir."
 		    " Actual: 0x%04X",
@@ -155,7 +155,7 @@ void WholeFramebufferOperations_DepthMask_TC_004(void) {
 	glGetBooleanv(GL_DEPTH_WRITEMASK, &d);
 
 	if (!(d == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Stres döngüsü sonrasi son state beklenenle uyusmuyor."
 		    " Actual: 0x%04X",
 		    (unsigned int)d);

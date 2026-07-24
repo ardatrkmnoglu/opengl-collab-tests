@@ -2,11 +2,11 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "ShadersAndPrograms_UniformMatrix_TP_001";
-static const char* test_case_1 = "ShadersAndPrograms_UniformMatrix_TC_001";
-static const char* test_case_2 = "ShadersAndPrograms_UniformMatrix_TC_002";
-static const char* test_case_3 = "ShadersAndPrograms_UniformMatrix_TC_003";
-static const char* test_case_4 = "ShadersAndPrograms_UniformMatrix_TC_004";
+static const char* test_procedure = "GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -21,7 +21,7 @@ static const char* test_case_4 = "ShadersAndPrograms_UniformMatrix_TC_004";
  * GL_FALSE olmak ZORUNDADIR. GL_TRUE verilerek sürücünün
  * bunu reddedip reddetmediği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_UniformMatrix_TC_001(void) {
+void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -34,14 +34,13 @@ void ShadersAndPrograms_UniformMatrix_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "GL_TRUE transpose bayrağı kabul edildi (Spec ihlali)."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -52,7 +51,7 @@ void ShadersAndPrograms_UniformMatrix_TC_001(void) {
  * fonksiyonuyla basmaya çalışarak sürücünün tip kontrolü
  * yapıp yapmadığını test eder.
  * ============================================================ */
-void ShadersAndPrograms_UniformMatrix_TC_002(void) {
+void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_002(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -65,14 +64,13 @@ void ShadersAndPrograms_UniformMatrix_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Mat3 lokasyonuna Mat4 veri kopyalanamaz (Spec ihlali)."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -82,7 +80,7 @@ void ShadersAndPrograms_UniformMatrix_TC_002(void) {
  * count parametresi negatif olamaz. count = -1 ile çağrı
  * yapılarak GL_INVALID_VALUE üretilip üretilmediği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_UniformMatrix_TC_003(void) {
+void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -95,14 +93,13 @@ void ShadersAndPrograms_UniformMatrix_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -112,7 +109,7 @@ void ShadersAndPrograms_UniformMatrix_TC_003(void) {
  * value parametresi olarak NULL pointer verildiğinde sürücünün
  * çökmeden tanımlı bir davranış sergilediği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_UniformMatrix_TC_004(void) {
+void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -126,12 +123,11 @@ void ShadersAndPrograms_UniformMatrix_TC_004(void) {
 	/* Hata üretse de üretmese de çökmeme koşulunu geçer */
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "NULL value pointer beklenmeyen hata kodu."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }

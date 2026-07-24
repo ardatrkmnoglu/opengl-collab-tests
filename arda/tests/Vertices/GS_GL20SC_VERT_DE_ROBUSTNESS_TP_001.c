@@ -2,11 +2,11 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "Vertices_DrawElements_TP_001";
-static const char* test_case_1 = "Vertices_DrawElements_TC_001";
-static const char* test_case_2 = "Vertices_DrawElements_TC_002";
-static const char* test_case_3 = "Vertices_DrawElements_TC_003";
-static const char* test_case_4 = "Vertices_DrawElements_TC_004";
+static const char* test_procedure = "GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -22,7 +22,7 @@ static const char* test_case_4 = "Vertices_DrawElements_TC_004";
  * GL_FLOAT verilerek sürücünün bunu reddedip reddetmediği
  * doğrulanır.
  * ============================================================ */
-void Vertices_DrawElements_TC_001(void) {
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -32,14 +32,13 @@ void Vertices_DrawElements_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -49,7 +48,7 @@ void Vertices_DrawElements_TC_001(void) {
  * count parametresi negatif olamaz. Negatif (veya aşırı büyük)
  * sayı ile GL_INVALID_VALUE üretilip üretilmediği doğrulanır.
  * ============================================================ */
-void Vertices_DrawElements_TC_002(void) {
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -59,14 +58,13 @@ void Vertices_DrawElements_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -77,7 +75,7 @@ void Vertices_DrawElements_TC_002(void) {
  * belirtir. Alakasız bir değer (GL_TEXTURE_2D) verilerek
  * GL_INVALID_ENUM üretilmesi beklenir.
  * ============================================================ */
-void Vertices_DrawElements_TC_003(void) {
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -87,14 +85,13 @@ void Vertices_DrawElements_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz mode GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -105,7 +102,7 @@ void Vertices_DrawElements_TC_003(void) {
  * olarak NULL ve count > 0 verilerek sürücünün sıfır adrese
  * erişip çökmek yerine tanımlı bir davranış göstermesi beklenir.
  * ============================================================ */
-void Vertices_DrawElements_TC_004(void) {
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -118,5 +115,4 @@ void Vertices_DrawElements_TC_004(void) {
 	/* Çökmemesi yeterlidir */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
-	glDeleteProgram(prog);
 }

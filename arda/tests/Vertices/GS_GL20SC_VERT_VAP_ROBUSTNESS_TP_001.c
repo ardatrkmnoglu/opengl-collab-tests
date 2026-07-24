@@ -1,12 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "Vertices_VertexAttribPointer_TP_001";
-static const char* test_case_1 = "Vertices_VertexAttribPointer_TC_001";
-static const char* test_case_2 = "Vertices_VertexAttribPointer_TC_002";
-static const char* test_case_3 = "Vertices_VertexAttribPointer_TC_003";
-static const char* test_case_4 = "Vertices_VertexAttribPointer_TC_004";
-static const char* test_case_5 = "Vertices_VertexAttribPointer_TC_005";
+static const char* test_procedure = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_005";
 
 
 /* ============================================================
@@ -21,7 +21,7 @@ static const char* test_case_5 = "Vertices_VertexAttribPointer_TC_005";
  * Alakasız bir Enum (GL_TEXTURE_2D) verilerek sürücünün
  * bunu reddedip reddetmediği doğrulanır.
  * ============================================================ */
-void Vertices_VertexAttribPointer_TC_001(void) {
+void GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -30,7 +30,7 @@ void Vertices_VertexAttribPointer_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz veri tipi (GL_TEXTURE_2D) reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -46,7 +46,7 @@ void Vertices_VertexAttribPointer_TC_001(void) {
  * Size parametresi yalnızca 1, 2, 3 veya 4 olabilir.
  * 5 elemanlı bir vektör geçersizdir.
  * ============================================================ */
-void Vertices_VertexAttribPointer_TC_002(void) {
+void GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -55,7 +55,7 @@ void Vertices_VertexAttribPointer_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "size=5 olan geçersiz boyut reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -71,7 +71,7 @@ void Vertices_VertexAttribPointer_TC_002(void) {
  * Stride değeri negatif olamaz. Sürücünün negatif
  * stride değerini GL_INVALID_VALUE ile reddettiği doğrulanır.
  * ============================================================ */
-void Vertices_VertexAttribPointer_TC_003(void) {
+void GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -79,7 +79,7 @@ void Vertices_VertexAttribPointer_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Negatif stride (-4) reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -95,7 +95,7 @@ void Vertices_VertexAttribPointer_TC_003(void) {
  * GL_MAX_VERTEX_ATTRIBS indeksine veri bağlanmaya
  * çalışılarak sürücünün sınır kontrolü doğrulanır.
  * ============================================================ */
-void Vertices_VertexAttribPointer_TC_004(void) {
+void GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_004(void) {
 	GLint max_attribs = 0;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
@@ -106,7 +106,7 @@ void Vertices_VertexAttribPointer_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Sınır dışı indeks reddedilmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -123,7 +123,7 @@ void Vertices_VertexAttribPointer_TC_004(void) {
  * verilmesi genellikle geçerli veya tanımlı hatadır.
  * Sürücünün bu durumda doğru yanıt verdiği kontrol edilir.
  * ============================================================ */
-void Vertices_VertexAttribPointer_TC_005(void) {
+void GS_GL20SC_VERT_VAP_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -134,7 +134,7 @@ void Vertices_VertexAttribPointer_TC_005(void) {
 
 	/* rTest_nullPtr'deki orijinal test (err != GL_NO_ERROR) bekliyordu */
 	if (!(err != GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "VBO bağlı değilken NULL pointer için hata bekleniyordu."
 		    " Actual: 0x%04X",
 		    err);

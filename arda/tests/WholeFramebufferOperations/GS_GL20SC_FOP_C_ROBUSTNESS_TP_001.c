@@ -1,12 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "WholeFramebufferOperations_Clear_TP_001";
-static const char* test_case_1 = "WholeFramebufferOperations_Clear_TC_001";
-static const char* test_case_2 = "WholeFramebufferOperations_Clear_TC_002";
-static const char* test_case_3 = "WholeFramebufferOperations_Clear_TC_003";
-static const char* test_case_4 = "WholeFramebufferOperations_Clear_TC_004";
-static const char* test_case_5 = "WholeFramebufferOperations_Clear_TC_005";
+static const char* test_procedure = "GS_GL20SC_FOP_C_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FOP_C_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FOP_C_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FOP_C_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FOP_C_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_FOP_C_ROBUSTNESS_TC_005";
 
 
 /* ============================================================
@@ -24,7 +24,7 @@ static const char* test_case_5 = "WholeFramebufferOperations_Clear_TC_005";
  * yaparak (0xFFFFFFFF) ve kirletilmis bir maske göndererek
  * sürücünün bunu reddedip reddetmedigi dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_Clear_TC_001(void) {
+void GS_GL20SC_FOP_C_ROBUSTNESS_TC_001(void) {
 	// glClear yalnızca COLOR, DEPTH ve STENCIL bitlerinin mantıksal OR
 	// (Veya) kombinasyonunu kabul eder. Tüm bitleri '1' yaparak
 	// (0xFFFFFFFF) sürücüye yasaklı bitler yolluyoruz.
@@ -32,7 +32,7 @@ void WholeFramebufferOperations_Clear_TC_001(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "glClear, tanımsız olan geçersiz maske bitlerini yuttu "
 		    "(0xFFFFFFFF)."
 		    " Actual: 0x%04X",
@@ -47,7 +47,7 @@ void WholeFramebufferOperations_Clear_TC_001(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Kirletilmiş mantıksal maske kombinasyonu reddedilmedi."
 		    " Actual: 0x%04X",
 		    err2);
@@ -66,12 +66,12 @@ void WholeFramebufferOperations_Clear_TC_001(void) {
  * kümesidir; bu sinir durumunun yanlislikla reddedilmedigini
  * dogrular.
  * ============================================================ */
-void WholeFramebufferOperations_Clear_TC_002(void) {
+void GS_GL20SC_FOP_C_ROBUSTNESS_TC_002(void) {
 	glClear(0);
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Bos bit maskesi (0), gecersiz mantiksal kombinasyon "
 		    "olarak yanlislikla reddedildi."
 		    " Actual: 0x%04X",
@@ -90,12 +90,12 @@ void WholeFramebufferOperations_Clear_TC_002(void) {
  * yapilandirmasinda ilgili buffer bulunmasa bile spesifikasyona
  * göre hata degil sessiz no-op beklenir.
  * ============================================================ */
-void WholeFramebufferOperations_Clear_TC_003(void) {
+void GS_GL20SC_FOP_C_ROBUSTNESS_TC_003(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tek basina GL_COLOR_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
 			      err1);
@@ -107,7 +107,7 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tek basina GL_DEPTH_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
 			      err2);
@@ -119,7 +119,7 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
 	GLenum err3 = glGetError();
 
 	if (!(err3 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tek basina GL_STENCIL_BUFFER_BIT reddedildi."
 			      " Actual: 0x%04X",
 			      err3);
@@ -138,12 +138,12 @@ void WholeFramebufferOperations_Clear_TC_003(void) {
  * isaret genisletme (sign extension) hatasi yapip yapmadigini
  * sinar.
  * ============================================================ */
-void WholeFramebufferOperations_Clear_TC_004(void) {
+void GS_GL20SC_FOP_C_ROBUSTNESS_TC_004(void) {
 	glClear(0x80000000);
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "En yüksek bit (MSB) sentinel degeri gecerli bir "
 			      "kombinasyon olmamasina ragmen kabul edildi."
 			      " Actual: 0x%04X",
@@ -164,12 +164,12 @@ void WholeFramebufferOperations_Clear_TC_004(void) {
  * hata döndürmedigini) dogrulamak, hata durumunun dogru
  * yönetildigini gösterir.
  * ============================================================ */
-void WholeFramebufferOperations_Clear_TC_005(void) {
+void GS_GL20SC_FOP_C_ROBUSTNESS_TC_005(void) {
 	glClear(0xFFFFFFFF);
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Ilk (kasitli gecersiz) cagri beklenen hatayi "
 			      "üretmedi."
 			      " Actual: 0x%04X",
@@ -182,7 +182,7 @@ void WholeFramebufferOperations_Clear_TC_005(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Önceki gecersiz cagridan kalan hata durumu, sonraki "
 		    "gecerli cagriyi da etkiledi (yapiskan hata)."
 		    " Actual: 0x%04X",

@@ -4,78 +4,78 @@
 
 
 /* --------------- BindBuffer --------------- */
-void BufferObjects_BindBuffer_TC_001();
-void BufferObjects_BindBuffer_TC_002();
-void BufferObjects_BindBuffer_TC_003();
-void BufferObjects_BindBuffer_TC_004();
-void BufferObjects_BindBuffer_TC_005();
-void BufferObjects_BindBuffer_TC_006();
-void BufferObjects_BindBuffer_TC_007();
-void BufferObjects_BindBuffer_TC_008();
-void BufferObjects_BindBuffer_TC_009();
-void BufferObjects_BindBuffer_TC_010();
-void BufferObjects_BindBuffer_TC_011();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_001();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_002();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_003();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_004();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_005();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_006();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_007();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_008();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_009();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_010();
+void GS_GL20SC_BO_BB_ROBUSTNESS_TC_011();
 
 /* --------------- BufferData --------------- */
-void BufferObjects_BufferData_TC_001();
-void BufferObjects_BufferData_TC_002();
-void BufferObjects_BufferData_TC_003();
-void BufferObjects_BufferData_TC_004();
-void BufferObjects_BufferData_TC_005();
-void BufferObjects_BufferData_TC_006();
-void BufferObjects_BufferData_TC_007();
-void BufferObjects_BufferData_TC_008();
-void BufferObjects_BufferData_TC_009();
-void BufferObjects_BufferData_TC_010();
-void BufferObjects_BufferData_TC_011();
-void BufferObjects_BufferData_TC_012();
-void BufferObjects_BufferData_TC_013();
-void BufferObjects_BufferData_TC_014();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_001();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_002();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_003();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_004();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_005();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_006();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_007();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_008();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_009();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_010();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_011();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_012();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_013();
+void GS_GL20SC_BO_BD_ROBUSTNESS_TC_014();
 
 /* --------------- BufferSubData --------------- */
-void BufferObjects_BufferSubData_TC_001();
-void BufferObjects_BufferSubData_TC_002();
-void BufferObjects_BufferSubData_TC_003();
-void BufferObjects_BufferSubData_TC_004();
-void BufferObjects_BufferSubData_TC_005();
-void BufferObjects_BufferSubData_TC_006();
-void BufferObjects_BufferSubData_TC_007();
-void BufferObjects_BufferSubData_TC_008();
-void BufferObjects_BufferSubData_TC_009();
-void BufferObjects_BufferSubData_TC_010();
-void BufferObjects_BufferSubData_TC_011();
-void BufferObjects_BufferSubData_TC_012();
-void BufferObjects_BufferSubData_TC_013();
-void BufferObjects_BufferSubData_TC_014();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_001();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_002();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_003();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_004();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_005();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_006();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_007();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_008();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_009();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_010();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_011();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_012();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_013();
+void GS_GL20SC_BO_BSD_ROBUSTNESS_TC_014();
 
 /* --------------- GenBuffers --------------- */
-void BufferObjects_GenBuffers_TC_001();
-void BufferObjects_GenBuffers_TC_002();
-void BufferObjects_GenBuffers_TC_003();
-void BufferObjects_GenBuffers_TC_004();
-void BufferObjects_GenBuffers_TC_005();
-void BufferObjects_GenBuffers_TC_006();
-void BufferObjects_GenBuffers_TC_007();
-void BufferObjects_GenBuffers_TC_008();
-void BufferObjects_GenBuffers_TC_009();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_001();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_002();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_003();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_004();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_005();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_006();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_007();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_008();
+void GS_GL20SC_BO_GB_ROBUSTNESS_TC_009();
 
 /* --------------- glGetBufferParameteriv --------------- */
-void BufferObjects_GetBufferParameteriv_TC_001();
-void BufferObjects_GetBufferParameteriv_TC_002();
-void BufferObjects_GetBufferParameteriv_TC_003();
-void BufferObjects_GetBufferParameteriv_TC_004();
-void BufferObjects_GetBufferParameteriv_TC_005();
-void BufferObjects_GetBufferParameteriv_TC_006();
-void BufferObjects_GetBufferParameteriv_TC_007();
-void BufferObjects_GetBufferParameteriv_TC_008();
-void BufferObjects_GetBufferParameteriv_TC_009();
-void BufferObjects_GetBufferParameteriv_TC_010();
-void BufferObjects_GetBufferParameteriv_TC_011();
-void BufferObjects_GetBufferParameteriv_TC_012();
-void BufferObjects_GetBufferParameteriv_TC_013();
-void BufferObjects_GetBufferParameteriv_TC_014();
-void BufferObjects_GetBufferParameteriv_TC_015();
-void BufferObjects_GetBufferParameteriv_TC_016();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_001();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_002();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_003();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_004();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_005();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_006();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_007();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_008();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_009();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_010();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_011();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_012();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_013();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_014();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_015();
+void GS_GL20SC_GBP_GB_ROBUSTNESS_TC_016();
 
 
 

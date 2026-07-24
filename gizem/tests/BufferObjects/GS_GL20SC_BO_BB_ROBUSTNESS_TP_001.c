@@ -1,6 +1,14 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
+//Gizem'de çalışması için
+#include <glad/gles2.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include "../../../include/macro.h"
+
+// Arda'da çalışması için
+// #include "../../../include/rtests.h"
+// #include "../../../include/helper.h"
+// #include "../../../include/macro.h"
 
 
 /*
@@ -293,13 +301,13 @@ void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_init(void) {
      CHECK_ERROR(test_procedure);
      GS_GL20SC_BO_BB_ROBUSTNESS_TC_010();
      CHECK_ERROR(test_procedure);
- }
+      }
 
-void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_draw(void) {
+     void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_draw(void) {
 
- }
+     }
 
-/* Cleanup */
-void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_close(void) {
-     CHECK_ERROR(test_procedure);
- }
+     /* Cleanup */
+     void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_close(void) {
+         CHECK_ERROR(test_procedure);
+     }

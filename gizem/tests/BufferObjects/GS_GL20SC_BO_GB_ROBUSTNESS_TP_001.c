@@ -1,6 +1,13 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
+//Gizem'de çalışması için
+#include <glad/gles2.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "../../../include/macro.h"
+
+// Arda'da çalışması için
+// #include "../../../include/rtests.h"
+// #include "../../../include/helper.h"
+// #include "../../../include/macro.h"
 
 /*
 GL20SC - BufferObjects - GenBuffers - ROBUSTNESS

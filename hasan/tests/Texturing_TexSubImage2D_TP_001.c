@@ -156,9 +156,9 @@ void Texturing_TexSubImage2D_TC_005(void) {
 	if (subData) {
 		for (int step = 0; step < 100; step++) {
 			for (int i = 0; i < subSize * subSize * 4; i += 4) {
-				subData[i] = rand() % 256;
-				subData[i + 1] = rand() % 256;
-				subData[i + 2] = rand() % 256;
+				subData[i] = (GLubyte)((i + step * 17) % 256);
+				subData[i + 1] = (GLubyte)((i * 3 + step * 31) % 256);
+				subData[i + 2] = (GLubyte)((i * 7 + step * 53) % 256);
 				subData[i + 3] = 255;
 			}
 

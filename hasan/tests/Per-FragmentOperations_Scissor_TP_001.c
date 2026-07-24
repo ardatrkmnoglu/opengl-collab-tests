@@ -156,34 +156,62 @@ void PerFragmentOperations_Scissor_TC_005(void) {
 }
 
 // ---------------------------------------------------------------
-// TEST 6: Rastgele Fuzzing (Rastgele glScissor Cagriları)
-// Cok sayida tamamen rastgele (mantikli ve mantiksiz) glScissor cagirilarak
+// TEST 6: Deterministik Fuzzing (glScissor Cagriları)
+// Cok sayida deterministik (mantikli ve mantiksiz) glScissor cagirilarak
 // bellek veya state bozulmasi tespiti yapilir.
 // ---------------------------------------------------------------
 void PerFragmentOperations_Scissor_TC_006(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
-	srand(12345); // Sabit seed (tekrar edilebilirlik)
+	// Basit deterministik LCG (Linear Congruential Generator)
+	unsigned int seed = 12345;
+	int unexpected_err_count = 0;
+	GLenum last_unexpected_err = GL_NO_ERROR;
+	int fail_iteration = -1;
 
 	for (int i = 0; i < 50000; i++) {
-		GLint x = (rand() % 4000) - 2000; // -2000 ile 2000 arasi
-		GLint y = (rand() % 4000) - 2000;
+		seed = seed * 1103515245 + 12345;
+		GLint x = (GLint)((seed >> 16) % 4000) - 2000;
 
-		// %10 ihtimalle negatif boyutlar göndererek GL_INVALID_VALUE
-		// tetiklet (kasten)
-		GLsizei w = (rand() % 100 < 10) ? -rand() % 500 : rand() % 4000;
-		GLsizei h = (rand() % 100 < 10) ? -rand() % 500 : rand() % 4000;
+		seed = seed * 1103515245 + 12345;
+		GLint y = (GLint)((seed >> 16) % 4000) - 2000;
+
+		seed = seed * 1103515245 + 12345;
+		unsigned int w_raw = (seed >> 16) % 4000;
+
+		seed = seed * 1103515245 + 12345;
+		unsigned int h_raw = (seed >> 16) % 4000;
+
+		// Her ~10 iterasyonda negatif boyut gonder (kasten)
+		GLsizei w = (i % 10 == 0) ? -(GLsizei)(w_raw % 500) : (GLsizei)w_raw;
+		GLsizei h = (i % 10 == 0) ? -(GLsizei)(h_raw % 500) : (GLsizei)h_raw;
 
 		glScissor(x, y, w, h);
 
-		// Her 1000 adimda bir hata kuyrugunu temizle (cok birikmesin)
-		if (i % 1000 == 0) {
-			while (glGetError() != GL_NO_ERROR)
-				;
+		GLenum err = glGetError();
+		// GL_INVALID_VALUE beklenen bir hata (negatif boyutlar icin)
+		// Bunun disindaki hatalar beklenmeyen hatadir
+		if (err != GL_NO_ERROR && err != GL_INVALID_VALUE) {
+			unexpected_err_count++;
+			last_unexpected_err = err;
+			if (fail_iteration < 0)
+				fail_iteration = i;
 		}
 	}
 
-	// Dongu cokmeden bittiyse surucu saglamdir.
-	TEST_LOG_SUCCESS(test_case6, test_procedure);
+	// Dongu sonrasi GL context sagligini dogrula
+	while (glGetError() != GL_NO_ERROR)
+		;
+	glScissor(0, 0, 100, 100);
+	GLenum final_err = glGetError();
+
+	if (unexpected_err_count == 0 && final_err == GL_NO_ERROR)
+		TEST_LOG_SUCCESS(test_case6, test_procedure);
+	else
+		TEST_LOG_FAIL(test_case6, test_procedure,
+			      "Fuzzing hatasi: beklenmeyen_hata=%d kez, "
+			      "ilk_hata_iter=%d, son_hata=0x%X, final=0x%X",
+			      unexpected_err_count, fail_iteration,
+			      last_unexpected_err, final_err);
 }

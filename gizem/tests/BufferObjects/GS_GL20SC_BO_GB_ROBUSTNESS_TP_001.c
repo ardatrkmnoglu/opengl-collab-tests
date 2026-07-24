@@ -1,6 +1,5 @@
-#include <glad/gles2.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "../../../include/rtests.h"
+#include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
 /*

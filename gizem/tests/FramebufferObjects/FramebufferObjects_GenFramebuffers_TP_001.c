@@ -1,10 +1,5 @@
-#include <glad/gles2.h>
-#include <GLFW/glfw3.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
+#include "../../../include/rtests.h"
+#include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
 // void glGenFramebuffers(GLsizei n, GLuint * framebuffers);

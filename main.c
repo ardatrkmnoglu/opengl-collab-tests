@@ -17,7 +17,7 @@ int main() {
 	printf("[INFO] Initializing: Robustness tests for OpenGL SC 2.0\n");
 	printf("--------------------------------------------------\n");
 
-	init();
+	//	init();
 	draw();
 	cleanup();
 

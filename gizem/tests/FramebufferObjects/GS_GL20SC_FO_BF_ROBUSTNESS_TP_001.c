@@ -1,32 +1,35 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
+//Gizem'de çalışması için
+#include <glad/gles2.h>
+#include <stdio.h>
 #include "../../../include/macro.h"
 
+// Arda'da çalışması için
+// #include "../../../include/rtests.h"
+// #include "../../../include/helper.h"
+// #include "../../../include/macro.h"
 
 
-// void glBindFramebuffer(GLenum target, GLuint framebuffer);
-// OpenGL’de hangi framebuffer’a çizim yapılacağını ve hangi framebuffer’dan okunacağını seçmek için kullanılır
-// target: Modern çekirdekte genelde hep GL_FRAMEBUFFER kullanılır.
-// framebuffer = 0: Varsayılan framebuffer
-// framebuffer = 0 olmayan bir id dersen: Senin glGenFramebuffers ile oluşturduğun, “off-screen” (ekran dışında) bir framebuffer’a geçersin.
+/*
+GL20SC - FramebufferObjects - BindFramebuffer - ROBUSTNESS
+*/
 
-static const char* test_procedure = "FramebufferObjects_BindFramebuffer_TP_001";
-static const char* test_case_1 = "FramebufferObjects_BindFramebuffer_TC_001";
-static const char* test_case_2 = "FramebufferObjects_BindFramebuffer_TC_002";
-static const char* test_case_3 = "FramebufferObjects_BindFramebuffer_TC_003";
-static const char* test_case_4 = "FramebufferObjects_BindFramebuffer_TC_004";
-static const char* test_case_5 = "FramebufferObjects_BindFramebuffer_TC_005";
-static const char* test_case_6 = "FramebufferObjects_BindFramebuffer_TC_006";
-static const char* test_case_7 = "FramebufferObjects_BindFramebuffer_TC_007";
-static const char* test_case_8 = "FramebufferObjects_BindFramebuffer_TC_008";
-static const char* test_case_9 = "FramebufferObjects_BindFramebuffer_TC_009";
-static const char* test_case_10 = "FramebufferObjects_BindFramebuffer_TC_010";
-static const char* test_case_11 = "FramebufferObjects_BindFramebuffer_TC_011";
-static const char* test_case_12 = "FramebufferObjects_BindFramebuffer_TC_012";
+
+static const char* test_procedure = "GS_GL20SC_FO_BF_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_006";
+static const char* test_case_7 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_007";
+static const char* test_case_8 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_008";
+static const char* test_case_9 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_009";
+static const char* test_case_10 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_010";
+static const char* test_case_11 = "GS_GL20SC_FO_BF_ROBUSTNESS_TC_011";
 
 
 // Belirtilen hata: GL_INVALID_ENUM is generated if target is not GL_FRAMEBUFFER.
-void FramebufferObjects_BindFramebuffer_TC_001()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_001()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -43,7 +46,7 @@ void FramebufferObjects_BindFramebuffer_TC_001()
 // belirtilmeyen hatalar ------------------------------
 
 // target parametresi GL_FRAMEBUFFER disinda bir enum oldugunda GL_INVALID_ENUM uretilip onceki binding'in bozulmadigini doğrular.
-void FramebufferObjects_BindFramebuffer_TC_002()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -69,11 +72,10 @@ void FramebufferObjects_BindFramebuffer_TC_002()
         TEST_LOG_SUCCESS(test_case_2, test_procedure);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo);
 }
 
 // glGenFramebuffers ile hiç uretilmemis, rastgele/keyfi bir framebuffer ismiyle bind cagirildiginda davranisi test eder
-void FramebufferObjects_BindFramebuffer_TC_003()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -93,13 +95,12 @@ void FramebufferObjects_BindFramebuffer_TC_003()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // Eger implicit olusturulduysa temizlemeyi dene (guvenli, gecersizse etkisi yok)
-    glDeleteFramebuffers(1, &arbitraryName);
 }
 
 // Yeni oluşturulup ilk kez bind edilen bir framebuffer'ın başlangıçta herhangi bir attachment içermediğini doğrular
 // GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT ve GL_STENCIL_ATTACHMENT noktalarının OBJECT_TYPE'ı,
 // bu noktalara bir renderbuffer veya texture bağlanana kadar GL_NONE olmalıdır
-void FramebufferObjects_BindFramebuffer_TC_004()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -120,12 +121,11 @@ void FramebufferObjects_BindFramebuffer_TC_004()
     else TEST_LOG_FAIL(test_case_4, test_procedure, "One or more attachment points not initialized to GL_NONE");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo);
 }
 
 // framebuffer = 0 iken (varsayilan) target uzerinde query/modify islemlerinin GL_INVALID_OPERATION ile reddedildigini doğrular
 // (spec: "While framebuffer object name zero is bound... GL_INVALID_OPERATION").
-void FramebufferObjects_BindFramebuffer_TC_005()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -145,37 +145,9 @@ void FramebufferObjects_BindFramebuffer_TC_005()
     }
 }
 
-// Eğer GL_FRAMEBUFFER hedefine bağlı olan bir FBO (framebuffer nesnesi) glDeleteFramebuffers ile silinirse,
-// OpenGL spesifikasyonuna göre GL_FRAMEBUFFER_BINDING durumunun otomatik olarak
-// varsayılan framebuffer’a (0) dönmesi gerekir.
-// Yani: "silinen FBO'ya işaret eden dangling bir binding kalmamalı".
-void FramebufferObjects_BindFramebuffer_TC_006()
-{
-    while (glGetError() != GL_NO_ERROR) {}
-
-    GLuint fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    glDeleteFramebuffers(1, &fbo);
-
-    GLenum errDelete = glGetError();
-
-    GLint currentBinding = -1;
-    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &currentBinding);
-
-    if (currentBinding == 0) {
-        TEST_LOG_SUCCESS(test_case_6, test_procedure);
-        printf("[PASS] Binding correctly reverted to 0 after deleting bound FBO.\n");
-    }
-    else {
-        TEST_LOG_FAIL(test_case_6, test_procedure, "Binding did not revert to 0 - dangling binding risk.");
-    }
-}
-
 // Ayni framebuffer'in ust uste ayni isimle tekrar tekrar bind edilmesinin (no-op olmasi beklenen durum)
 // implementasyonu bozup bozmadigini (orn. state'i sifirlayip sifirlamadigini) test eder.
-void FramebufferObjects_BindFramebuffer_TC_007()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -199,15 +171,13 @@ void FramebufferObjects_BindFramebuffer_TC_007()
     glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &objType);
 
     if (err == GL_NO_ERROR && objType == GL_RENDERBUFFER) {
-        TEST_LOG_SUCCESS(test_case_7, test_procedure);
+        TEST_LOG_SUCCESS(test_case_6, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_7, test_procedure, "State corrupted or error occurred during repeated rebind.");
+        TEST_LOG_FAIL(test_case_6, test_procedure, "State corrupted or error occurred during repeated rebind.");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo);
-    glDeleteRenderbuffers(1, &rb);
 }
 
 // glGenFramebuffers ile hiç üretilmemiş, aşırı/uç framebuffer isimleri
@@ -215,7 +185,7 @@ void FramebufferObjects_BindFramebuffer_TC_007()
 // sürücünün/implementasyonun iç kaynak tablosunda (örneğin isimleri dizi indeksi
 // gibi kullanan basit implementasyonlarda) out-of-bounds erişim, bellek hatası
 // ya da crash olup olmadığını kontrol eder.
-void FramebufferObjects_BindFramebuffer_TC_008()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -227,11 +197,11 @@ void FramebufferObjects_BindFramebuffer_TC_008()
         glBindFramebuffer(GL_FRAMEBUFFER, extremeNames[i]);
         GLenum err = glGetError();
         if (err != GL_NO_ERROR) {
-            TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
+            TEST_LOG_FAIL(test_case_7, test_procedure, "error = 0x%x.", err);
             return;
         }
     }
-    TEST_LOG_SUCCESS(test_case_8, test_procedure);
+    TEST_LOG_SUCCESS(test_case_7, test_procedure);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -241,7 +211,7 @@ void FramebufferObjects_BindFramebuffer_TC_008()
 // Senaryo:
 // - glGenRenderbuffers ile bir renderbuffer ismi (rb) üretiyoruz.
 // - Bu renderbuffer ismini, sanki bir framebuffer adıymış gibi kullanıyoruz.
-void FramebufferObjects_BindFramebuffer_TC_009()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -251,20 +221,19 @@ void FramebufferObjects_BindFramebuffer_TC_009()
 
     GLenum err = glGetError();
     if (err == GL_NO_ERROR) {
-        TEST_LOG_SUCCESS(test_case_9, test_procedure);
+        TEST_LOG_SUCCESS(test_case_8, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
+        TEST_LOG_FAIL(test_case_8, test_procedure, "error = 0x%x.", err);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteRenderbuffers(1, &rb);
 }
 
 // glBindFramebuffer ile “sık ve tekrarlı bind/unbind (0’a dön)”
 // işlemlerinin sürücüde zamanla bozulma, kaynak sızıntısı veya kararsızlık
 // (örneğin hataya düşme, iç durumun bozulması) üretip üretmediğini ölçer.
-void FramebufferObjects_BindFramebuffer_TC_010()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -279,19 +248,17 @@ void FramebufferObjects_BindFramebuffer_TC_010()
 
     GLenum err = glGetError();
     if (err == GL_NO_ERROR) {
-        TEST_LOG_SUCCESS(test_case_10, test_procedure);
+        TEST_LOG_SUCCESS(test_case_9, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_10, test_procedure, "error = 0x%x.", err);
+        TEST_LOG_FAIL(test_case_9, test_procedure, "error = 0x%x.", err);
     }
-
-    glDeleteFramebuffers(8, fbos);
 }
 
 // Bir framebuffer bağlıyken (nonzero), farklı bir framebuffer'a gecis yapildiginda önceki
 // binding’in gerçekten bırakılıp bırakılmadığını doğrular (GL_FRAMEBUFFER_BINDING query'si ile)
 // (spec: "previous binding is automatically broken")
-void FramebufferObjects_BindFramebuffer_TC_011()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -308,21 +275,19 @@ void FramebufferObjects_BindFramebuffer_TC_011()
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &b2); //binding == fbo2 olmalı (önceki fbo bırakılmalı)
 
     if ((GLuint)b1 == fbo1 && (GLuint)b2 == fbo2 && b1 != b2) {
-        TEST_LOG_SUCCESS(test_case_11, test_procedure);
+        TEST_LOG_SUCCESS(test_case_10, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_11, test_procedure, "Binding state inconsistent across switch");
+        TEST_LOG_FAIL(test_case_10, test_procedure, "Binding state inconsistent across switch");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo1);
-    glDeleteFramebuffers(1, &fbo2);
 }
 
 // Halihazirda bind edilmis olan framebuffer'in tekrar ayni isimle bind
 // edilmesinin (self-rebind) attachment durumunu sifirlayip sifirlamadigini test eder
 // - spec bu konuda sessiz, "ilk bind" ile "sonraki bind"ler arasinda fark olmamali.
-void FramebufferObjects_BindFramebuffer_TC_012()
+void GS_GL20SC_FO_BF_ROBUSTNESS_TC_011()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
@@ -343,13 +308,49 @@ void FramebufferObjects_BindFramebuffer_TC_012()
     GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE, &objType);
 
     if (objType == GL_RENDERBUFFER) {
-        TEST_LOG_SUCCESS(test_case_12, test_procedure);
+        TEST_LOG_SUCCESS(test_case_11, test_procedure);
     }
     else {
-        TEST_LOG_FAIL(test_case_12, test_procedure, "Self-rebind unexpectedly reset attachment state.");
+        TEST_LOG_FAIL(test_case_11, test_procedure, "Self-rebind unexpectedly reset attachment state.");
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDeleteFramebuffers(1, &fbo);
-    glDeleteRenderbuffers(1, &rb);
+}
+
+
+
+/* Initialization */
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_init(void) {
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_001();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_002();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_003();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_004();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_005();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_006();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_007();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_008();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_009();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_010();
+    CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_BF_ROBUSTNESS_TC_011();
+    CHECK_ERROR(test_procedure);
+}
+
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_draw(void) {
+
+}
+
+/* Cleanup */
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_close(void) {
+    CHECK_ERROR(test_procedure);
 }

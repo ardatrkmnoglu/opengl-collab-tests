@@ -190,7 +190,7 @@ void GS_GL20SC_VC_DR_ROBUSTNESS_TC_004(void) {
 	GLenum err;
 
 	GLfloat values[][2] = {
-	    {0.0, 1.0}, {1.0, 0.0}, {0.25, 0.75}, {-1.0, 2.0}, {5.0, -5.0}};
+		{0.0f, 1.0f}, {1.0f, 0.0f}, {0.25f, 0.75f}, {-1.0f, 2.0f}, {5.0f, -5.0f}};
 
 	int count = sizeof(values) / sizeof(values[0]);
 	int i;
@@ -198,34 +198,35 @@ void GS_GL20SC_VC_DR_ROBUSTNESS_TC_004(void) {
 	resetState_DepthRange();
 
 	for (i = 0; i < count; i++) {
-		glDepthRange(values[i][0], values[i][1]);
+		glDepthRangef(values[i][0], values[i][1]);
 
 		err = glGetError();
 
 		if (err != GL_NO_ERROR) {
 			TEST_LOG_FAIL(test_case_4, test_procedure, "Error=0x%X",
-				      err);
+					  err);
 			return;
 		}
 
-		glGetfloatv(GL_DEPTH_RANGE, depthRange);
+		glGetFloatv(GL_DEPTH_RANGE, depthRange);
 
-		if (depthRange[0] < 0.0 || depthRange[0] > 1.0) {
+		if (depthRange[0] < 0.0f || depthRange[0] > 1.0f) {
 			TEST_LOG_FAIL(test_case_4, test_procedure,
-				      "Near aralik disinda: %lf",
-				      depthRange[0]);
+					  "Near aralik disinda: %f",
+					  depthRange[0]);
 			return;
 		}
 
-		if (depthRange[1] < 0.0 || depthRange[1] > 1.0) {
+		if (depthRange[1] < 0.0f || depthRange[1] > 1.0f) {
 			TEST_LOG_FAIL(test_case_4, test_procedure,
-				      "Far aralik disinda: %lf", depthRange[1]);
+					  "Far aralik disinda: %f", depthRange[1]);
 			return;
 		}
 	}
-// TEST EDİLMESİ ŞART
-	if (!checkFloatState2(test_case_4, test_procedure, GL_DEPTH_RANGE, 0.0,
-			       1.0, 1e-6))
+
+
+	if (!checkFloatArray2(test_case_4, test_procedure, GL_DEPTH_RANGE,
+				  1.0f, 0.0f, 1e-6f))
 		return;
 
 	resetState_DepthRange();

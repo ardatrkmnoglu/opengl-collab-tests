@@ -2,13 +2,13 @@
 #include "../../include/macro.h"
 #include "../../include/rtests.h"
 
-static const char *test_case1 = "Texturing_TexStorage2D_TC_001";
-static const char *test_case2 = "Texturing_TexStorage2D_TC_002";
-static const char *test_case3 = "Texturing_TexStorage2D_TC_003";
-static const char *test_case4 = "Texturing_TexStorage2D_TC_004";
-static const char *test_case5 = "Texturing_TexStorage2D_TC_005";
+static const char *test_case_1 = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_005";
 
-static const char *test_procedure = "Texturing_TexStorage2D_TP_001";
+static const char *test_procedure = "GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001";
 
 static GLuint g_tex1 = 0;
 static GLuint g_tex2 = 0;
@@ -20,23 +20,13 @@ static GLuint g_tex5 = 0;
 #define GL_RGBA8_OES 0x8058
 #endif
 
-// PFNGLTEXSTORAGE2DEXTPROC GLES2/gl2ext.h baslik dosyasinda zaten tanimlidir
 static PFNGLTEXSTORAGE2DEXTPROC pglTexStorage2D = NULL;
 
-void Texturing_TexStorage2D_init(void) {
-	pglTexStorage2D =
-	    (PFNGLTEXSTORAGE2DEXTPROC)glfwGetProcAddress("glTexStorage2DEXT");
-	if (!pglTexStorage2D)
-		pglTexStorage2D = (PFNGLTEXSTORAGE2DEXTPROC)glfwGetProcAddress(
-		    "glTexStorage2D");
-
-	if (!pglTexStorage2D) {
-		printf("[HATA] glTexStorage2DEXT bulunamadi!\n");
-	}
-}
+/* Forward declaration for close */
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001_close(void);
 
 // Test 1: Negatif Boyut Testi (Invalid Value)
-void Texturing_TexStorage2D_TC_001(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -52,16 +42,16 @@ void Texturing_TexStorage2D_TC_001(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_VALUE) {
-		TEST_LOG_SUCCESS(test_case1, test_procedure);
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case1, test_procedure,
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X",
 			      err);
 	}
 }
 
 // Test 2: Geçersiz İç Format Testi (Invalid Enum)
-void Texturing_TexStorage2D_TC_002(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -78,16 +68,16 @@ void Texturing_TexStorage2D_TC_002(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_ENUM) {
-		TEST_LOG_SUCCESS(test_case2, test_procedure);
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	} else {
-		TEST_LOG_FAIL(test_case2, test_procedure,
+		TEST_LOG_FAIL(test_case_2, test_procedure,
 			      "Beklenen GL_INVALID_ENUM (0x500), alinan: 0x%X",
 			      err);
 	}
 }
 
 // Test 3: Değiştirilemezlik (Immutability) Testi (Invalid Operation)
-void Texturing_TexStorage2D_TC_003(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -109,16 +99,16 @@ void Texturing_TexStorage2D_TC_003(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_OPERATION) {
-		TEST_LOG_SUCCESS(test_case3, test_procedure);
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	} else {
 		TEST_LOG_FAIL(
-		    test_case3, test_procedure,
+		    test_case_3, test_procedure,
 		    "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
 	}
 }
 
 // Test 4 : level ile boyut ilişkisini test etme
-void Texturing_TexStorage2D_TC_004(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -133,16 +123,16 @@ void Texturing_TexStorage2D_TC_004(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_OPERATION) {
-		TEST_LOG_SUCCESS(test_case4, test_procedure);
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	} else {
 		TEST_LOG_FAIL(
-		    test_case4, test_procedure,
+		    test_case_4, test_procedure,
 		    "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
 	}
 }
 
 // Test 5 : max level'i aşmaya çalışmak
-void Texturing_TexStorage2D_TC_005(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -161,16 +151,46 @@ void Texturing_TexStorage2D_TC_005(void) {
 
 	GLenum err = glGetError();
 	if (err == GL_INVALID_OPERATION) {
-		TEST_LOG_SUCCESS(test_case5, test_procedure);
+		TEST_LOG_SUCCESS(test_case_5, test_procedure);
 	} else {
 		TEST_LOG_FAIL(
-		    test_case5, test_procedure,
+		    test_case_5, test_procedure,
 		    "Beklenen GL_INVALID_OPERATION (0x502), alinan: 0x%X", err);
 	}
 }
 
+/* Initialization */
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001_init(void) {
+	pglTexStorage2D =
+	    (PFNGLTEXSTORAGE2DEXTPROC)glfwGetProcAddress("glTexStorage2DEXT");
+	if (!pglTexStorage2D)
+		pglTexStorage2D = (PFNGLTEXSTORAGE2DEXTPROC)glfwGetProcAddress(
+		    "glTexStorage2D");
+
+	if (!pglTexStorage2D) {
+		printf("[HATA] glTexStorage2DEXT bulunamadi!\n");
+	}
+
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_001();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_002();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_003();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_004();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TC_005();
+	//CHECK_ERROR(test_procedure);
+
+	GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001_close();
+}
+
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001_draw(void) {
+}
+
 /* Cleanup */
-void Texturing_TexStorage2D_close(void) {
+void GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001_close(void) {
 #ifdef __ubuntu__
 	if (g_tex1)
 		glDeleteTextures(1, &g_tex1);
@@ -183,4 +203,5 @@ void Texturing_TexStorage2D_close(void) {
 	if (g_tex5)
 		glDeleteTextures(1, &g_tex5);
 #endif
+	//CHECK_ERROR(test_procedure);
 }

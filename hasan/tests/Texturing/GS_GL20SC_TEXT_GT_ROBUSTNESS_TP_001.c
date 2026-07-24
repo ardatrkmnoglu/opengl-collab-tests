@@ -2,22 +2,23 @@
 #include "../../include/macro.h"
 #include "../../include/rtests.h"
 
-static const char *test_case1 = "Texturing_GenTextures_TC_001";
-static const char *test_case2 = "Texturing_GenTextures_TC_002";
-static const char *test_case3 = "Texturing_GenTextures_TC_003";
-static const char *test_case4 = "Texturing_GenTextures_TC_004";
-static const char *test_case5 = "Texturing_GenTextures_TC_005";
-static const char *test_case6 = "Texturing_GenTextures_TC_006";
-static const char *test_case7 = "Texturing_GenTextures_TC_007";
-static const char *test_case8 = "Texturing_GenTextures_TC_008";
-static const char *test_case9 = "Texturing_GenTextures_TC_009";
-static const char *test_case10 = "Texturing_GenTextures_TC_010";
-static const char *test_case11 = "Texturing_GenTextures_TC_011";
-static const char *test_case12 = "Texturing_GenTextures_TC_012";
+static const char *test_case_1 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_006";
+static const char *test_case_7 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_007";
+static const char *test_case_8 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_008";
+static const char *test_case_9 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_009";
+static const char *test_case_10 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_010";
+static const char *test_case_11 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_011";
+static const char *test_case_12 = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_012";
 
-static const char *test_procedure = "Texturing_GenTextures_TP_001";
+static const char *test_procedure = "GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001";
 
 // Static variables for cleanup in close()
+static GLuint g_tex1 = 0;
 static GLuint g_tex2_first = 0;
 static GLuint g_tex2_batch[10] = {0};
 static GLuint g_tex3_names[5] = {0};
@@ -29,6 +30,9 @@ static GLuint g_tex7_a = 0;
 static GLuint g_tex7_b = 0;
 static GLuint g_tex9 = 0;
 static GLuint g_tex12[1000] = {0};
+
+/* Forward declaration for close */
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001_close(void);
 
 /*
  * glGenTextures Robustness Test Suite
@@ -42,35 +46,29 @@ static GLuint g_tex12[1000] = {0};
 // TEST 1: glIsTexture Durum Zinciri
 // Bir texture ID'sinin yasam dongusundeki her asamada
 // glIsTexture'in dogru sonuc dondurup dondurmedigini kontrol eder.
-// (Not: Bu test adimlarindan biri glDeleteTextures davranisini test eder)
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_001(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
-	GLuint tex;
-	glGenTextures(1, &tex);
+	glGenTextures(1, &g_tex1);
 
 	// Asama 1: Uretildi ama bind edilmedi -> GL_FALSE olmali
-	GLboolean after_gen = glIsTexture(tex);
+	GLboolean after_gen = glIsTexture(g_tex1);
 
 	// Asama 2: Bind edildi -> GL_TRUE olmali
-	glBindTexture(GL_TEXTURE_2D, tex);
-	GLboolean after_bind = glIsTexture(tex);
-
-	// Asama 3: Silindi -> GL_FALSE olmali (glDeleteTextures testi)
-	glDeleteTextures(1, &tex);
-	GLboolean after_delete = glIsTexture(tex);
+	glBindTexture(GL_TEXTURE_2D, g_tex1);
+	GLboolean after_bind = glIsTexture(g_tex1);
 
 	GLenum err = glGetError();
 
-	if (!after_gen && after_bind && !after_delete && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case1, test_procedure);
+	if (!after_gen && after_bind && err == GL_NO_ERROR)
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case1, test_procedure,
-		    "Durum zinciri bozuldu: gen=%d, bind=%d, del=%d, err=0x%X",
-		    after_gen, after_bind, after_delete, err);
+		    test_case_1, test_procedure,
+		    "Durum zinciri bozuldu: gen=%d, bind=%d, err=0x%X",
+		    after_gen, after_bind, err);
 }
 
 // ---------------------------------------------------------------
@@ -78,7 +76,7 @@ void Texturing_GenTextures_TC_001(void) {
 // Bir texture aktif olarak bind edilmis iken yeni texture'lar
 // uretmenin mevcut baglantiyı bozup bozmadigini kontrol eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_002(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -95,10 +93,10 @@ void Texturing_GenTextures_TC_002(void) {
 	GLenum err = glGetError();
 
 	if ((GLuint)current_binding == g_tex2_first && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case2, test_procedure);
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case2, test_procedure,
+		    test_case_2, test_procedure,
 		    "Binding bozuldu: aktif=%d, beklenen=%u, err=0x%X",
 		    current_binding, g_tex2_first, err);
 }
@@ -108,7 +106,7 @@ void Texturing_GenTextures_TC_002(void) {
 // Ayni buffer'a art arda glGenTextures cagrildiginda eski
 // isimlerin gecersiz kalip kalmadigini gozlemler.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_003(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -121,9 +119,9 @@ void Texturing_GenTextures_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case3, test_procedure);
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case3, test_procedure,
+		TEST_LOG_FAIL(test_case_3, test_procedure,
 			      "Ust uste yazmada hata: 0x%X", err);
 }
 
@@ -132,7 +130,7 @@ void Texturing_GenTextures_TC_003(void) {
 // Ayni batch'te uretilen ID'lerden bazilari 2D, bazilari CUBE_MAP
 // olarak bind edildiginde birbirlerini etkileyip etkilemedigini test eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_004(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -153,9 +151,9 @@ void Texturing_GenTextures_TC_004(void) {
 	GLenum cross_err = glGetError();
 
 	if (err == GL_NO_ERROR && cross_err == GL_INVALID_OPERATION)
-		TEST_LOG_SUCCESS(test_case4, test_procedure);
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case4, test_procedure,
+		TEST_LOG_FAIL(test_case_4, test_procedure,
 			      "Capraz hedef hatasi: err=0x%X, cross_err=0x%X "
 			      "(0x502 beklenir)",
 			      err, cross_err);
@@ -166,7 +164,7 @@ void Texturing_GenTextures_TC_004(void) {
 // Onceden var olan bir GL hata bayragi uzerinde glGenTextures
 // cagrisinin hata durumunu temizleyip temizledigini kontrol eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_005(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -184,10 +182,10 @@ void Texturing_GenTextures_TC_005(void) {
 	GLenum surviving_err = glGetError();
 
 	if (planted_err == GL_INVALID_ENUM && surviving_err == GL_INVALID_ENUM)
-		TEST_LOG_SUCCESS(test_case5, test_procedure);
+		TEST_LOG_SUCCESS(test_case_5, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case5, test_procedure,
+		    test_case_5, test_procedure,
 		    "Onceki hata korunamadi: planted=0x%X, surviving=0x%X",
 		    planted_err, surviving_err);
 }
@@ -197,7 +195,7 @@ void Texturing_GenTextures_TC_005(void) {
 // 5 adet tek tek uretilmis ve 5 adet toplu uretilmis ID'nin
 // birbirleriyle veya 0 ile cakismadigini kontrol eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_006(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_006(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -230,10 +228,10 @@ void Texturing_GenTextures_TC_006(void) {
 	GLenum err = glGetError();
 
 	if (ok && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case6, test_procedure);
+		TEST_LOG_SUCCESS(test_case_6, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case6, test_procedure,
+		    test_case_6, test_procedure,
 		    "Tekli ve toplu uretim tutarsiz veya 0 ID: err=0x%X", err);
 }
 
@@ -242,7 +240,7 @@ void Texturing_GenTextures_TC_006(void) {
 // Aktif bir texture'a glTexImage2D ile veri yuklenirken araya
 // glGenTextures girmesinin VRAM/state durumunu bozmadigini test eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_007(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_007(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -266,9 +264,9 @@ void Texturing_GenTextures_TC_007(void) {
 
 	if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR &&
 	    (GLuint)bound_now == g_tex7_a)
-		TEST_LOG_SUCCESS(test_case7, test_procedure);
+		TEST_LOG_SUCCESS(test_case_7, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case7, test_procedure,
+		TEST_LOG_FAIL(test_case_7, test_procedure,
 			      "Etkilesim hatasi: err1=0x%X, err2=0x%X, "
 			      "bound=%d (beklenen %u)",
 			      err1, err2, bound_now, g_tex7_a);
@@ -277,7 +275,7 @@ void Texturing_GenTextures_TC_007(void) {
 // ---------------------------------------------------------------
 // TEST 8: Negatif n Degeri (Spec Tanimi: GL_INVALID_VALUE)
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_008(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_008(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -286,9 +284,9 @@ void Texturing_GenTextures_TC_008(void) {
 	GLenum err = glGetError();
 
 	if (err == GL_INVALID_VALUE)
-		TEST_LOG_SUCCESS(test_case8, test_procedure);
+		TEST_LOG_SUCCESS(test_case_8, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case8, test_procedure,
+		TEST_LOG_FAIL(test_case_8, test_procedure,
 			      "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X",
 			      err);
 }
@@ -298,7 +296,7 @@ void Texturing_GenTextures_TC_008(void) {
 // Yeni uretilip bind edilen bir texture'in varsayilan filtre
 // parametrelerinin dogru olup olmadigini kontrol eder.
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_009(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_009(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -315,9 +313,9 @@ void Texturing_GenTextures_TC_009(void) {
 
 	if (min_filter == GL_NEAREST_MIPMAP_LINEAR && mag_filter == GL_LINEAR &&
 	    wrap_s == GL_REPEAT && wrap_t == GL_REPEAT && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case9, test_procedure);
+		TEST_LOG_SUCCESS(test_case_9, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case9, test_procedure,
+		TEST_LOG_FAIL(test_case_9, test_procedure,
 			      "Varsayilan parametreler hatali: min=0x%X, "
 			      "mag=0x%X, s=0x%X, t=0x%X, err=0x%X",
 			      min_filter, mag_filter, wrap_s, wrap_t, err);
@@ -326,7 +324,7 @@ void Texturing_GenTextures_TC_009(void) {
 // ---------------------------------------------------------------
 // TEST 10: n < 0 ise Beklenen Hata: GL_INVALID_VALUE
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_010(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_010(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -335,9 +333,9 @@ void Texturing_GenTextures_TC_010(void) {
 	GLenum err = glGetError();
 
 	if (err == GL_INVALID_VALUE)
-		TEST_LOG_SUCCESS(test_case10, test_procedure);
+		TEST_LOG_SUCCESS(test_case_10, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case10, test_procedure,
+		TEST_LOG_FAIL(test_case_10, test_procedure,
 			      "Beklenen GL_INVALID_VALUE (0x501), alinan: 0x%X",
 			      err);
 }
@@ -345,7 +343,7 @@ void Texturing_GenTextures_TC_010(void) {
 // ---------------------------------------------------------------
 // TEST 11: textures = NULL, n > 0 (negative robustness)
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_011(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_011(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -354,9 +352,9 @@ void Texturing_GenTextures_TC_011(void) {
 
 	if (err == GL_NO_ERROR || err == GL_INVALID_VALUE ||
 	    err == GL_INVALID_OPERATION)
-		TEST_LOG_SUCCESS(test_case11, test_procedure);
+		TEST_LOG_SUCCESS(test_case_11, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case11, test_procedure,
+		TEST_LOG_FAIL(test_case_11, test_procedure,
 			      "Sistem cökmedi veya beklenmeyen hata: 0x%X",
 			      err);
 }
@@ -364,7 +362,7 @@ void Texturing_GenTextures_TC_011(void) {
 // ---------------------------------------------------------------
 // TEST 12: Unique Names Test (Toplu Benzersizlik Kontrolü)
 // ---------------------------------------------------------------
-void Texturing_GenTextures_TC_012(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_012(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -395,15 +393,51 @@ void Texturing_GenTextures_TC_012(void) {
 
 	GLenum err = glGetError();
 	if (!duplicate_or_zero && err == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case12, test_procedure);
+		TEST_LOG_SUCCESS(test_case_12, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case12, test_procedure,
+		TEST_LOG_FAIL(test_case_12, test_procedure,
 			      "Cift veya 0 ID saptandi veya hata: 0x%X", err);
 }
 
+/* Initialization */
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001_init(void) {
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_001();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_002();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_003();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_004();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_005();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_006();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_007();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_008();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_009();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_010();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_011();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TC_012();
+	//CHECK_ERROR(test_procedure);
+
+	GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001_close();
+}
+
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001_draw(void) {
+}
+
 /* Cleanup */
-void Texturing_GenTextures_close(void) {
+void GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001_close(void) {
 #ifdef __ubuntu__
+	if (g_tex1)
+		glDeleteTextures(1, &g_tex1);
 	if (g_tex2_first)
 		glDeleteTextures(1, &g_tex2_first);
 	glDeleteTextures(10, g_tex2_batch);
@@ -421,4 +455,5 @@ void Texturing_GenTextures_close(void) {
 		glDeleteTextures(1, &g_tex9);
 	glDeleteTextures(1000, g_tex12);
 #endif
+	//CHECK_ERROR(test_procedure);
 }

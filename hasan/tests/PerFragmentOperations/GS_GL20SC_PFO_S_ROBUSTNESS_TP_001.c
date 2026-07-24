@@ -2,30 +2,26 @@
 #include "../../include/macro.h"
 #include "../../include/rtests.h"
 
-static const char *test_case1 = "PerFragmentOperations_Scissor_TC_001";
-static const char *test_case2 = "PerFragmentOperations_Scissor_TC_002";
-static const char *test_case3 = "PerFragmentOperations_Scissor_TC_003";
-static const char *test_case4 = "PerFragmentOperations_Scissor_TC_004";
-static const char *test_case5 = "PerFragmentOperations_Scissor_TC_005";
-static const char *test_case6 = "PerFragmentOperations_Scissor_TC_006";
-
-static const char *test_procedure = "Per-FragmentOperations_Scissor_TP_001";
-
 /*
- * ============================================================================
- * glScissor & GL_SCISSOR_TEST Robustness Test Suite
- * Hasan - OpenGL ES 2.0
- *
- * Bu test paketi, Per-Fragment operasyonlarindan "Scissor Test" mekanizmasini
- * sinamak uzere yazilmistir. Fuzzing ve sinir testlerini icerir.
- * ============================================================================
- */
+GL20SC - PerFragmentOperations - Scissor - ROBUSTNESS
+*/
+
+static const char *test_procedure = "GS_GL20SC_PFO_S_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_PFO_S_ROBUSTNESS_TC_006";
+
+/* Forward declaration for close */
+void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_close(void);
 
 // ---------------------------------------------------------------
 // TEST 1: Negatif Genislik ve Yukseklik (Spec Hatasi)
 // Spec'e gore width veya height 0'dan kucukse GL_INVALID_VALUE uretilmelidir.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_001(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_001(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -40,9 +36,9 @@ void PerFragmentOperations_Scissor_TC_001(void) {
 
 	if (err1 == GL_INVALID_VALUE && err2 == GL_INVALID_VALUE &&
 	    err3 == GL_INVALID_VALUE)
-		TEST_LOG_SUCCESS(test_case1, test_procedure);
+		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	else
-		TEST_LOG_FAIL(test_case1, test_procedure,
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Negatif boyutlar reddedilmedi: err1=0x%X, "
 			      "err2=0x%X, err3=0x%X",
 			      err1, err2, err3);
@@ -53,7 +49,7 @@ void PerFragmentOperations_Scissor_TC_001(void) {
 // Spec'e gore x (left) ve y (bottom) degerleri negatif OLABILIR.
 // Bu durumda kutunun bir kismi ekran disinda kalir. Hata VERILMEMELIDIR.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_002(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -64,10 +60,10 @@ void PerFragmentOperations_Scissor_TC_002(void) {
 	glGetIntegerv(GL_SCISSOR_BOX, box);
 
 	if (err == GL_NO_ERROR && box[0] == -100 && box[1] == -50)
-		TEST_LOG_SUCCESS(test_case2, test_procedure);
+		TEST_LOG_SUCCESS(test_case_2, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case2, test_procedure,
+		    test_case_2, test_procedure,
 		    "Negatif koordinat hatasi: err=0x%X, box=(%d,%d,%d,%d)",
 		    err, box[0], box[1], box[2], box[3]);
 }
@@ -77,7 +73,7 @@ void PerFragmentOperations_Scissor_TC_002(void) {
 // Tamsayi tasmasi (integer overflow) yaratip surucunun cokup
 // cokmedigini kontrol ederiz.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_003(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -92,10 +88,10 @@ void PerFragmentOperations_Scissor_TC_003(void) {
 
 	// Spec bu durumlarda hata tanimlamaz, ancak sistemin cokmemesi esastir.
 	if (err1 == GL_NO_ERROR && err2 == GL_NO_ERROR)
-		TEST_LOG_SUCCESS(test_case3, test_procedure);
+		TEST_LOG_SUCCESS(test_case_3, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case3, test_procedure,
+		    test_case_3, test_procedure,
 		    "Asiri buyuk limitlerde hata: err1=0x%X, err2=0x%X", err1,
 		    err2);
 }
@@ -105,7 +101,7 @@ void PerFragmentOperations_Scissor_TC_003(void) {
 // Genislik veya yuksekligin tam 0 olmasi yasaldir.
 // Hata vermemesi ve basariyla kaydedilmesi gerekir.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_004(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -116,10 +112,10 @@ void PerFragmentOperations_Scissor_TC_004(void) {
 	glGetIntegerv(GL_SCISSOR_BOX, box);
 
 	if (err == GL_NO_ERROR && box[2] == 0 && box[3] == 0)
-		TEST_LOG_SUCCESS(test_case4, test_procedure);
+		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case4, test_procedure,
+		    test_case_4, test_procedure,
 		    "Sifir boyutlu kutu hatasi: err=0x%X, boyut=%dx%d", err,
 		    box[2], box[3]);
 }
@@ -129,7 +125,7 @@ void PerFragmentOperations_Scissor_TC_004(void) {
 // GL_SCISSOR_TEST ozelligini binlerce kez ard arda acip kapatarak
 // surucunun durum (state) makinesinin bozulup bozulmadigini test eder.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_005(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_005(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
@@ -147,43 +143,98 @@ void PerFragmentOperations_Scissor_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (err == GL_NO_ERROR && err_count == 0)
-		TEST_LOG_SUCCESS(test_case5, test_procedure);
+		TEST_LOG_SUCCESS(test_case_5, test_procedure);
 	else
 		TEST_LOG_FAIL(
-		    test_case5, test_procedure,
+		    test_case_5, test_procedure,
 		    "State thrashing hatasi: err=0x%X, uyusmazlik=%d kez", err,
 		    err_count);
 }
 
 // ---------------------------------------------------------------
-// TEST 6: Rastgele Fuzzing (Rastgele glScissor Cagriları)
-// Cok sayida tamamen rastgele (mantikli ve mantiksiz) glScissor cagirilarak
+// TEST 6: Deterministik Fuzzing (glScissor Cagriları)
+// Cok sayida deterministik (mantikli ve mantiksiz) glScissor cagirilarak
 // bellek veya state bozulmasi tespiti yapilir.
 // ---------------------------------------------------------------
-void PerFragmentOperations_Scissor_TC_006(void) {
+void GS_GL20SC_PFO_S_ROBUSTNESS_TC_006(void) {
 	while (glGetError() != GL_NO_ERROR)
 		;
 
-	srand(12345); // Sabit seed (tekrar edilebilirlik)
+	// Basit deterministik LCG (Linear Congruential Generator)
+	unsigned int seed = 12345;
+	int unexpected_err_count = 0;
+	GLenum last_unexpected_err = GL_NO_ERROR;
+	int fail_iteration = -1;
 
 	for (int i = 0; i < 50000; i++) {
-		GLint x = (rand() % 4000) - 2000; // -2000 ile 2000 arasi
-		GLint y = (rand() % 4000) - 2000;
+		seed = seed * 1103515245 + 12345;
+		GLint x = (GLint)((seed >> 16) % 4000) - 2000;
 
-		// %10 ihtimalle negatif boyutlar göndererek GL_INVALID_VALUE
-		// tetiklet (kasten)
-		GLsizei w = (rand() % 100 < 10) ? -rand() % 500 : rand() % 4000;
-		GLsizei h = (rand() % 100 < 10) ? -rand() % 500 : rand() % 4000;
+		seed = seed * 1103515245 + 12345;
+		GLint y = (GLint)((seed >> 16) % 4000) - 2000;
+
+		seed = seed * 1103515245 + 12345;
+		unsigned int w_raw = (seed >> 16) % 4000;
+
+		seed = seed * 1103515245 + 12345;
+		unsigned int h_raw = (seed >> 16) % 4000;
+
+		// Her ~10 iterasyonda negatif boyut gonder (kasten)
+		GLsizei w = (i % 10 == 0) ? -(GLsizei)(w_raw % 500) : (GLsizei)w_raw;
+		GLsizei h = (i % 10 == 0) ? -(GLsizei)(h_raw % 500) : (GLsizei)h_raw;
 
 		glScissor(x, y, w, h);
 
-		// Her 1000 adimda bir hata kuyrugunu temizle (cok birikmesin)
-		if (i % 1000 == 0) {
-			while (glGetError() != GL_NO_ERROR)
-				;
+		GLenum err = glGetError();
+		// GL_INVALID_VALUE beklenen bir hata (negatif boyutlar icin)
+		// Bunun disindaki hatalar beklenmeyen hatadir
+		if (err != GL_NO_ERROR && err != GL_INVALID_VALUE) {
+			unexpected_err_count++;
+			last_unexpected_err = err;
+			if (fail_iteration < 0)
+				fail_iteration = i;
 		}
 	}
 
-	// Dongu cokmeden bittiyse surucu saglamdir.
-	TEST_LOG_SUCCESS(test_case6, test_procedure);
+	// Dongu sonrasi GL context sagligini dogrula
+	while (glGetError() != GL_NO_ERROR)
+		;
+	glScissor(0, 0, 100, 100);
+	GLenum final_err = glGetError();
+
+	if (unexpected_err_count == 0 && final_err == GL_NO_ERROR)
+		TEST_LOG_SUCCESS(test_case_6, test_procedure);
+	else
+		TEST_LOG_FAIL(test_case_6, test_procedure,
+			      "Fuzzing hatasi: beklenmeyen_hata=%d kez, "
+			      "ilk_hata_iter=%d, son_hata=0x%X, final=0x%X",
+			      unexpected_err_count, fail_iteration,
+			      last_unexpected_err, final_err);
+}
+
+/* Initialization */
+void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_init(void) {
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_001();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_002();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_003();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_004();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_005();
+	//CHECK_ERROR(test_procedure);
+	GS_GL20SC_PFO_S_ROBUSTNESS_TC_006();
+	//CHECK_ERROR(test_procedure);
+
+	GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_close();
+}
+
+void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_draw(void) {
+}
+
+/* Cleanup */
+void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_close(void) {
+	//CHECK_ERROR(test_procedure);
 }

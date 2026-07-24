@@ -456,3 +456,32 @@ void GS_GL20SC_PR_PS_ROBUSTNESS_TC_006(void) {
 	TEST_LOG_INFO("1,000,000 test basariyla tamamlandi.");
 	TEST_LOG_SUCCESS(test_case_6, test_procedure);
 }
+
+/* Initialization */
+void GS_GL20SC_PR_PS_ROBUSTNESS_TP_001_init(void) {
+
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_001();
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_002();
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_003();
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_004();
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_005();
+	CHECK_ERROR(test_procedure);
+	GS_GL20SC_PR_PS_ROBUSTNESS_TC_006();
+	CHECK_ERROR(test_procedure);
+
+
+}
+
+void GS_GL20SC_PR_PS_ROBUSTNESS_TP_001_draw(void) {
+}
+/* Cleanup */
+void GS_GL20SC_PR_PS_ROBUSTNESS_TP_001_close(void) {
+
+	CHECK_ERROR(test_procedure);
+
+}

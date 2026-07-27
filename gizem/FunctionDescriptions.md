@@ -59,6 +59,10 @@ GLuint renderbuffer: Bağlamak istediğin renderbuffer nesnesinin adı/ID’si B
 - 0 ise → renderbuffer unbind edilir (şu an bağlı renderbuffer yok olur).
 
 
+void glGenRenderbuffers(GLsizei n, GLuint * renderbuffers);
+Renderbuffer object (renderbuffer) için yeni kimlik/ID üretmek içindir.
+n: kaç adet renderbuffer ID üretileceğini söyler.
+renderbuffers: üretilen ID’lerin yazılacağı dizi (çoğunlukla tek bir GLuint değişken için n=1 ve adresi verilir).
 
 
 

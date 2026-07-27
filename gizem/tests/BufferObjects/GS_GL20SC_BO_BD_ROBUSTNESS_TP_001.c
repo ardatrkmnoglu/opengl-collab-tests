@@ -128,6 +128,7 @@ void GS_GL20SC_BO_BD_ROBUSTNESS_TC_005()
 
 // Kaynak veri boyutunun belirtilen 'size' değerinden küçük olduğu hatalı API
 // kullanımına karşı implementasyonun dayanıklılığını gözlemler.
+// It crashed on Windows
 void GS_GL20SC_BO_BD_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -174,6 +175,7 @@ void GS_GL20SC_BO_BD_ROBUSTNESS_TC_007()
 }
 
 // Sınır ve aşırı boyut size değerleri karşısında implementasyonun kararlılığını gözlemler.
+// It failed on Windows
 void GS_GL20SC_BO_BD_ROBUSTNESS_TC_008()
 {
     GLsizeiptr candidates[] = { -1, INT_MIN, (GLsizeiptr)INT_MAX + 1, LLONG_MAX };
@@ -196,6 +198,7 @@ void GS_GL20SC_BO_BD_ROBUSTNESS_TC_008()
 }
 
 // Geçersiz ve kirlenmiş usage enum değerleri karşısında implementasyonun kararlılığını gözlemler.
+// It failed on Windows
 void GS_GL20SC_BO_BD_ROBUSTNESS_TC_009()
 {
     GLenum candidates[] = {GL_STATIC_DRAW, 0xFFFF0000u, 0xFFFFFFFFu, 0x12345678u, 0xDEADBEEFu};
@@ -315,6 +318,7 @@ void GS_GL20SC_BO_BD_ROBUSTNESS_TC_013()
 
 // Büyük bir data store tahsis denemesi sonrasında buffer nesnesinin
 // durumunun korunup korunmadığını gözlemler.
+// It failed on Windows
 void GS_GL20SC_BO_BD_ROBUSTNESS_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -346,33 +350,33 @@ void GS_GL20SC_BO_BD_ROBUSTNESS_TC_014()
 /* Initialization */
 void GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_init(void) {
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_001();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_001();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_002();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_002();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_003();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_003();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_004();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_004();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_005();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_005();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_006();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_006(); // It crashed on Windows
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_007();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_007();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_008();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_008(); // It failed on Windows
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_009();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_009(); // It failed on Windows
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_010();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_010();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_011();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_011();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_012();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_012();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_013();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_013();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_014();
+    GS_GL20SC_BO_BD_ROBUSTNESS_TC_014(); // It failed on Windows
     // CHECK_ERROR(test_procedure);
 }
 

@@ -2,9 +2,27 @@
 #define FRAMEBUFFER_TESTS_H
 
 
+/* --------------- GenRenderbuffers --------------- */
+void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_close(void);
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_001();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_002();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_003(); /* It crashed on Windows */
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_004();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_005();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_006();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_007(); /* It crashed on Windows */
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_008();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_009();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_010();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_011();
+void GS_GL20SC_FO_GR_ROBUSTNESS_TC_012();
 
-/* --------------- BindRenderbuffer --------------- */
+/* --------------- BindRenderbuffer --------------- */  // No crash
 void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_close(void);
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_001();
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_002();
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_003();
@@ -16,17 +34,19 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_008();
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_009();
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_010();
 
-
 /* --------------- GenFramebuffer --------------- */
+void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_close(void);
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_001();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_002();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_003();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_004();
-void GS_GL20SC_FO_GF_ROBUSTNESS_TC_005();
+void GS_GL20SC_FO_GF_ROBUSTNESS_TC_005(); /* It crashed on Windows */
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_006();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_007();
-void GS_GL20SC_FO_GF_ROBUSTNESS_TC_008();
-void GS_GL20SC_FO_GF_ROBUSTNESS_TC_009();
+void GS_GL20SC_FO_GF_ROBUSTNESS_TC_008(); /* It crashed the entire system on Windows */
+void GS_GL20SC_FO_GF_ROBUSTNESS_TC_009(); /* It crashed and failed on Windows */
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_010();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_011();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_012();
@@ -34,8 +54,10 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_013();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_014();
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_015();
 
-
-/* --------------- BindFramebuffer --------------- */
+/* --------------- BindFramebuffer --------------- */  // No crash
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_close(void);
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_001();
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_002();
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_003();
@@ -47,7 +69,6 @@ void GS_GL20SC_FO_BF_ROBUSTNESS_TC_008();
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_009();
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_010();
 void GS_GL20SC_FO_BF_ROBUSTNESS_TC_011();
-void GS_GL20SC_FO_BF_ROBUSTNESS_TC_012();
 
 
 #endif

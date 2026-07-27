@@ -192,6 +192,7 @@ void GS_GL20SC_BO_GBP_ROBUSTNESS_TC_007()
 
 // data parametresi NULL iken cagirildiginda (n>0 anlaminda tek bir GLint yazilacak durum)
 // implementasyonun segfault yerine tanimli/tutarli davranip davranmadigini gozlemler.
+// It crashed on Windows
 void GS_GL20SC_BO_GBP_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -411,35 +412,35 @@ void GS_GL20SC_BO_GBP_ROBUSTNESS_TC_015() {
 /* Initialization */
 void GS_GL20SC_BO_GBP_ROBUSTNESS_TP_001_init(void) {
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_001();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_001();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_002();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_002();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_003();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_003();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_004();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_004();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_005();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_005();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_006();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_006();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_007();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_007();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_008();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_008(); // It crashed on Windows
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_009();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_009();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_010();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_010();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_011();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_011();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_012();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_012();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_013();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_013();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_014();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_014();
     // CHECK_ERROR(test_procedure);
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TC_015();
+    GS_GL20SC_BO_GBP_ROBUSTNESS_TC_015();
     // CHECK_ERROR(test_procedure);
 }
 

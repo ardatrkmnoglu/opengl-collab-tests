@@ -89,7 +89,7 @@ void init(void)
     Örneğin Buffer Objects - Bind Buffer 001 testi için:
     GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
 
-
+    // GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init();  /* -- RenderbufferStorage -- */
     // GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_init();  /* -- GenRenderbuffers -- */
     // GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init();  /* -- BindRenderbuffer -- */
     // GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init();  /* -- GenFramebuffer -- */

@@ -65,8 +65,17 @@ n: kaç adet renderbuffer ID üretileceğini söyler.
 renderbuffers: üretilen ID’lerin yazılacağı dizi (çoğunlukla tek bir GLuint değişken için n=1 ve adresi verilir).
 
 
-
-
+void glRenderbufferStorage(	GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+Bir renderbuffer (renderbuffer nesnesi) için bellekte data store oluşturur ve başlatır.
+- Önceden o renderbuffer’a ait bir bellek alanı varsa silinir.
+- Yeni bir internalformat seçilir.
+- Renderbuffer’ın boyutları width × height olarak ayarlanır.
+- Böylece renderbuffer, framebuffer’da (ör. renk / derinlik ekleri gibi) kullanılabilecek şekilde “hazır” hale gelir.
+- Fonksiyonun sonunda renderbuffer’ın içeriği tanımsızdır (yani sıfırla/temizle yapmaz). İstersen render ile doldurursun.
+Parametreler
+target: mutlaka GL_RENDERBUFFER olmalı.
+internalformat: renderbuffer’ın türünü/formatını belirler (ör. renk için GL_RGBA4, depth için GL_DEPTH_COMPONENT16, stencil için GL_STENCIL_INDEX8 gibi).
+width, height: renderbuffer’ın piksel cinsinden boyutu.
 
 
 

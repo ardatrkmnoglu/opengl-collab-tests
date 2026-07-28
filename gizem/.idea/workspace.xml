@@ -33,7 +33,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/FramebufferObjects/GS_GL20SC_FO_FR_ROBUSTNESS_TP_001.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/FramebufferObjects/GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/editor.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/opengl-collab-tests.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -109,9 +109,9 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="untitled" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="untitled" TARGET_NAME="untitled" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="untitled" RUN_TARGET_NAME="untitled">
@@ -142,6 +142,7 @@
       <workItem from="1785131530308" duration="3930000" />
       <workItem from="1785136031249" duration="9869000" />
       <workItem from="1785220875077" duration="1724000" />
+      <workItem from="1785222898731" duration="2788000" />
     </task>
     <servers />
   </component>

@@ -91,4 +91,7 @@ renderbuffertarget = GL_RENDERBUFFER (Takılan şeyin türü renderbuffer olduğ
 renderbuffer = Bağlanacak renderbuffer’ın ID’si. 0 verirsen ilgili attachment’den çıkar/detach eder.
 
 
+GLenum glCheckFramebufferStatus(	GLenum target);
+Şu an glBindFramebuffer(GL_FRAMEBUFFER, ...) ile bağlı olan framebuffer’ın (FBO) “framebuffer complete” olup olmadığını kontrol eder.
+Fonksiyon sana eksik/uygunsuzluk sebebini de söyler.
 

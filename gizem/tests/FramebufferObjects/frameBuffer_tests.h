@@ -1,6 +1,20 @@
 #ifndef FRAMEBUFFER_TESTS_H
 #define FRAMEBUFFER_TESTS_H
 
+/* --------------- CheckFramebufferStatus --------------- */
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_close(void);
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_001();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_002();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_003();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_004();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_005();  /* It failed on Windows */
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_006();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_007();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_008();
+void GS_GL20SC_FO_CFS_ROBUSTNESS_TC_009();
+
 /* --------------- FramebufferRenderbuffer --------------- */
 void GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init(void);
 void GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_draw(void);

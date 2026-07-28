@@ -2,7 +2,7 @@
 #include <limits.h>
 #include <glad/gles2.h>
 #include <stdio.h>
-#include "../../../include/macro.h"
+#include "../../include/macro.h"
 
 // Arda'da çalışması için
 // #include "../../../include/rtests.h"
@@ -207,7 +207,7 @@ void GS_GL20SC_FO_RS_ROBUSTNESS_TC_008()
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, 32, 32);
     while (glGetError() != GL_NO_ERROR) {}
 
-    glRenderbufferStorage(GL_RENDERBUFFER, (GLenum)0xFFFFFFFF, 64, 64); // gecersiz internalformat
+    glRenderbufferStorage(GL_RENDERBUFFER, (GLenum)0xFFFFFFFF, 64, 64); // geçersiz internalformat
 
     GLenum err = glGetError();
 
@@ -302,9 +302,9 @@ void GS_GL20SC_FO_RS_ROBUSTNESS_TC_011()
 
     // Önce GL_OUT_OF_MEMORY tetiklenmeye calisilir.
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, maxSize, maxSize);
-    glGetError(); // hata kodu ne olursa olsun temizle, asil kontrol bir sonraki adimda
+    glGetError(); // hata kodu ne olursa olsun temizle, asıl kontrol bir sonraki adımda
 
-    // Ardindan makul, kucuk bir boyutla tekrar cagri yapilir.
+    // Ardından makul, küçük bir boyutla tekrar çağrı yapılır.
     glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA4, 8, 8);
 
     GLenum err = glGetError();

@@ -2,7 +2,7 @@
 #include <glad/gles2.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../../include/macro.h"
+#include "../../include/macro.h"
 
 // Arda'da çalışması için
 // #include "../../../include/rtests.h"
@@ -43,8 +43,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_001()
 
 // belirtilmeyen hatalar ------------------------------
 
-// target parametresi GL_RENDERBUFFER disinda bir enum oldugunda GL_INVALID_ENUM uretilip
-// onceki binding'in bozulmadigini doğrular
+// target parametresi GL_RENDERBUFFER dışında bir enum olduğunda GL_INVALID_ENUM üretilip
+// önceki binding'in bozulmadığını doğrular.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -73,8 +73,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_002()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-// glGenRenderbuffers ile hic uretilmemis, rastgele/keyfi bir renderbuffer ismiyle bind
-// cagirildiginda implementasyonun cokmedigini ve tanimsiz davranis sergilemedigini test eder.
+// glGenRenderbuffers ile hiç üretilmemiş, rastgele/keyfi bir renderbuffer ismiyle bind
+// çağrıldığında implementasyonun çökmemiş olduğunu ve tanımsız davranış sergilemediğini test eder.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -95,8 +95,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_003()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-// renderbuffer == 0 bagliyken, target GL_RENDERBUFFER uzerinde state sorgulayan/degistiren bir cagri
-// (örneğin glRenderbufferStorage) GL_INVALID_OPERATION hatası uretmeli.
+// renderbuffer == 0 bağlıyken, target GL_RENDERBUFFER üzerinde state sorgulayan/değiştiren bir çağrı
+// (örneğin glRenderbufferStorage) GL_INVALID_OPERATION hatası üretmeli.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_004()
 {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -113,8 +113,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_004()
     TEST_LOG_SUCCESS(test_case_4, test_procedure);
 }
 
-// Yeni olusturulup ilk kez bind edilen bir renderbuffer'in baslangic durumunun
-// spesifikasyona uygun oldugunu (format GL_RGBA4, boyut 0x0) dogrular.
+// Yeni oluşturulup ilk kez bind edilen bir renderbuffer'in başlangıç durumunun
+// spesifikasyona uygun olduğunu (format GL_RGBA4, boyut 0x0) doğrular.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -140,8 +140,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_005()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-// Farkli bir renderbuffer bind edildiginde onceki binding'in otomatik olarak
-// kirilip GL_RENDERBUFFER_BINDING'in yeni isme guncellendigini dogrular.
+// Farklı bir renderbuffer bind edildiğinde önceki bağlamanın otomatik olarak
+// kırılıp GL_RENDERBUFFER_BINDING'in yeni isme güncellendiğini doğrular.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -170,8 +170,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_006()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-// renderbuffer parametresi olarak buyuk/gecersiz (garbage) bir deger verildiginde
-// implementasyonun cokmeden guvenli sekilde davranmasini test eder
+// renderbuffer parametresi olarak büyük/geçersiz (garbage) bir değer verildiğinde
+// implementasyonun çökmenden güvenli şekilde davranmasını test eder.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -181,7 +181,7 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_007()
 
     for (size_t i = 0; i < sizeof(garbageNames) / sizeof(garbageNames[0]); ++i) {
         glBindRenderbuffer(GL_RENDERBUFFER, garbageNames[i]);
-        glGetError(); // hata ne olursa olsun sadece cokme/cokmeme onemli, temizle
+        glGetError(); // hata ne olursa olsun sadece çökme/çökmeme önemli, temizle
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
         glGetError();
     }
@@ -194,8 +194,8 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_007()
     }
 }
 
-// Ayni renderbuffer isminin art arda, gereksiz yere tekrar tekrar bind edilmesinin
-// (aynı objeye rebind) herhangi bir hataya veya durum bozulmasina yol acmadigini dogrular.
+// Aynı renderbuffer isminin ardışık, gereksiz yere tekrar tekrar bind edilmesinin
+// (aynı objeye rebind) herhangi bir hataya veya durum bozulmasına yol açmadığını doğrular.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -223,9 +223,9 @@ void GS_GL20SC_FO_BR_ROBUSTNESS_TC_008()
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-// glGenRenderbuffers ile sadece "reserve" edilmis (henuz hic bind edilmemis) bir isim
-// glIsRenderbuffer ile sorgulandiginda GL_FALSE donmesi beklenir; bind sonrasi GL_TRUE olmali.
-// Bu, "name generated but not yet bound" durumunun dogru ayirt edildigini test eder.
+// glGenRenderbuffers ile sadece "reserve" edilmiş (henüz hiç bind edilmemiş) bir isim
+// glIsRenderbuffer ile sorgulandığında GL_FALSE dönmesi beklenir; bind sonrası GL_TRUE olmalı.
+// Bu, "name generated but not yet bound" durumunun doğru ayırt edildiğini test eder.
 void GS_GL20SC_FO_BR_ROBUSTNESS_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}

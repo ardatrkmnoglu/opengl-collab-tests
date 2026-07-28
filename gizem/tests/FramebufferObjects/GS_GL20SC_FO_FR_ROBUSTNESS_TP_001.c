@@ -3,7 +3,7 @@
 #include <glad/gles2.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "../../../include/macro.h"
+#include "../../include/macro.h"
 
 // Arda'da çalışması için
 // #include "../../../include/rtests.h"

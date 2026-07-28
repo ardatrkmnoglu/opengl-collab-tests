@@ -45,11 +45,11 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL ES 2.0 Testleri", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL ES 2.0 Tests", NULL, NULL);
 
     if (window == NULL)
     {
-        printf("Pencere olusturulamadi!\n");
+        printf("Window could not be created!\n");
         glfwTerminate();
         return -1;
     }
@@ -59,7 +59,7 @@ int main(void)
 
     if (!gladLoadGLES2((GLADloadfunc)glfwGetProcAddress))
     {
-        printf("GLAD yuklenemedi!\n");
+        printf("GLAD could not be loaded!\n");
         glfwTerminate();
         return -1;
         }
@@ -89,6 +89,7 @@ void init(void)
     Örneğin Buffer Objects - Bind Buffer 001 testi için:
     GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
 
+    /* --------------- Framebuffer Objects Functions --------------- */
     // GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_init();  /* -- CheckFramebufferStatus -- */
     // GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init();  /* -- FramebufferRenderbuffer -- */
     // GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init();  /* -- RenderbufferStorage -- */
@@ -115,7 +116,7 @@ void init(void)
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("Vertex Shader Derleme Hatasi:\n%s\n", infoLog);
+        printf("Vertex Shader Compilation Error:\n%s\n", infoLog);
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -126,7 +127,7 @@ void init(void)
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        printf("Fragment Shader Derleme Hatasi:\n%s\n", infoLog);
+        printf("Fragment Shader Compilation Error:\n%s\n", infoLog);
     }
 
     shaderProgram = glCreateProgram();
@@ -139,7 +140,7 @@ void init(void)
     if (!success)
     {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        printf("Shader Programi Link Hatasi:\n%s\n", infoLog);
+        printf("Shader Program Link Error:\n%s\n", infoLog);
     }
 
     glDeleteShader(vertexShader);

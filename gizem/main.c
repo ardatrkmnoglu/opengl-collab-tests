@@ -89,6 +89,7 @@ void init(void)
     Örneğin Buffer Objects - Bind Buffer 001 testi için:
     GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
 
+    // GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init();  /* -- FramebufferRenderbuffer -- */
     // GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init();  /* -- RenderbufferStorage -- */
     // GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_init();  /* -- GenRenderbuffers -- */
     // GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init();  /* -- BindRenderbuffer -- */
@@ -97,10 +98,10 @@ void init(void)
 
     /* --------------- Buffer Objects Functions --------------- */
     // GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_init();  /* -- BindBuffer -- */
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_init(); /* -- BufferData -- */
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_init();  /* -- BufferSubData -- */
+    // GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_init();  /* -- BufferData -- */
+    // GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_init(); /* -- BufferSubData -- */
     // GS_GL20SC_BO_GB_ROBUSTNESS_TP_001_init();  /* -- GenBuffers -- */
-    // GS_GL20SC_BO_GBP_ROBUSTNESS_TP_001_init();  /* -- glGetBufferParameteriv -- */
+    // GS_GL20SC_BO_GBP_ROBUSTNESS_TP_001_init(); /* -- glGetBufferParameteriv -- */
 
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

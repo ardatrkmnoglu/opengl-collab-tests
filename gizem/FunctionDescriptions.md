@@ -79,7 +79,16 @@ width, height: renderbuffer’ın piksel cinsinden boyutu.
 
 
 
-
+void glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+Mevcut (currently bound) bir Framebuffer (FBO) içine, bir Renderbuffer nesnesini (RBO) belirli bir “attachment” noktasına bağlar.
+Yani FBO’nun color / depth / stencil gibi mantıksal tamponlarına renderbuffer’ı takarsın.
+target = GL_FRAMEBUFFER  (Bağlanacak framebuffer hedefi)
+attachment (Renderbuffer’ın FBO üzerinde takılacağı parça):
+- GL_COLOR_ATTACHMENT0 (genelde renk çıktı buffer’ı)
+- GL_DEPTH_ATTACHMENT (depth buffer)
+- GL_STENCIL_ATTACHMENT (stencil buffer)
+renderbuffertarget = GL_RENDERBUFFER (Takılan şeyin türü renderbuffer olduğunu belirtir)
+renderbuffer = Bağlanacak renderbuffer’ın ID’si. 0 verirsen ilgili attachment’den çıkar/detach eder.
 
 
 

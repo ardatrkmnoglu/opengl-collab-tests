@@ -1,12 +1,10 @@
-#include "../../../include/macro.h"
-#include "../../../include/rtests.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * TEST GRUBU: glVertexAttrib{1234}{f} / glVertexAttrib{1234}{f}v
@@ -31,7 +29,8 @@ void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "max_attribs indeksinde GL_INVALID_VALUE beklendi."
 		    " Actual: 0x%04X",
 		    err);
@@ -110,11 +109,27 @@ void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "Aşırı büyük indeks (0xFFFFFFFF) GL_INVALID_VALUE "
 		    "üretmedi. Actual: 0x%04X",
 		    err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
+
+/* Initialization */
+void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_001();
+	GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_002();
+	GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_003();
+	GS_GL20SC_VERT_VA1F_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

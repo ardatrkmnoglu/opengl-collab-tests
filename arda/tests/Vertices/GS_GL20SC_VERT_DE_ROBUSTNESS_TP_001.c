@@ -1,13 +1,10 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
-#include "../../../include/macro.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * TEST GRUBU: glDrawElements
@@ -25,20 +22,22 @@ static const char* test_case_4 = "GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004";
 void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Geçersiz type: GL_FLOAT */
 	glDrawElements(GL_TRIANGLES, 3, GL_FLOAT, NULL);
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
-			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
-			      " Actual: 0x%04X", err);
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
+		    "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
+		    " Actual: 0x%04X",
+		    err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -51,7 +50,8 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001(void) {
 void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Count negatif olamaz */
 	glDrawElements(GL_TRIANGLES, -1, GL_UNSIGNED_SHORT, NULL);
@@ -60,11 +60,11 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -78,7 +78,8 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002(void) {
 void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Geçersiz mode */
 	glDrawElements(GL_TEXTURE_2D, 3, GL_UNSIGNED_SHORT, NULL);
@@ -87,11 +88,11 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003(void) {
 	if (!(err == GL_INVALID_ENUM)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz mode GL_INVALID_ENUM üretmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -106,7 +107,8 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Buffer bağlı değil, count > 0, ptr = NULL */
 	glDrawElements(GL_POINTS, 3, GL_UNSIGNED_BYTE, NULL);
@@ -114,5 +116,19 @@ void GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004(void) {
 
 	/* Çökmemesi yeterlidir */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
+}
 
+/* Initialization */
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_VERT_DE_ROBUSTNESS_TC_001();
+	GS_GL20SC_VERT_DE_ROBUSTNESS_TC_002();
+	GS_GL20SC_VERT_DE_ROBUSTNESS_TC_003();
+	GS_GL20SC_VERT_DE_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

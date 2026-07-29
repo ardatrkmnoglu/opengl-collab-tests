@@ -1,12 +1,10 @@
-#include "../../../include/macro.h"
-#include "../../../include/rtests.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_FOP_SM_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * ============================================================
@@ -29,7 +27,8 @@ void GS_GL20SC_FOP_SM_ROBUSTNESS_TC_001(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "Tüm bitleri 1 olan maske (0xFFFFFFFF) reddedildi."
 		    " Actual: 0x%04X",
 		    err1);
@@ -103,7 +102,8 @@ void GS_GL20SC_FOP_SM_ROBUSTNESS_TC_002(void) {
 	GLint expected = (GLint)0xABCD1234u;
 
 	if (!(front == expected && back == expected)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "glStencilMask hem ön hem arka yüz maskesini ayni anda "
 		    "güncellemedi (senkronizasyon hatasi)."
 		    " Actual: 0x%04X",
@@ -129,7 +129,8 @@ void GS_GL20SC_FOP_SM_ROBUSTNESS_TC_003(void) {
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &val);
 
 	if (!(val == 0x12345678)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)val);
@@ -169,11 +170,27 @@ void GS_GL20SC_FOP_SM_ROBUSTNESS_TC_004(void) {
 	GLint expected = (GLint)0xAAAAAAAAu;
 
 	if (!(val == expected)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "Stres döngüsü sonrasi son state beklenenle uyusmuyor."
 		    " Actual: 0x%04X",
 		    (unsigned int)val);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
+
+/* Initialization */
+void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_FOP_SM_ROBUSTNESS_TC_001();
+	GS_GL20SC_FOP_SM_ROBUSTNESS_TC_002();
+	GS_GL20SC_FOP_SM_ROBUSTNESS_TC_003();
+	GS_GL20SC_FOP_SM_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

@@ -1,8 +1,4 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <stdio.h>
-
-#include "include/rtests.h"
+#include "test_utility.h"
 
 /** COLORS!
  * RED:    "\x1b[31m"
@@ -17,7 +13,7 @@ int main() {
 	printf("[INFO] Initializing: Robustness tests for OpenGL SC 2.0\n");
 	printf("--------------------------------------------------\n");
 
-	//	init();
+	init();
 	draw();
 	cleanup();
 

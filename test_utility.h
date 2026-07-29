@@ -238,4 +238,7 @@ extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_draw(void);
 extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_close(void);
 
+extern void init(void);
+extern void draw(void);
+extern void cleanup(void);
 #endif /* TEST_UTILITY_H */

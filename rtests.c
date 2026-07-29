@@ -1,4 +1,8 @@
-#include "include/rtests.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include "test_utility.h"
 #include "include/helper.h"
 
 int retcode = 0;
@@ -93,15 +97,14 @@ static void runTest_old(void (*test_func)(), const char *name) {
 	retcode = 0;
 }
 
-static void runTest(void (*test_func)(), const char *name) {
+static void runTestNew(void (*init_func)(), void (*draw_func)(), void (*close_func)(), const char *name) {
 	printf("[TEST] %s...\n", name);
 	fflush(stdout);
 
 	pid_t pid = fork();
 
 	if (pid < 0) {
-		fprintf(stderr, "\x1b[31m[ERROR]\x1b[0m Fork failed for %s\n",
-			name);
+		fprintf(stderr, "\x1b[31m[ERROR]\x1b[0m Fork failed for %s\n", name);
 		return;
 	}
 
@@ -110,7 +113,9 @@ static void runTest(void (*test_func)(), const char *name) {
 		createContext(&w);
 
 		cleanOpenGLState();
-		test_func();
+		init_func();
+        draw_func();
+        close_func();
 
 		destroyContext(&w);
 		exit(retcode);
@@ -120,26 +125,21 @@ static void runTest(void (*test_func)(), const char *name) {
 		if (WIFEXITED(status)) {
 			int exit_code = WEXITSTATUS(status);
 			if (exit_code == 0) {
-				printf("\x1b[32m[PASS]\x1b[0m %s passed.\n",
-				       name);
+				printf("\x1b[32m[PASS]\x1b[0m %s passed.\n", name);
 			}
 		} else if (WIFSIGNALED(status)) {
 			int sig = WTERMSIG(status);
-			fprintf(stderr,
-				"\x1b[31m[CRASH]\x1b[0m %s killed by signal "
-				"%d! (Driver Vulnerability / Memory Corruption "
-				"caught)\n",
-				name, sig);
+			fprintf(stderr, "\x1b[31m[CRASH]\x1b[0m %s killed by signal %d! (Driver Vulnerability / Memory Corruption caught)\n", name, sig);
 		}
 	}
 	retcode = 0;
 }
-#define runTest(func) runTest(func, #func)
+#define runTest(tp) runTestNew(tp ## _init, tp ## _draw, tp ## _close, #tp)
+
 
 /******************************************/
 /*** Category-specific Helper Functions ***/
 /******************************************/
-#include <GL/gl.h>
 #include <math.h>
 #include <stdlib.h>
 
@@ -318,431 +318,61 @@ GLint randInt32(void) {
 /***********************************/
 
 void init() {
-	printf("init\n");
-	/* --------------- ViewportandClipping - Viewport --------------- */
-	ViewportandClipping_Viewport_TC_001();
-	ViewportandClipping_Viewport_TC_002();
-	ViewportandClipping_Viewport_TC_003();
-	ViewportandClipping_Viewport_TC_004();
-	ViewportandClipping_Viewport_TC_005();
-	ViewportandClipping_Viewport_TC_006();
-
-	/* --------------- ViewportandClipping - DepthRangef --------------- */
-	ViewportandClipping_DepthRangef_TC_001();
-	ViewportandClipping_DepthRangef_TC_002();
-	ViewportandClipping_DepthRangef_TC_003();
-	ViewportandClipping_DepthRangef_TC_004();
-	ViewportandClipping_DepthRangef_TC_005();
-	ViewportandClipping_DepthRangef_TC_006();
-
-	/* --------------- Rasterization - CullFace --------------- */
-	Rasterizaton_CullFace_TC_001();
-	Rasterizaton_CullFace_TC_002();
-	Rasterizaton_CullFace_TC_003();
-	Rasterizaton_CullFace_TC_004();
-	Rasterizaton_CullFace_TC_005();
-	Rasterizaton_CullFace_TC_006();
-	Rasterizaton_CullFace_TC_007();
-	Rasterizaton_CullFace_TC_008();
-	Rasterizaton_CullFace_TC_009();
-
-	/* --------------- Rasterization - FrontFace --------------- */
-	Rasterizaton_FrontFace_TC_001();
-	Rasterizaton_FrontFace_TC_002();
-	Rasterizaton_FrontFace_TC_003();
-	Rasterizaton_FrontFace_TC_004();
-	Rasterizaton_FrontFace_TC_005();
-	Rasterizaton_FrontFace_TC_006();
-	Rasterizaton_FrontFace_TC_007();
-	Rasterizaton_FrontFace_TC_008();
-
-	/* --------------- Rasterization - LineWidth --------------- */
-	Rasterizaton_LineWidth_TC_001();
-	Rasterizaton_LineWidth_TC_002();
-	Rasterizaton_LineWidth_TC_003();
-	Rasterizaton_LineWidth_TC_004();
-	Rasterizaton_LineWidth_TC_005();
-	Rasterizaton_LineWidth_TC_006();
-	Rasterizaton_LineWidth_TC_007();
-	Rasterizaton_LineWidth_TC_008();
-
-	/* --------------- Rasterization - PolygonOffset --------------- */
-	Rasterizaton_PolygonOffset_TC_001();
-	Rasterizaton_PolygonOffset_TC_002();
-	Rasterizaton_PolygonOffset_TC_003();
-	Rasterizaton_PolygonOffset_TC_004();
-	Rasterizaton_PolygonOffset_TC_005();
-	Rasterizaton_PolygonOffset_TC_006();
-	Rasterizaton_PolygonOffset_TC_007();
-
-	/* --------------- PixelRectangles - PixelStorei --------------- */
-	PixelRectangles_PixelStorei_TC_001();
-	PixelRectangles_PixelStorei_TC_002();
-	PixelRectangles_PixelStorei_TC_003();
-	PixelRectangles_PixelStorei_TC_004();
-	PixelRectangles_PixelStorei_TC_005();
-	PixelRectangles_PixelStorei_TC_006();
-
-	/* --------------- SpecialFunctions - Flush --------------- */
-	SpecialFunctions_Flush_TC_001();
-	SpecialFunctions_Flush_TC_002();
-	SpecialFunctions_Flush_TC_003();
-	SpecialFunctions_Flush_TC_004();
-	SpecialFunctions_Flush_TC_005();
-	SpecialFunctions_Flush_TC_006();
-	SpecialFunctions_Flush_TC_007();
-
-	/* --------------- SpecialFunctions - Finish --------------- */
-	SpecialFunctions_Finish_TC_001();
-	SpecialFunctions_Finish_TC_002();
-	SpecialFunctions_Finish_TC_003();
-	SpecialFunctions_Finish_TC_004();
-	SpecialFunctions_Finish_TC_005();
-	SpecialFunctions_Finish_TC_006();
-	SpecialFunctions_Finish_TC_007();
-
-	/* --------------- ErrorsandStatusReset - GetError --------------- */
-	ErrorsandStatusReset_GetError_TC_001();
-	ErrorsandStatusReset_GetError_TC_002();
-	ErrorsandStatusReset_GetError_TC_003();
-	ErrorsandStatusReset_GetError_TC_004();
-	ErrorsandStatusReset_GetError_TC_005();
-	ErrorsandStatusReset_GetError_TC_006();
-	ErrorsandStatusReset_GetError_TC_007();
 }
 
 void draw() {
-	runTest(BufferObjects_BindBuffer_TC_002);
-	runTest(BufferObjects_BindBuffer_TC_003);
-	runTest(BufferObjects_BindBuffer_TC_004);
-	runTest(BufferObjects_BindBuffer_TC_005);
-	runTest(BufferObjects_BindBuffer_TC_006);
-	runTest(BufferObjects_BindBuffer_TC_007);
-	runTest(BufferObjects_BindBuffer_TC_008);
-	runTest(BufferObjects_BindBuffer_TC_009);
-	runTest(BufferObjects_BindBuffer_TC_010);
-	runTest(BufferObjects_BindBuffer_TC_011);
-	runTest(BufferObjects_BufferData_TC_001);
-	runTest(BufferObjects_BufferData_TC_002);
-	runTest(BufferObjects_BufferData_TC_003);
-	runTest(BufferObjects_BufferData_TC_004);
-	runTest(BufferObjects_BufferData_TC_005);
-	runTest(BufferObjects_BufferData_TC_006);
-	runTest(BufferObjects_BufferData_TC_007);
-	runTest(BufferObjects_BufferData_TC_008);
-	runTest(BufferObjects_BufferData_TC_009);
-	runTest(BufferObjects_BufferData_TC_010);
-	runTest(BufferObjects_BufferData_TC_011);
-	runTest(BufferObjects_BufferData_TC_012);
-	runTest(BufferObjects_BufferData_TC_013);
-	runTest(BufferObjects_BufferData_TC_014);
-	runTest(BufferObjects_BufferSubData_TC_001);
-	runTest(BufferObjects_BufferSubData_TC_002);
-	runTest(BufferObjects_BufferSubData_TC_003);
-	runTest(BufferObjects_BufferSubData_TC_004);
-	runTest(BufferObjects_BufferSubData_TC_005);
-	runTest(BufferObjects_BufferSubData_TC_006);
-	runTest(BufferObjects_BufferSubData_TC_007);
-	runTest(BufferObjects_BufferSubData_TC_008);
-	runTest(BufferObjects_BufferSubData_TC_009);
-	runTest(BufferObjects_BufferSubData_TC_010);
-	runTest(BufferObjects_BufferSubData_TC_011);
-	runTest(BufferObjects_BufferSubData_TC_012);
-	runTest(BufferObjects_BufferSubData_TC_013);
-	runTest(BufferObjects_BufferSubData_TC_014);
-	runTest(BufferObjects_GenBuffers_TC_001);
-	runTest(BufferObjects_GenBuffers_TC_002);
-	runTest(BufferObjects_GenBuffers_TC_003);
-	runTest(BufferObjects_GenBuffers_TC_004);
-	runTest(BufferObjects_GenBuffers_TC_005);
-	runTest(BufferObjects_GenBuffers_TC_006);
-	runTest(BufferObjects_GenBuffers_TC_007);
-	runTest(BufferObjects_GenBuffers_TC_008);
-	runTest(BufferObjects_GenBuffers_TC_009);
-	runTest(BufferObjects_GetBufferParameteriv_TC_001);
-	runTest(BufferObjects_GetBufferParameteriv_TC_002);
-	runTest(BufferObjects_GetBufferParameteriv_TC_003);
-	runTest(BufferObjects_GetBufferParameteriv_TC_004);
-	runTest(BufferObjects_GetBufferParameteriv_TC_005);
-	runTest(BufferObjects_GetBufferParameteriv_TC_006);
-	runTest(BufferObjects_GetBufferParameteriv_TC_007);
-	runTest(BufferObjects_GetBufferParameteriv_TC_008);
-	runTest(BufferObjects_GetBufferParameteriv_TC_009);
-	runTest(BufferObjects_GetBufferParameteriv_TC_010);
-	runTest(BufferObjects_GetBufferParameteriv_TC_011);
-	runTest(BufferObjects_GetBufferParameteriv_TC_012);
-	runTest(BufferObjects_GetBufferParameteriv_TC_013);
-	runTest(BufferObjects_GetBufferParameteriv_TC_014);
-	runTest(BufferObjects_GetBufferParameteriv_TC_015);
-	runTest(BufferObjects_GetBufferParameteriv_TC_016);
-	runTest(FramebufferObjects_BindFramebuffer_TC_001);
-	runTest(FramebufferObjects_BindFramebuffer_TC_002);
-	runTest(FramebufferObjects_BindFramebuffer_TC_003);
-	runTest(FramebufferObjects_BindFramebuffer_TC_004);
-	runTest(FramebufferObjects_BindFramebuffer_TC_005);
-	runTest(FramebufferObjects_BindFramebuffer_TC_006);
-	runTest(FramebufferObjects_BindFramebuffer_TC_007);
-	runTest(FramebufferObjects_BindFramebuffer_TC_008);
-	runTest(FramebufferObjects_BindFramebuffer_TC_009);
-	runTest(FramebufferObjects_BindFramebuffer_TC_010);
-	runTest(FramebufferObjects_BindFramebuffer_TC_011);
-	runTest(FramebufferObjects_BindFramebuffer_TC_012);
-	runTest(FramebufferObjects_GenFramebuffers_TC_001);
-	runTest(FramebufferObjects_GenFramebuffers_TC_002);
-	runTest(FramebufferObjects_GenFramebuffers_TC_003);
-	runTest(FramebufferObjects_GenFramebuffers_TC_004);
-	runTest(FramebufferObjects_GenFramebuffers_TC_005);
-	runTest(FramebufferObjects_GenFramebuffers_TC_006);
-	runTest(FramebufferObjects_GenFramebuffers_TC_007);
-	runTest(FramebufferObjects_GenFramebuffers_TC_008);
-	runTest(FramebufferObjects_GenFramebuffers_TC_009);
-	runTest(FramebufferObjects_GenFramebuffers_TC_010);
-	runTest(FramebufferObjects_GenFramebuffers_TC_011);
-	runTest(FramebufferObjects_GenFramebuffers_TC_012);
-	runTest(FramebufferObjects_GenFramebuffers_TC_013);
-	runTest(FramebufferObjects_GenFramebuffers_TC_014);
-	runTest(FramebufferObjects_GenFramebuffers_TC_015);
-	runTest(PerFragmentOperations_Scissor_TC_001);
-	runTest(PerFragmentOperations_Scissor_TC_002);
-	runTest(PerFragmentOperations_Scissor_TC_003);
-	runTest(PerFragmentOperations_Scissor_TC_004);
-	runTest(PerFragmentOperations_Scissor_TC_005);
-	runTest(PerFragmentOperations_Scissor_TC_006);
-	runTest(PixelRectangles_PixelStorei_TC_001);
-	runTest(PixelRectangles_PixelStorei_TC_002);
-	runTest(PixelRectangles_PixelStorei_TC_003);
-	runTest(PixelRectangles_PixelStorei_TC_004);
-	runTest(PixelRectangles_PixelStorei_TC_005);
-	runTest(PixelRectangles_PixelStorei_TC_006);
-	runTest(Rasterizaton_CullFace_TC_001);
-	runTest(Rasterizaton_CullFace_TC_002);
-	runTest(Rasterizaton_CullFace_TC_003);
-	runTest(Rasterizaton_CullFace_TC_004);
-	runTest(Rasterizaton_CullFace_TC_005);
-	runTest(Rasterizaton_CullFace_TC_006);
-	runTest(Rasterizaton_CullFace_TC_007);
-	runTest(Rasterizaton_CullFace_TC_008);
-	runTest(Rasterizaton_CullFace_TC_009);
-	runTest(Rasterizaton_FrontFace_TC_001);
-	runTest(Rasterizaton_FrontFace_TC_002);
-	runTest(Rasterizaton_FrontFace_TC_003);
-	runTest(Rasterizaton_FrontFace_TC_004);
-	runTest(Rasterizaton_FrontFace_TC_005);
-	runTest(Rasterizaton_FrontFace_TC_006);
-	runTest(Rasterizaton_FrontFace_TC_007);
-	runTest(Rasterizaton_FrontFace_TC_008);
-	runTest(Rasterizaton_LineWidth_TC_001);
-	runTest(Rasterizaton_LineWidth_TC_002);
-	runTest(Rasterizaton_LineWidth_TC_003);
-	runTest(Rasterizaton_LineWidth_TC_004);
-	runTest(Rasterizaton_LineWidth_TC_005);
-	runTest(Rasterizaton_LineWidth_TC_006);
-	runTest(Rasterizaton_LineWidth_TC_007);
-	runTest(Rasterizaton_LineWidth_TC_008);
-	runTest(Rasterizaton_PolygonOffset_TC_001);
-	runTest(Rasterizaton_PolygonOffset_TC_002);
-	runTest(Rasterizaton_PolygonOffset_TC_003);
-	runTest(Rasterizaton_PolygonOffset_TC_004);
-	runTest(Rasterizaton_PolygonOffset_TC_005);
-	runTest(Rasterizaton_PolygonOffset_TC_006);
-	runTest(Rasterizaton_PolygonOffset_TC_007);
-	runTest(ReadingPixels_ReadnPixels_TC_001);
-	runTest(ReadingPixels_ReadnPixels_TC_002);
-	runTest(ReadingPixels_ReadnPixels_TC_003);
-	runTest(ReadingPixels_ReadnPixels_TC_004);
-	runTest(ShaderQueries_GetProgram_TC_001);
-	runTest(ShaderQueries_GetProgram_TC_002);
-	runTest(ShaderQueries_GetProgram_TC_003);
-	runTest(ShaderQueries_GetProgram_TC_004);
-	runTest(ShaderQueries_GetVertexAttribPointer_TC_001);
-	runTest(ShaderQueries_GetVertexAttribPointer_TC_002);
-	runTest(ShaderQueries_GetVertexAttribPointer_TC_003);
-	runTest(ShaderQueries_GetVertexAttribPointer_TC_004);
-	runTest(ShaderQueries_GetVertexAttrib_TC_001);
-	runTest(ShaderQueries_GetVertexAttrib_TC_002);
-	runTest(ShaderQueries_GetVertexAttrib_TC_003);
-	runTest(ShaderQueries_GetVertexAttrib_TC_004);
-	runTest(ShaderQueries_GetnUniform_TC_001);
-	runTest(ShaderQueries_GetnUniform_TC_002);
-	runTest(ShaderQueries_GetnUniform_TC_003);
-	runTest(ShaderQueries_GetnUniform_TC_004);
-	runTest(ShadersAndPrograms_CreateProgram_TC_001);
-	runTest(ShadersAndPrograms_CreateProgram_TC_002);
-	runTest(ShadersAndPrograms_CreateProgram_TC_003);
-	runTest(ShadersAndPrograms_CreateProgram_TC_004);
-	runTest(ShadersAndPrograms_GetAttribLocation_TC_001);
-	runTest(ShadersAndPrograms_GetAttribLocation_TC_002);
-	runTest(ShadersAndPrograms_GetAttribLocation_TC_003);
-	runTest(ShadersAndPrograms_GetAttribLocation_TC_004);
-	runTest(ShadersAndPrograms_GetUniformLocation_TC_001);
-	runTest(ShadersAndPrograms_GetUniformLocation_TC_002);
-	runTest(ShadersAndPrograms_GetUniformLocation_TC_003);
-	runTest(ShadersAndPrograms_GetUniformLocation_TC_004);
-	runTest(ShadersAndPrograms_ProgramBinary_TC_001);
-	runTest(ShadersAndPrograms_ProgramBinary_TC_002);
-	runTest(ShadersAndPrograms_ProgramBinary_TC_003);
-	runTest(ShadersAndPrograms_ProgramBinary_TC_004);
-	runTest(ShadersAndPrograms_UniformMatrix_TC_001);
-	runTest(ShadersAndPrograms_UniformMatrix_TC_002);
-	runTest(ShadersAndPrograms_UniformMatrix_TC_003);
-	runTest(ShadersAndPrograms_UniformMatrix_TC_004);
-	runTest(ShadersAndPrograms_Uniform_TC_001);
-	runTest(ShadersAndPrograms_Uniform_TC_002);
-	runTest(ShadersAndPrograms_Uniform_TC_003);
-	runTest(ShadersAndPrograms_Uniform_TC_004);
-	runTest(ShadersAndPrograms_Uniform_TC_005);
-	runTest(ShadersAndPrograms_Uniform_TC_006);
-	runTest(ShadersAndPrograms_UseProgram_TC_001);
-	runTest(ShadersAndPrograms_UseProgram_TC_002);
-	runTest(ShadersAndPrograms_UseProgram_TC_003);
-	runTest(ShadersAndPrograms_UseProgram_TC_004);
-	runTest(SpecialFunctions_Finish_TC_001);
-	runTest(SpecialFunctions_Finish_TC_002);
-	runTest(SpecialFunctions_Finish_TC_003);
-	runTest(SpecialFunctions_Finish_TC_004);
-	runTest(SpecialFunctions_Finish_TC_005);
-	runTest(SpecialFunctions_Finish_TC_006);
-	runTest(SpecialFunctions_Finish_TC_007);
-	runTest(Texturing_BindTexture_TC_001);
-	runTest(Texturing_BindTexture_TC_002);
-	runTest(Texturing_BindTexture_TC_003);
-	runTest(Texturing_BindTexture_TC_004);
-	runTest(Texturing_BindTexture_TC_005);
-	runTest(Texturing_BindTexture_TC_006);
-	runTest(Texturing_BindTexture_TC_007);
-	runTest(Texturing_BindTexture_TC_008);
-	runTest(Texturing_GenTextures_TC_001);
-	runTest(Texturing_GenTextures_TC_002);
-	runTest(Texturing_GenTextures_TC_003);
-	runTest(Texturing_GenTextures_TC_004);
-	runTest(Texturing_GenTextures_TC_005);
-	runTest(Texturing_GenTextures_TC_006);
-	runTest(Texturing_GenTextures_TC_007);
-	runTest(Texturing_GenTextures_TC_008);
-	runTest(Texturing_GenTextures_TC_009);
-	runTest(Texturing_GenTextures_TC_010);
-	runTest(Texturing_GenTextures_TC_011);
-	runTest(Texturing_GenTextures_TC_012);
-	runTest(Texturing_GenerateMipmap_TC_001);
-	runTest(Texturing_GenerateMipmap_TC_002);
-	runTest(Texturing_GenerateMipmap_TC_003);
-	runTest(Texturing_GenerateMipmap_TC_004);
-	runTest(Texturing_GenerateMipmap_TC_005);
-	runTest(Texturing_GenerateMipmap_TC_006);
-	runTest(Texturing_GenerateMipmap_TC_007);
-	runTest(Texturing_GenerateMipmap_TC_008);
-	runTest(Texturing_GenerateMipmap_TC_009);
-	runTest(Texturing_GenerateMipmap_TC_010);
-	runTest(Texturing_GenerateMipmap_TC_011);
-	runTest(Texturing_GenerateMipmap_TC_012);
-	runTest(Texturing_GenerateMipmap_TC_013);
-	runTest(Texturing_GenerateMipmap_TC_014);
-	runTest(Texturing_GenerateMipmap_TC_015);
-	runTest(Texturing_TexStorage2D_TC_001);
-	runTest(Texturing_TexStorage2D_TC_002);
-	runTest(Texturing_TexStorage2D_TC_003);
-	runTest(Texturing_TexStorage2D_TC_004);
-	runTest(Texturing_TexStorage2D_TC_005);
-	runTest(Texturing_TexSubImage2D_TC_001);
-	runTest(Texturing_TexSubImage2D_TC_002);
-	runTest(Texturing_TexSubImage2D_TC_003);
-	runTest(Texturing_TexSubImage2D_TC_004);
-	runTest(Texturing_TexSubImage2D_TC_005);
-	runTest(Vertices_DisableVertexAttribArray_TC_001);
-	runTest(Vertices_DisableVertexAttribArray_TC_002);
-	runTest(Vertices_DisableVertexAttribArray_TC_003);
-	runTest(Vertices_DisableVertexAttribArray_TC_004);
-	runTest(Vertices_DrawArrays_TC_001);
-	runTest(Vertices_DrawArrays_TC_002);
-	runTest(Vertices_DrawArrays_TC_003);
-	runTest(Vertices_DrawArrays_TC_004);
-	runTest(Vertices_DrawArrays_TC_005);
-	runTest(Vertices_DrawArrays_TC_006);
-	runTest(Vertices_DrawElements_TC_001);
-	runTest(Vertices_DrawElements_TC_002);
-	runTest(Vertices_DrawElements_TC_003);
-	runTest(Vertices_DrawElements_TC_004);
-	runTest(Vertices_DrawRangeElements_TC_001);
-	runTest(Vertices_DrawRangeElements_TC_002);
-	runTest(Vertices_DrawRangeElements_TC_003);
-	runTest(Vertices_DrawRangeElements_TC_004);
-	runTest(Vertices_EnableVertexAttribArray_TC_001);
-	runTest(Vertices_EnableVertexAttribArray_TC_002);
-	runTest(Vertices_EnableVertexAttribArray_TC_003);
-	runTest(Vertices_EnableVertexAttribArray_TC_004);
-	runTest(Vertices_VertexAttribPointer_TC_001);
-	runTest(Vertices_VertexAttribPointer_TC_002);
-	runTest(Vertices_VertexAttribPointer_TC_003);
-	runTest(Vertices_VertexAttribPointer_TC_004);
-	runTest(Vertices_VertexAttribPointer_TC_005);
-	runTest(Vertices_VertexAttrib_TC_001);
-	runTest(Vertices_VertexAttrib_TC_002);
-	runTest(Vertices_VertexAttrib_TC_003);
-	runTest(Vertices_VertexAttrib_TC_004);
-	runTest(ViewportandClipping_DepthRangef_TC_001);
-	runTest(ViewportandClipping_DepthRangef_TC_002);
-	runTest(ViewportandClipping_DepthRangef_TC_003);
-	runTest(ViewportandClipping_DepthRangef_TC_004);
-	runTest(ViewportandClipping_DepthRangef_TC_005);
-	runTest(ViewportandClipping_DepthRangef_TC_006);
-	runTest(ViewportandClipping_Viewport_TC_001);
-	runTest(ViewportandClipping_Viewport_TC_002);
-	runTest(ViewportandClipping_Viewport_TC_003);
-	runTest(ViewportandClipping_Viewport_TC_004);
-	runTest(ViewportandClipping_Viewport_TC_005);
-	runTest(ViewportandClipping_Viewport_TC_006);
-	runTest(WholeFramebufferOperations_ClearColor_TC_001);
-	runTest(WholeFramebufferOperations_ClearColor_TC_002);
-	runTest(WholeFramebufferOperations_ClearColor_TC_003);
-	runTest(WholeFramebufferOperations_ClearColor_TC_004);
-	runTest(WholeFramebufferOperations_ClearColor_TC_005);
-	runTest(WholeFramebufferOperations_ClearDepthf_TC_001);
-	runTest(WholeFramebufferOperations_ClearDepthf_TC_002);
-	runTest(WholeFramebufferOperations_ClearDepthf_TC_003);
-	runTest(WholeFramebufferOperations_ClearDepthf_TC_004);
-	runTest(WholeFramebufferOperations_ClearDepthf_TC_005);
-	runTest(WholeFramebufferOperations_ClearStencil_TC_001);
-	runTest(WholeFramebufferOperations_ClearStencil_TC_002);
-	runTest(WholeFramebufferOperations_ClearStencil_TC_003);
-	runTest(WholeFramebufferOperations_ClearStencil_TC_004);
-	runTest(WholeFramebufferOperations_ClearStencil_TC_005);
-	runTest(WholeFramebufferOperations_Clear_TC_001);
-	runTest(WholeFramebufferOperations_Clear_TC_002);
-	runTest(WholeFramebufferOperations_Clear_TC_003);
-	runTest(WholeFramebufferOperations_Clear_TC_004);
-	runTest(WholeFramebufferOperations_Clear_TC_005);
-	runTest(WholeFramebufferOperations_ColorMask_TC_001);
-	runTest(WholeFramebufferOperations_ColorMask_TC_002);
-	runTest(WholeFramebufferOperations_ColorMask_TC_003);
-	runTest(WholeFramebufferOperations_ColorMask_TC_004);
-	runTest(WholeFramebufferOperations_ColorMask_TC_005);
-	runTest(WholeFramebufferOperations_DepthMask_TC_001);
-	runTest(WholeFramebufferOperations_DepthMask_TC_002);
-	runTest(WholeFramebufferOperations_DepthMask_TC_003);
-	runTest(WholeFramebufferOperations_DepthMask_TC_004);
-	runTest(WholeFramebufferOperations_StencilMaskSeparate_TC_001);
-	runTest(WholeFramebufferOperations_StencilMaskSeparate_TC_002);
-	runTest(WholeFramebufferOperations_StencilMaskSeparate_TC_003);
-	runTest(WholeFramebufferOperations_StencilMaskSeparate_TC_004);
-	runTest(WholeFramebufferOperations_StencilMaskSeparate_TC_005);
-	runTest(WholeFramebufferOperations_StencilMask_TC_001);
-	runTest(WholeFramebufferOperations_StencilMask_TC_002);
-	runTest(WholeFramebufferOperations_StencilMask_TC_003);
-	runTest(WholeFramebufferOperations_StencilMask_TC_004);
-	runTest(SpecialFunctions_Flush_TC_001);
-	runTest(SpecialFunctions_Flush_TC_002);
-	runTest(SpecialFunctions_Flush_TC_003);
-	runTest(SpecialFunctions_Flush_TC_004);
-	runTest(SpecialFunctions_Flush_TC_005);
-	runTest(SpecialFunctions_Flush_TC_006);
-	runTest(SpecialFunctions_Flush_TC_007);
-	runTest(ErrorsandStatusReset_GetError_TC_001);
-	runTest(ErrorsandStatusReset_GetError_TC_002);
-	runTest(ErrorsandStatusReset_GetError_TC_003);
-	runTest(ErrorsandStatusReset_GetError_TC_004);
-	runTest(ErrorsandStatusReset_GetError_TC_005);
-	runTest(ErrorsandStatusReset_GetError_TC_006);
-	runTest(ErrorsandStatusReset_GetError_TC_007);
+	runTest(GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_C_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_CP_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GUIV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_GVAIV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_PB_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1I_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2I_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3I_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4I_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_UM2FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_UM3FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_UP_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA1FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA2F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA3F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA4F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001);
 }
 
 void cleanup() { printf("cleanup\n"); }

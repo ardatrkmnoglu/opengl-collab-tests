@@ -1,6 +1,6 @@
-#include "../../../include/rtests.h"
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
+#include "../../../include/rtests.h"
 
 static const char* test_procedure = "GS_GL20SC_SaSR_GB_ROBUSTNESS_TP_001";
 static const char* test_case_1 = "GS_GL20SC_SaSR_GB_ROBUSTNESS_TC_001";

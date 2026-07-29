@@ -141,3 +141,21 @@ GLenum glCheckFramebufferStatus(GLenum target);
 ```
 - Şu an `glBindFramebuffer(GL_FRAMEBUFFER, ...)` ile bağlı olan framebuffer'ın (FBO) **"framebuffer complete"** olup olmadığını kontrol eder.
 - Fonksiyon sana eksik/uygunsuzluk sebebini de söyler.
+
+
+### `GetFramebufferAttachmentParameteriv`
+```c
+void glGetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint * params);
+```
+Bağlı framebuffer (target: GL_FRAMEBUFFER) üzerindeki belirli bir attachment noktasının (ör. renk/depth/stencil ekleri) hangi nesneye ait olduğunu ve bunun bazı parametrelerini sorgular.
+- target (sadece GL_FRAMEBUFFER) ile bağlı framebuffer seçilir.
+- attachment ile hangi ek noktasına bakılacağı belirtilir:
+  GL_COLOR_ATTACHMENT0
+  GL_DEPTH_ATTACHMENT
+  GL_STENCIL_ATTACHMENT
+- pname ile “şunu sor” dersin (object tipi, object adı, mip seviyesi vb.).
+- Sonuç params pointer’ındaki değere yazılır.
+
+
+### `www`
+

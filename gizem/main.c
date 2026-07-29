@@ -90,6 +90,8 @@ void init(void)
     GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
 
     /* --------------- Framebuffer Objects Functions --------------- */
+
+    GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_init();  /* -- GetFramebufferAttachmentParameteriv -- */
     // GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_init();  /* -- CheckFramebufferStatus -- */
     // GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init();  /* -- FramebufferRenderbuffer -- */
     // GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init();  /* -- RenderbufferStorage -- */

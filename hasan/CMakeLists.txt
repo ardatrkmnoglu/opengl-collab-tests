@@ -65,6 +65,12 @@ add_robustness_test(PFO_BlendFunc
     GS_GL20SC_PFO_BF_ROBUSTNESS_TP_001
 )
 
+# --- PerFragmentOperations - BlendFuncSeparate ---
+add_robustness_test(PFO_BlendFuncSeparate
+    tests/PerFragmentOperations/GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001
+)
+
 # --- ReadingPixels - ReadnPixels ---
 add_robustness_test(RP_ReadnPixels
     tests/ReadingPixels/GS_GL20SC_RP_RNP_ROBUSTNESS_TP_001.c

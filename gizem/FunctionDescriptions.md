@@ -167,8 +167,8 @@ OpenGL’de renderbuffer (GL_RENDERBUFFER) nesnesinin bazı özelliklerini okuma
 - params: Sorgulanan değeri buraya yazar.
 
 
-
-
-
-
+### `FramebufferTexture2D`
+```c
+void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+```
 

@@ -1,7 +1,23 @@
 #ifndef FRAMEBUFFER_TESTS_H
 #define FRAMEBUFFER_TESTS_H
 
-
+/* --------------- FramebufferTexture2D --------------- */
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TP_001_init(void);
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TP_001_draw(void);
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TP_001_close(void);
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_001();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_002();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_003();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_004();  /* It failed on Windows */
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_005();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_006();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_007();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_008();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_009();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_010();  /* It failed on Windows */
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_011();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_012();
+void GS_GL20SC_FO_FT2D_ROBUSTNESS_TC_013();  /* It failed on Windows */
 
 /* --------------- GetRenderbufferParameteriv --------------- */
 void GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001_init(void);
@@ -18,7 +34,6 @@ void GS_GL20SC_FO_GRP_ROBUSTNESS_TC_008();
 void GS_GL20SC_FO_GRP_ROBUSTNESS_TC_009();  /* It crashed on Windows */
 void GS_GL20SC_FO_GRP_ROBUSTNESS_TC_010();
 void GS_GL20SC_FO_GRP_ROBUSTNESS_TC_011();
-
 
 /* --------------- GetFramebufferAttachmentParameteriv --------------- */
 void GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_init(void);

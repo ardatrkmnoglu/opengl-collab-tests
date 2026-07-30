@@ -33,7 +33,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6cc062fe-ba63-425d-b6ec-2a427677962f" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/tests/FramebufferObjects/GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/FramebufferObjects/GS_GL20SC_FO_FT2D_ROBUSTNESS_TP_001.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/editor.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.idea/opengl-collab-tests.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -145,7 +145,7 @@
       <workItem from="1785220875077" duration="1724000" />
       <workItem from="1785222898731" duration="2788000" />
       <workItem from="1785239174514" duration="9378000" />
-      <workItem from="1785328966812" duration="3304000" />
+      <workItem from="1785328966812" duration="5563000" />
     </task>
     <servers />
   </component>

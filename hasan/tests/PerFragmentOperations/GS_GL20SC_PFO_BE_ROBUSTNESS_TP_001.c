@@ -106,7 +106,9 @@ void GS_GL20SC_PFO_BE_ROBUSTNESS_TC_002(void) {
 	for (mode = 0; mode < 65536; mode++) {
 		GLenum expected = (mode == GL_FUNC_ADD ||
 				   mode == GL_FUNC_SUBTRACT ||
-				   mode == GL_FUNC_REVERSE_SUBTRACT)
+				   mode == GL_FUNC_REVERSE_SUBTRACT ||
+				   mode == 0x8007 /* GL_MIN */ ||
+				   mode == 0x8008 /* GL_MAX */)
 					  ? GL_NO_ERROR
 					  : GL_INVALID_ENUM;
 

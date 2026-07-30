@@ -1,11 +1,11 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "ShaderQueries_GetVertexAttribPointer_TP_001";
-static const char* test_case_1 = "ShaderQueries_GetVertexAttribPointer_TC_001";
-static const char* test_case_2 = "ShaderQueries_GetVertexAttribPointer_TC_002";
-static const char* test_case_3 = "ShaderQueries_GetVertexAttribPointer_TC_003";
-static const char* test_case_4 = "ShaderQueries_GetVertexAttribPointer_TC_004";
+static const char* test_procedure = "GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -20,7 +20,7 @@ static const char* test_case_4 = "ShaderQueries_GetVertexAttribPointer_TC_004";
  * Enum'ini kabul eder. GL_FLOAT gibi geçersiz bir Enum
  * verilerek sürücünün bunu reddedip reddetmediği doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetVertexAttribPointer_TC_001(void) {
+void GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_001(void) {
 	void *ptr = NULL;
 
 	/* Yalnızca GL_VERTEX_ATTRIB_ARRAY_POINTER geçerlidir. */
@@ -28,7 +28,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "GL_FLOAT pname GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -44,7 +44,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_001(void) {
  * GL_VERTEX_ATTRIB_ARRAY_POINTER ile yapılan sorgunun
  * hatasız tamamlandığını doğrular (pozitif test).
  * ============================================================ */
-void ShaderQueries_GetVertexAttribPointer_TC_002(void) {
+void GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -53,7 +53,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçerli sorgu hata üretmemeli iken üretdi."
 			      " Actual: 0x%04X",
 			      err);
@@ -70,7 +70,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_002(void) {
  * yapılarak sınır kontrolünün çalıştığı doğrulanır.
  * GL_INVALID_VALUE beklenir.
  * ============================================================ */
-void ShaderQueries_GetVertexAttribPointer_TC_003(void) {
+void GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_003(void) {
 	GLint max_attribs = 0;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
@@ -82,7 +82,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "max_attribs indeksinde GL_INVALID_VALUE beklendi."
 		    " Actual: 0x%04X",
 		    err);
@@ -99,7 +99,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_003(void) {
  * çökmeden davranıp davranmadığı gözlemlenir. Spec bu durumu
  * tam olarak tanımlamasa da sürücü çökmemelidir.
  * ============================================================ */
-void ShaderQueries_GetVertexAttribPointer_TC_004(void) {
+void GS_GL20SC_SP_VAPV_ROBUSTNESS_TC_004(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -109,7 +109,7 @@ void ShaderQueries_GetVertexAttribPointer_TC_004(void) {
 
 	/* Hata üretse de üretmese de çökmeme koşulunu geçer */
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "NULL pointer beklenmeyen hata kodu üretdi."
 			      " Actual: 0x%04X",
 			      err);

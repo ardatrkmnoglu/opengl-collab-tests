@@ -1,12 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "WholeFramebufferOperations_ColorMask_TP_001";
-static const char* test_case_1 = "WholeFramebufferOperations_ColorMask_TC_001";
-static const char* test_case_2 = "WholeFramebufferOperations_ColorMask_TC_002";
-static const char* test_case_3 = "WholeFramebufferOperations_ColorMask_TC_003";
-static const char* test_case_4 = "WholeFramebufferOperations_ColorMask_TC_004";
-static const char* test_case_5 = "WholeFramebufferOperations_ColorMask_TC_005";
+static const char* test_procedure = "GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FOP_CM_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FOP_CM_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FOP_CM_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FOP_CM_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_FOP_CM_ROBUSTNESS_TC_005";
 
 
 /* ============================================================
@@ -23,12 +23,12 @@ static const char* test_case_5 = "WholeFramebufferOperations_ColorMask_TC_005";
  * 0x80) gönderilerek OpenGL kuralina göre 0 disindaki her
  * seyin GL_TRUE kabul edilmesi dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ColorMask_TC_001(void) {
+void GS_GL20SC_FOP_CM_ROBUSTNESS_TC_001(void) {
 	glColorMask(0xFF, 0x02, 0x00, 0x80);
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Standart dışı değerler girildiğinde hata üretildi "
 		    "(Spesifikasyona aykırı)."
 		    " Actual: 0x%04X",
@@ -43,7 +43,7 @@ void WholeFramebufferOperations_ColorMask_TC_001(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_TRUE && mask[2] == GL_FALSE &&
 	      mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Sürücü '!= 0' kuralını ihlal etti veya değerleri "
 		    "doğru cast etmedi."
 		    " Actual: 0x%04X",
@@ -63,7 +63,7 @@ void WholeFramebufferOperations_ColorMask_TC_001(void) {
  * büyük bir sayi gönderip 'dogal olarak true olur' varsaymasi
  * senaryosunu simüle eder.
  * ============================================================ */
-void WholeFramebufferOperations_ColorMask_TC_002(void) {
+void GS_GL20SC_FOP_CM_ROBUSTNESS_TC_002(void) {
 	// 0x100 -> alt bayt 0x00 (FALSE), 0x101 -> alt bayt 0x01 (TRUE)
 	// 0xFF00 -> alt bayt 0x00 (FALSE), 0xFF01 -> alt bayt 0x01 (TRUE)
 	glColorMask((GLboolean)0x100, (GLboolean)0x101, (GLboolean)0xFF00,
@@ -71,7 +71,7 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Bayt sinirindaki tasma degerleri hata ürettirdi."
 			      " Actual: 0x%04X",
 			      err);
@@ -84,7 +84,7 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_TRUE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Sürücü bayt sinirindaki tasmayi dogru yorumlamadi "
 		    "(0x100 -> FALSE, 0x101 -> TRUE olmali)."
 		    " Actual: 0x%04X",
@@ -102,7 +102,7 @@ void WholeFramebufferOperations_ColorMask_TC_002(void) {
  * sürücü çökmemeli ve dahili state'i bozmamalidir. Ardindan
  * gecerli bir sorgu ile state'in hala tutarli oldugu dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ColorMask_TC_003(void) {
+void GS_GL20SC_FOP_CM_ROBUSTNESS_TC_003(void) {
 	// NULL isaretçi ile çagri - çökme (crash) testi. State bozulmamali.
 	glGetBooleanv(GL_COLOR_WRITEMASK, NULL);
 
@@ -114,7 +114,7 @@ void WholeFramebufferOperations_ColorMask_TC_003(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_FALSE && mask[2] == GL_TRUE &&
 	      mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu "
 		    "veya tutarsiz hale geldi."
 		    " Actual: 0x%04X",
@@ -132,7 +132,7 @@ void WholeFramebufferOperations_ColorMask_TC_003(void) {
  * yer degistirmedigini) dogrulamak için yalnizca tek bir kanal
  * TRUE yapilip digerlerinin FALSE kaldigi sinanir.
  * ============================================================ */
-void WholeFramebufferOperations_ColorMask_TC_004(void) {
+void GS_GL20SC_FOP_CM_ROBUSTNESS_TC_004(void) {
 	// Sadece Red kanali acik
 	glColorMask(GL_TRUE, GL_FALSE, GL_FALSE, GL_FALSE);
 	GLboolean mask[4];
@@ -140,7 +140,7 @@ void WholeFramebufferOperations_ColorMask_TC_004(void) {
 
 	if (!(mask[0] == GL_TRUE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Yalnizca R kanali TRUE olmali, digerleri FALSE "
 			      "kalmaliydi (kanal karismasi olabilir)."
 			      " Actual: 0x%04X",
@@ -155,7 +155,7 @@ void WholeFramebufferOperations_ColorMask_TC_004(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_TRUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Yalnizca A kanali TRUE olmali, digerleri FALSE "
 			      "kalmaliydi (R/A karismasi supheli)."
 			      " Actual: 0x%04X",
@@ -174,7 +174,7 @@ void WholeFramebufferOperations_ColorMask_TC_004(void) {
  * biriktigi (sticky error) veya state'in araya sikistigi bir
  * durum olusup olusmadigini yakalamak.
  * ============================================================ */
-void WholeFramebufferOperations_ColorMask_TC_005(void) {
+void GS_GL20SC_FOP_CM_ROBUSTNESS_TC_005(void) {
 	for (int i = 0; i < 1024; i++) {
 		GLboolean v = (i % 2 == 0) ? 0xFF : 0x00;
 		glColorMask(v, v, v, v);
@@ -182,7 +182,7 @@ void WholeFramebufferOperations_ColorMask_TC_005(void) {
 
 	GLenum err = glGetError();
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tekrarli uc deger degisimleri sonrasinda hata "
 			      "durumu biriktirilmis olabilir."
 			      " Actual: 0x%04X",
@@ -197,7 +197,7 @@ void WholeFramebufferOperations_ColorMask_TC_005(void) {
 
 	if (!(mask[0] == GL_FALSE && mask[1] == GL_FALSE &&
 	      mask[2] == GL_FALSE && mask[3] == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Stres döngüsü sonrasi son state beklenenle uyusmuyor."
 		    " Actual: 0x%04X",
 		    (unsigned int)mask[0]);

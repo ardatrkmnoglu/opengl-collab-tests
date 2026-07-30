@@ -2,11 +2,11 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "ShaderQueries_GetnUniform_TP_001";
-static const char* test_case_1 = "ShaderQueries_GetnUniform_TC_001";
-static const char* test_case_2 = "ShaderQueries_GetnUniform_TC_002";
-static const char* test_case_3 = "ShaderQueries_GetnUniform_TC_003";
-static const char* test_case_4 = "ShaderQueries_GetnUniform_TC_004";
+static const char* test_procedure = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -22,7 +22,7 @@ static const char* test_case_4 = "ShaderQueries_GetnUniform_TC_004";
  * temel kuralıdır. Sürücünün negatif bir buffer boyutunu
  * reddedip reddetmediği doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetnUniform_TC_001(void) {
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	GLint locFloat = glGetUniformLocation(prog, "uFloat");
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -33,14 +33,13 @@ void ShaderQueries_GetnUniform_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Negatif bufSize GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -51,7 +50,7 @@ void ShaderQueries_GetnUniform_TC_001(void) {
  * Sürücünün geçersiz bir Program ID'si üzerinden Uniform
  * sorgulayıp sorgulamadığı doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetnUniform_TC_002(void) {
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
 
 	GLfloat data[4];
@@ -60,7 +59,7 @@ void ShaderQueries_GetnUniform_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz (0) program ID'si reddedilmedi."
 			      " Actual: 0x%04X", err);
 	} else {
@@ -75,7 +74,7 @@ void ShaderQueries_GetnUniform_TC_002(void) {
  * BufSize = 0 durumunda sürücünün herhangi bir çöküm
  * yaşamadan tanımlı davranış sergilediği doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetnUniform_TC_003(void) {
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	GLint locFloat = glGetUniformLocation(prog, "uFloat");
@@ -88,14 +87,13 @@ void ShaderQueries_GetnUniform_TC_003(void) {
 
 	if (!(err == GL_NO_ERROR || err == GL_INVALID_VALUE ||
 	      err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "BufSize=0 için beklenmeyen hata kodu."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -106,7 +104,7 @@ void ShaderQueries_GetnUniform_TC_003(void) {
  * ile çağrı yapılarak sürücünün bunu reddettiği doğrulanır.
  * GL_INVALID_OPERATION beklenir.
  * ============================================================ */
-void ShaderQueries_GetnUniform_TC_004(void) {
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -117,12 +115,11 @@ void ShaderQueries_GetnUniform_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION || err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz lokasyon (0x7FFFFFFF) reddedilmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }

@@ -1,11 +1,11 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "ShaderQueries_GetVertexAttrib_TP_001";
-static const char* test_case_1 = "ShaderQueries_GetVertexAttrib_TC_001";
-static const char* test_case_2 = "ShaderQueries_GetVertexAttrib_TC_002";
-static const char* test_case_3 = "ShaderQueries_GetVertexAttrib_TC_003";
-static const char* test_case_4 = "ShaderQueries_GetVertexAttrib_TC_004";
+static const char* test_procedure = "GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -20,14 +20,14 @@ static const char* test_case_4 = "ShaderQueries_GetVertexAttrib_TC_004";
  * geçersiz bir parametre sorgusuna GL_INVALID_ENUM ile
  * yanıt vermesi beklenir.
  * ============================================================ */
-void ShaderQueries_GetVertexAttrib_TC_001(void) {
+void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_001(void) {
 	GLfloat params[4] = {0};
 
 	glGetVertexAttribfv(0, 0xDEADBEEF, params);
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Geçersiz pname (0xDEADBEEF) GL_INVALID_ENUM üretmedi."
 		    " Actual: 0x%04X",
 		    err);
@@ -43,7 +43,7 @@ void ShaderQueries_GetVertexAttrib_TC_001(void) {
  * Donanım sınırına (GL_MAX_VERTEX_ATTRIBS) eşit bir indeks
  * ile sorgu yapılarak sürücünün sınır kontrolü doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetVertexAttrib_TC_002(void) {
+void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_002(void) {
 	GLint max_attribs = 0;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &max_attribs);
 
@@ -55,7 +55,7 @@ void ShaderQueries_GetVertexAttrib_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "max_attribs indeksi GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X",
 			      err);
@@ -71,7 +71,7 @@ void ShaderQueries_GetVertexAttrib_TC_002(void) {
  * Attribute 0 için GL_VERTEX_ATTRIB_ARRAY_ENABLED sorgusunun
  * hatasız tamamlandığını doğrular. Temel pozitif test.
  * ============================================================ */
-void ShaderQueries_GetVertexAttrib_TC_003(void) {
+void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_003(void) {
 	while (glGetError() != GL_NO_ERROR) { /* temizle */
 	}
 
@@ -80,7 +80,7 @@ void ShaderQueries_GetVertexAttrib_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Geçerli sorgu hata üretmemeli iken hata üretildi."
 		    " Actual: 0x%04X",
 		    err);
@@ -96,7 +96,7 @@ void ShaderQueries_GetVertexAttrib_TC_003(void) {
  * Spesifikasyonun tanımladığı tüm geçerli pname enum'ları
  * sırayla sorgulanarak hata üretilmediği doğrulanır.
  * ============================================================ */
-void ShaderQueries_GetVertexAttrib_TC_004(void) {
+void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TC_004(void) {
 	GLenum valid_pnames[] = {GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
 				 GL_VERTEX_ATTRIB_ARRAY_ENABLED,
 				 GL_VERTEX_ATTRIB_ARRAY_SIZE,
@@ -114,7 +114,7 @@ void ShaderQueries_GetVertexAttrib_TC_004(void) {
 		glGetVertexAttribiv(0, valid_pnames[i], &val);
 		GLenum err = glGetError();
 		if (err != GL_NO_ERROR) {
-			TEST_LOG_FAIL(test_case_1, test_procedure, 
+			TEST_LOG_FAIL(test_case_1, test_procedure,
 				      "pname=0x%04X hata üretmemeli iken "
 				      "üretdi. Actual: 0x%04X",
 				      (unsigned int)valid_pnames[i],

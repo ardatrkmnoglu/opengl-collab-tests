@@ -2,13 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "ShadersAndPrograms_Uniform_TP_001";
-static const char* test_case_1 = "ShadersAndPrograms_Uniform_TC_001";
-static const char* test_case_2 = "ShadersAndPrograms_Uniform_TC_002";
-static const char* test_case_3 = "ShadersAndPrograms_Uniform_TC_003";
-static const char* test_case_4 = "ShadersAndPrograms_Uniform_TC_004";
-static const char* test_case_5 = "ShadersAndPrograms_Uniform_TC_005";
-static const char* test_case_6 = "ShadersAndPrograms_Uniform_TC_006";
+static const char* test_procedure = "GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_SP_U1F_ROBUSTNESS_TC_006";
 
 
 /* ============================================================
@@ -23,7 +23,7 @@ static const char* test_case_6 = "ShadersAndPrograms_Uniform_TC_006";
  * (glUniform1f) basmaya çalışırız. Sürücünün tip uyumsuzluğunu
  * tespit edip GL_INVALID_OPERATION üretmesi beklenir.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_001(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -35,14 +35,13 @@ void ShadersAndPrograms_Uniform_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "'int' değişkene 'float' atanması engellenmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -53,7 +52,7 @@ void ShadersAndPrograms_Uniform_TC_001(void) {
  * (GL_NO_ERROR). Geçersiz (fakat -1 olmayan) lokasyon ise
  * GL_INVALID_OPERATION fırlatmalıdır.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_002(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_002(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -63,7 +62,7 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "-1 lokasyonu sessizce yutulmalıydı (Spec kuralı)."
 			      " Actual: 0x%04X", err1);
 	} else {
@@ -75,14 +74,13 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Devasa geçersiz lokasyon ID'si reddedilmedi."
 			      " Actual: 0x%04X", err2);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -92,7 +90,7 @@ void ShadersAndPrograms_Uniform_TC_002(void) {
  * Count (eleman sayısı) negatif olamaz. Sürücünün negatif
  * eleman sayısını (count = -1) reddetmesi beklenir.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_003(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -105,14 +103,13 @@ void ShadersAndPrograms_Uniform_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -123,7 +120,7 @@ void ShadersAndPrograms_Uniform_TC_003(void) {
  * çalışılarak sürücünün sınır ihlaline izin verip
  * vermediği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_004(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -137,14 +134,13 @@ void ShadersAndPrograms_Uniform_TC_004(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Array OOB (count=4, boyut=3) engellenemedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -156,7 +152,7 @@ void ShadersAndPrograms_Uniform_TC_004(void) {
  * Syntax hatası içeren bir fragment shader'ın derleme
  * durumunun GL_FALSE olması gerektiği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_005(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_005(void) {
 	/* Syntax hatası: eksik noktalı virgül */
 	const char *bad = "void main() { gl_FragColor = vec4(1.0) }";
 	GLuint s = glCreateShader(GL_FRAGMENT_SHADER);
@@ -167,14 +163,13 @@ void ShadersAndPrograms_Uniform_TC_005(void) {
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
 
 	if (!(status == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Hatalı shader başarıyla derlendi (derleme kabul edilmemeli)."
 			      " status=%d", status);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteShader(s);
 }
 
 /* ============================================================
@@ -186,7 +181,7 @@ void ShadersAndPrograms_Uniform_TC_005(void) {
  * "superhighp" gibi tanımsız bir precision qualifier içeren
  * shader'ın derlenmemesi gerektiği doğrulanır.
  * ============================================================ */
-void ShadersAndPrograms_Uniform_TC_006(void) {
+void GS_GL20SC_SP_U1F_ROBUSTNESS_TC_006(void) {
 	const char *bad = "precision superhighp float; void main(){}";
 	GLuint s = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(s, 1, &bad, NULL);
@@ -196,12 +191,11 @@ void ShadersAndPrograms_Uniform_TC_006(void) {
 	glGetShaderiv(s, GL_COMPILE_STATUS, &status);
 
 	if (!(status == GL_FALSE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz precision qualifier ile shader derlendi."
 			      " status=%d", status);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteShader(s);
 }

@@ -2,11 +2,11 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "Vertices_DrawRangeElements_TP_001";
-static const char* test_case_1 = "Vertices_DrawRangeElements_TC_001";
-static const char* test_case_2 = "Vertices_DrawRangeElements_TC_002";
-static const char* test_case_3 = "Vertices_DrawRangeElements_TC_003";
-static const char* test_case_4 = "Vertices_DrawRangeElements_TC_004";
+static const char* test_procedure = "GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_004";
 
 
 /* ============================================================
@@ -20,7 +20,7 @@ static const char* test_case_4 = "Vertices_DrawRangeElements_TC_004";
  * end indeksinin start indeksinden küçük olması spesifikasyon
  * gereği hatadır. GL_INVALID_VALUE üretilmesi beklenir.
  * ============================================================ */
-void Vertices_DrawRangeElements_TC_001(void) {
+void GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -30,14 +30,13 @@ void Vertices_DrawRangeElements_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "end < start durumu GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -48,7 +47,7 @@ void Vertices_DrawRangeElements_TC_001(void) {
  * veya GL_UNSIGNED_INT olabilir. Geçersiz type (GL_FLOAT) ile
  * çağrı yapılarak GL_INVALID_ENUM üretilmesi beklenir.
  * ============================================================ */
-void Vertices_DrawRangeElements_TC_002(void) {
+void GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_002(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -58,14 +57,13 @@ void Vertices_DrawRangeElements_TC_002(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz type (GL_FLOAT) GL_INVALID_ENUM üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -75,7 +73,7 @@ void Vertices_DrawRangeElements_TC_002(void) {
  * count parametresi negatif olamaz. GL_INVALID_VALUE üretip
  * üretmediği kontrol edilir.
  * ============================================================ */
-void Vertices_DrawRangeElements_TC_003(void) {
+void GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -85,14 +83,13 @@ void Vertices_DrawRangeElements_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -103,7 +100,7 @@ void Vertices_DrawRangeElements_TC_003(void) {
  * içsel buffer aşımı yapıp yapmadığı, çökmeyip hayatta
  * kalabildiği doğrulanır.
  * ============================================================ */
-void Vertices_DrawRangeElements_TC_004(void) {
+void GS_GL20SC_VERT_DRE_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -115,5 +112,4 @@ void Vertices_DrawRangeElements_TC_004(void) {
 	/* Hata üretebilir veya üretmeyebilir, ama çökmemesi başarısıdır. */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
-	glDeleteProgram(prog);
 }

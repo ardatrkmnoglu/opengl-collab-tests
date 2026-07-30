@@ -230,19 +230,21 @@ int checkFloatState2(const char *test_case, const char *test_procedure,
 	return 1;
 }
 
-int checkDoubleState2(const char *test_case, const char *test_procedure,
-		      GLenum pname, GLdouble expectedA, GLdouble expectedB,
-		      GLdouble tolerance) {
-	GLdouble value[2];
+int checkFloatArray2(const char* test_case, const char* test_procedure,
+					 GLenum pname,
+					 GLfloat expectedA, GLfloat expectedB,
+					 GLfloat tolerance)
+{
+	GLfloat value[2];
 
-	glGetDoublev(pname, value);
+	glGetFloatv(pname, value);
 
-	if (fabs(value[0] - expectedA) > tolerance ||
-	    fabs(value[1] - expectedB) > tolerance) {
-		TEST_LOG_FAIL(
-		    test_case, test_procedure,
-		    "State bozuldu. Beklenen: (%lf,%lf) Gercek: (%lf,%lf)",
-		    expectedA, expectedB, value[0], value[1]);
+	if(fabsf(value[0]-expectedA) > tolerance ||
+	   fabsf(value[1]-expectedB) > tolerance)
+	{
+		TEST_LOG_FAIL(test_case, test_procedure,
+					  "State bozuldu. Beklenen: (%.6f,%.6f) Gercek: (%.6f,%.6f)",
+					  expectedA, expectedB, value[0], value[1]);
 		return 0;
 	}
 

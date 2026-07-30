@@ -2,13 +2,13 @@
 #include "../../../include/helper.h"
 #include "../../../include/macro.h"
 
-static const char* test_procedure = "Vertices_DrawArrays_TP_001";
-static const char* test_case_1 = "Vertices_DrawArrays_TC_001";
-static const char* test_case_2 = "Vertices_DrawArrays_TC_002";
-static const char* test_case_3 = "Vertices_DrawArrays_TC_003";
-static const char* test_case_4 = "Vertices_DrawArrays_TC_004";
-static const char* test_case_5 = "Vertices_DrawArrays_TC_005";
-static const char* test_case_6 = "Vertices_DrawArrays_TC_006";
+static const char* test_procedure = "GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005";
+static const char* test_case_6 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006";
 
 
 /* ============================================================
@@ -24,7 +24,7 @@ static const char* test_case_6 = "Vertices_DrawArrays_TC_006";
  * hata (genellikle OOB çizimlerinde tanımsız davranış ama
  * SC driverları çökmeyi engellemeli) ürettiği doğrulanır.
  * ============================================================ */
-void Vertices_DrawArrays_TC_001(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -49,7 +49,6 @@ void Vertices_DrawArrays_TC_001(void) {
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDeleteBuffers(1, &vbo);
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -61,19 +60,19 @@ void Vertices_DrawArrays_TC_001(void) {
  * koyarak glDrawArrays çağrılır. Sürücü sınır dışına çıkarsa
  * segfault üretir ve runner bunu yakalar.
  * ============================================================ */
-void Vertices_DrawArrays_TC_002(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002(void) {
 	/* Çok platformlu (mmap gerektiren) test.
 	   Burada sembolik uygulandı; eğer runner çöküşü yakalarsa
 	   segfault olarak loglanır. Çökmezse geçer. */
 	long page_size = sysconf(_SC_PAGESIZE);
 	if (page_size == -1) {
-		TEST_LOG_INFO("Vertices_DrawArrays_TC_002: sysconf başarısız.");
+		TEST_LOG_INFO("GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: sysconf başarısız.");
 		return;
 	}
 
 	void *mem = mmap(NULL, page_size * 2, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (mem == MAP_FAILED) {
-		TEST_LOG_INFO("Vertices_DrawArrays_TC_002: mmap başarısız.");
+		TEST_LOG_INFO("GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: mmap başarısız.");
 		return;
 	}
 
@@ -99,7 +98,6 @@ void Vertices_DrawArrays_TC_002(void) {
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDisableVertexAttribArray(0);
-	glDeleteProgram(prog);
 	munmap(mem, page_size * 2);
 }
 
@@ -110,7 +108,7 @@ void Vertices_DrawArrays_TC_002(void) {
  * Shader programının kullandığı bir attribute enable edilmemiş
  * (veya veri bağlanmamış) iken çizim yapılmaya çalışılır.
  * ============================================================ */
-void Vertices_DrawArrays_TC_003(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -123,7 +121,6 @@ void Vertices_DrawArrays_TC_003(void) {
 	/* Sürücü çökmemeli. GL_INVALID_OPERATION fırlatabilir veya yutabilir */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -134,11 +131,11 @@ void Vertices_DrawArrays_TC_003(void) {
  * yapılır. GPU'nun veya sürücünün matematik istisnası üretmeden
  * çökmeyi engellediği doğrulanır.
  * ============================================================ */
-void Vertices_DrawArrays_TC_004(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
-	GLfloat data[] = { NAN, INFINITY, -INFINITY }; 
+	GLfloat data[] = { NAN, INFINITY, -INFINITY };
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -157,7 +154,6 @@ void Vertices_DrawArrays_TC_004(void) {
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDeleteBuffers(1, &vbo);
-	glDeleteProgram(prog);
 }
 
 /* ============================================================
@@ -167,7 +163,7 @@ void Vertices_DrawArrays_TC_004(void) {
  * glUseProgram(0) iken çizim komutu gönderilir.
  * OpenGL ES 2.0/SC 2.0'da GL_INVALID_OPERATION üretmelidir.
  * ============================================================ */
-void Vertices_DrawArrays_TC_005(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005(void) {
 	glUseProgram(0);
 
 	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
@@ -176,7 +172,7 @@ void Vertices_DrawArrays_TC_005(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Programsız çizimde GL_INVALID_OPERATION bekleniyordu."
 			      " Actual: 0x%04X", err);
 	} else {
@@ -191,7 +187,7 @@ void Vertices_DrawArrays_TC_005(void) {
  * Negatif count veya geçersiz first değeriyle çizim.
  * count = -1 (max unsigned int) olacağından GPU'yu çökertme riski vardır.
  * ============================================================ */
-void Vertices_DrawArrays_TC_006(void) {
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
@@ -202,12 +198,11 @@ void Vertices_DrawArrays_TC_006(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
 			      " Actual: 0x%04X", err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
 
-	glDeleteProgram(prog);
 }

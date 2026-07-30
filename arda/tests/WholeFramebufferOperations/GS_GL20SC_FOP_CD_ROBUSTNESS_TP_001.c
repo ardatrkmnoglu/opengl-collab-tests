@@ -1,12 +1,12 @@
 #include "../../../include/macro.h"
 #include "../../../include/rtests.h"
 
-static const char* test_procedure = "WholeFramebufferOperations_ClearDepthf_TP_001";
-static const char* test_case_1 = "WholeFramebufferOperations_ClearDepthf_TC_001";
-static const char* test_case_2 = "WholeFramebufferOperations_ClearDepthf_TC_002";
-static const char* test_case_3 = "WholeFramebufferOperations_ClearDepthf_TC_003";
-static const char* test_case_4 = "WholeFramebufferOperations_ClearDepthf_TC_004";
-static const char* test_case_5 = "WholeFramebufferOperations_ClearDepthf_TC_005";
+static const char* test_procedure = "GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001";
+static const char* test_case_1 = "GS_GL20SC_FOP_CD_ROBUSTNESS_TC_001";
+static const char* test_case_2 = "GS_GL20SC_FOP_CD_ROBUSTNESS_TC_002";
+static const char* test_case_3 = "GS_GL20SC_FOP_CD_ROBUSTNESS_TC_003";
+static const char* test_case_4 = "GS_GL20SC_FOP_CD_ROBUSTNESS_TC_004";
+static const char* test_case_5 = "GS_GL20SC_FOP_CD_ROBUSTNESS_TC_005";
 
 
 /* ============================================================
@@ -23,7 +23,7 @@ static const char* test_case_5 = "WholeFramebufferOperations_ClearDepthf_TC_005"
  * olmalidir. Sinir disina çikilarak sürücünün sessizce
  * kırpma (clamp) yapip yapamadigi dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearDepthf_TC_001(void) {
+void GS_GL20SC_FOP_CD_ROBUSTNESS_TC_001(void) {
 	// Depth değeri matematikte sadece [0.0, 1.0] aralığında olabilir.
 	// Biz sınırların çok dışına taşıyoruz.
 	glClearDepthf(5000.0f);
@@ -32,7 +32,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_001(void) {
 	// Spesifikasyon: "Değerler hata fırlatmadan sessizce [0,1] aralığına
 	// kırpılır."
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Sınır dışı depth atamasında beklenmeyen bir "
 			      "hata fırlatıldı."
 			      " Actual: 0x%04X",
@@ -46,7 +46,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_001(void) {
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
 
 	if (!(depth == 1.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Sürücü aşırı depth değerini [0,1] aralığına "
 			      "kırpmayı başaramadı."
 			      " Actual: 0x%04X",
@@ -64,12 +64,12 @@ void WholeFramebufferOperations_ClearDepthf_TC_001(void) {
  * deger gönderilerek sürücünün bunu 0.0'a kirpip kirpmadigi
  * dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearDepthf_TC_002(void) {
+void GS_GL20SC_FOP_CD_ROBUSTNESS_TC_002(void) {
 	glClearDepthf(-5000.0f);
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Sinir disi negatif depth atamasinda beklenmeyen bir "
 		    "hata firlatildi."
 		    " Actual: 0x%04X",
@@ -82,7 +82,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_002(void) {
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
 
 	if (!(depth == 0.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Sürücü asiri negatif depth degerini 0.0'a kirpmayi "
 		    "basaramadi."
 		    " Actual: 0x%04X",
@@ -100,13 +100,13 @@ void WholeFramebufferOperations_ClearDepthf_TC_002(void) {
  * herhangi bir hassasiyet kaymasi olmadan birebir saklandigi
  * dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearDepthf_TC_003(void) {
+void GS_GL20SC_FOP_CD_ROBUSTNESS_TC_003(void) {
 	glClearDepthf(0.0f);
 	GLfloat depth = -1.0f;
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
 
 	if (!(depth == 0.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tam alt sinir (0.0) hatali saklandi."
 			      " Actual: 0x%04X",
 			      (unsigned int)depth);
@@ -118,7 +118,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_003(void) {
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
 
 	if (!(depth == 1.0f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Tam üst sinir (1.0) hatali saklandi."
 			      " Actual: 0x%04X",
 			      (unsigned int)depth);
@@ -135,12 +135,12 @@ void WholeFramebufferOperations_ClearDepthf_TC_003(void) {
  * karsiligi. Sürücü kesinlikle çökmemeli, ya sessizce kabul
  * etmeli ya da GL_INVALID_VALUE ile reddetmelidir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearDepthf_TC_004(void) {
+void GS_GL20SC_FOP_CD_ROBUSTNESS_TC_004(void) {
 	glClearDepthf(NAN);
 	GLenum err1 = glGetError();
 
 	if (!(err1 == GL_NO_ERROR || err1 == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "NaN depth degeri atanirken sürücü beklenmedik "
 			      "sekilde davrandi."
 			      " Actual: 0x%04X",
@@ -153,7 +153,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_004(void) {
 	GLenum err2 = glGetError();
 
 	if (!(err2 == GL_NO_ERROR || err2 == GL_INVALID_VALUE)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "Infinity depth degeri atanirken sürücü beklenmedik "
 		    "sekilde davrandi."
 		    " Actual: 0x%04X",
@@ -170,7 +170,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_004(void) {
  * GL_DEPTH_CLEAR_VALUE sorgusuna NULL isaretçi geçilerek çökme
  * dayanikliligi ve state bütünlügü dogrulanir.
  * ============================================================ */
-void WholeFramebufferOperations_ClearDepthf_TC_005(void) {
+void GS_GL20SC_FOP_CD_ROBUSTNESS_TC_005(void) {
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, NULL);
 
 	glClearDepthf(0.42f);
@@ -179,7 +179,7 @@ void WholeFramebufferOperations_ClearDepthf_TC_005(void) {
 	glGetFloatv(GL_DEPTH_CLEAR_VALUE, &depth);
 
 	if (!(depth == 0.42f)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure, 
+		TEST_LOG_FAIL(test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)depth);

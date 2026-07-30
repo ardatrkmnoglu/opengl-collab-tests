@@ -157,5 +157,18 @@ Bağlı framebuffer (target: GL_FRAMEBUFFER) üzerindeki belirli bir attachment 
 - Sonuç params pointer’ındaki değere yazılır.
 
 
-### `www`
+### `GetRenderbufferParameteriv`
+```c
+void glGetRenderbufferParameteriv(GLenum target, GLenum pname, GLint * params);
+```
+OpenGL’de renderbuffer (GL_RENDERBUFFER) nesnesinin bazı özelliklerini okumak için kullanılır. Yani ekrana değil, hafızadaki renderbuffer’ın parametrelerini sorgular.
+- target: Mutlaka GL_RENDERBUFFER olmalı.
+- pname: Hangi özelliği soracağını belirtir (örn. genişlik, yükseklik, renk bit derinlikleri, format).
+- params: Sorgulanan değeri buraya yazar.
+
+
+
+
+
+
 

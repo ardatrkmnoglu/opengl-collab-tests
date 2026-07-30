@@ -4,11 +4,21 @@
 #include <GLES2/gl2ext.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "tests/tests.h"
 
-void init(void);
-void draw(void);
-void cleanup(void);
+/*
+ * CMake'den -DTEST_INIT, -DTEST_DRAW, -DTEST_CLOSE
+ * tanimlari ile derlenir. Boylece her test dosyasi
+ * kendi basina bagimsiz bir executable olarak calisir.
+ *
+ * Ornek:
+ *   -DTEST_INIT=GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_init
+ *   -DTEST_DRAW=GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_draw
+ *   -DTEST_CLOSE=GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_close
+ */
+
+extern void TEST_INIT(void);
+extern void TEST_DRAW(void);
+extern void TEST_CLOSE(void);
 
 int main(void) {
     setenv("LIBGL_ALWAYS_SOFTWARE", "1", 1);
@@ -29,99 +39,15 @@ int main(void) {
 
     glfwMakeContextCurrent(window);
 
-    init();
+    TEST_INIT();
 
     while (!glfwWindowShouldClose(window)) {
-        draw();
+        TEST_DRAW();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    cleanup();
+    TEST_CLOSE();
     glfwTerminate();
     return 0;
-}
-
-void init(void) {
-    /* --------------- ReadingPixels - ReadnPixels --------------- */
-    ReadingPixels_ReadnPixels_init();
-    ReadingPixels_ReadnPixels_TC_001();
-    ReadingPixels_ReadnPixels_TC_002();
-    ReadingPixels_ReadnPixels_TC_003();
-    ReadingPixels_ReadnPixels_TC_004();
-
-    /* --------------- Per-FragmentOperations - Scissor --------------- */
-    PerFragmentOperations_Scissor_TC_001();
-    PerFragmentOperations_Scissor_TC_002();
-    PerFragmentOperations_Scissor_TC_003();
-    PerFragmentOperations_Scissor_TC_004();
-    PerFragmentOperations_Scissor_TC_005();
-    PerFragmentOperations_Scissor_TC_006();
-
-    /* --------------- Texturing - BindTexture --------------- */
-    Texturing_BindTexture_TC_001();
-    Texturing_BindTexture_TC_002();
-    Texturing_BindTexture_TC_003();
-    Texturing_BindTexture_TC_004();
-    Texturing_BindTexture_TC_005();
-    Texturing_BindTexture_TC_006();
-    Texturing_BindTexture_TC_007();
-    Texturing_BindTexture_TC_008();
-
-    /* --------------- Texturing - TexStorage2D --------------- */
-    Texturing_TexStorage2D_init();
-    Texturing_TexStorage2D_TC_001();
-    Texturing_TexStorage2D_TC_002();
-    Texturing_TexStorage2D_TC_003();
-    Texturing_TexStorage2D_TC_004();
-    Texturing_TexStorage2D_TC_005();
-
-    /* --------------- Texturing - TexSubImage2D --------------- */
-    Texturing_TexSubImage2D_TC_001();
-    Texturing_TexSubImage2D_TC_002();
-    Texturing_TexSubImage2D_TC_003();
-    Texturing_TexSubImage2D_TC_004();
-    Texturing_TexSubImage2D_TC_005();
-
-    /* --------------- Texturing - GenTextures --------------- */
-    Texturing_GenTextures_TC_001();
-    Texturing_GenTextures_TC_002();
-    Texturing_GenTextures_TC_003();
-    Texturing_GenTextures_TC_004();
-    Texturing_GenTextures_TC_005();
-    Texturing_GenTextures_TC_006();
-    Texturing_GenTextures_TC_007();
-    Texturing_GenTextures_TC_008();
-    Texturing_GenTextures_TC_009();
-    Texturing_GenTextures_TC_010();
-    Texturing_GenTextures_TC_011();
-    Texturing_GenTextures_TC_012();
-
-    /* --------------- Texturing - GenerateMipmap --------------- */
-    Texturing_GenerateMipmap_TC_001();
-    Texturing_GenerateMipmap_TC_002();
-    Texturing_GenerateMipmap_TC_003();
-    Texturing_GenerateMipmap_TC_004();
-    Texturing_GenerateMipmap_TC_005();
-    Texturing_GenerateMipmap_TC_006();
-    Texturing_GenerateMipmap_TC_007();
-    Texturing_GenerateMipmap_TC_008();
-    Texturing_GenerateMipmap_TC_009();
-    Texturing_GenerateMipmap_TC_010();
-    Texturing_GenerateMipmap_TC_011();
-    Texturing_GenerateMipmap_TC_012();
-    Texturing_GenerateMipmap_TC_013();
-    Texturing_GenerateMipmap_TC_014();
-    Texturing_GenerateMipmap_TC_015();
-}
-
-void draw(void) {
-}
-
-void cleanup(void) {
-    Texturing_BindTexture_close();
-    Texturing_TexStorage2D_close();
-    Texturing_TexSubImage2D_close();
-    Texturing_GenTextures_close();
-    Texturing_GenerateMipmap_close();
 }

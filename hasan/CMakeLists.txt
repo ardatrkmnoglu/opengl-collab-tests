@@ -25,19 +25,72 @@ include_directories(
     ${GLEW_INCLUDE_DIRS}
 )
 
-# Ana executable: main.c + tum test dosyalari
-add_executable(hasan_tests main.c
-    tests/ReadingPixels_ReadnPixels_TP_001.c
-    tests/Per-FragmentOperations_Scissor_TP_001.c
-    tests/Texturing_BindTexture_TP_001.c
-    tests/Texturing_TexStorage2D_TP_001.c
-    tests/Texturing_TexSubImage2D_TP_001.c
-    tests/Texturing_GenTextures_TP_001.c
-    tests/Texturing_GenerateMipmap_TP_001.c
+# Ortak link kutuphaneleri
+set(COMMON_LIBS ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
+
+# =============================================================
+# Yardimci makro: her test dosyasi icin ayri executable olusturur
+# test_runner.c + test dosyasi derlenir,
+# -DTEST_INIT / -DTEST_DRAW / -DTEST_CLOSE makrolariyla
+# dogru fonksiyonlar cagirilir.
+# =============================================================
+macro(add_robustness_test TARGET_NAME TEST_SOURCE TEST_PREFIX)
+    add_executable(${TARGET_NAME}
+        main.c
+        ${TEST_SOURCE}
+    )
+    target_compile_definitions(${TARGET_NAME} PRIVATE
+        TEST_INIT=${TEST_PREFIX}_init
+        TEST_DRAW=${TEST_PREFIX}_draw
+        TEST_CLOSE=${TEST_PREFIX}_close
+    )
+    target_link_libraries(${TARGET_NAME} PRIVATE ${COMMON_LIBS})
+endmacro()
+
+# --- PerFragmentOperations - Scissor ---
+add_robustness_test(PFO_Scissor
+    tests/PerFragmentOperations/GS_GL20SC_PFO_S_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_S_ROBUSTNESS_TP_001
 )
-target_link_libraries(hasan_tests PRIVATE ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLES2_LIB} ${EGL_LIB} ${GLEW_LIBRARIES} ${M_LIB})
 
+# --- PerFragmentOperations - BlendEquation ---
+add_robustness_test(PFO_BlendEquation
+    tests/PerFragmentOperations/GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001
+)
 
+# --- ReadingPixels - ReadnPixels ---
+add_robustness_test(RP_ReadnPixels
+    tests/ReadingPixels/GS_GL20SC_RP_RNP_ROBUSTNESS_TP_001.c
+    GS_GL20SC_RP_RNP_ROBUSTNESS_TP_001
+)
 
+# --- Texturing - BindTexture ---
+add_robustness_test(TEXT_BindTexture
+    tests/Texturing/GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001
+)
 
+# --- Texturing - TexStorage2D ---
+add_robustness_test(TEXT_TexStorage2D
+    tests/Texturing/GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TS_ROBUSTNESS_TP_001
+)
 
+# --- Texturing - TexSubImage2D ---
+add_robustness_test(TEXT_TexSubImage2D
+    tests/Texturing/GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TSI_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - GenTextures ---
+add_robustness_test(TEXT_GenTextures
+    tests/Texturing/GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - GenerateMipmap ---
+add_robustness_test(TEXT_GenerateMipmap
+    tests/Texturing/GS_GL20SC_TEXT_GM_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_GM_ROBUSTNESS_TP_001
+)

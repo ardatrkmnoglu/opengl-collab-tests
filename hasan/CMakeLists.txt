@@ -130,3 +130,11 @@ add_robustness_test(PFO_DepthFunc_Draw
     tests/PerFragmentOperations/GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002.c
     GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002
 )
+
+
+# --- PerFragmentOperations - DepthFunc (Draw) ---
+add_robustness_test(PFO_SampleCovarage_Draw
+        tests/PerFragmentOperations/GS_GL20SC_PFO_SC_ROBUSTNESS_TP_001.c
+        GS_GL20SC_PFO_SC_ROBUSTNESS_TP_001
+)
+

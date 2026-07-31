@@ -2,6 +2,223 @@
 #include "test_utility.h"
 
 /* ============================================================
+ * Forward declarations — Arda / WholeFramebufferOperations
+ * ============================================================ */
+extern void GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_C_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_C_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_C_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_close(void);
+
+/* ============================================================
+ * Forward declarations — Arda / ShadersAndPrograms
+ * ============================================================ */
+extern void GS_GL20SC_SP_CP_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_CP_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_CP_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GUIV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GUIV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GUIV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_GVAIV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_GVAIV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_GVAIV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_PB_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_PB_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_PB_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U1I_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U1I_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U1I_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U2F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U2F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U2F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U2I_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U2I_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U2I_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U3F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U3F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U3F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U3I_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U3I_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U3I_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U4F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U4F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U4F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U4I_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U4I_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U4I_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_UM2FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_UM2FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_UM2FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_UM3FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_UM3FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_UM3FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_UP_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_UP_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_UP_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001_close(void);
+
+/* ============================================================
+ * Forward declarations — Arda / Vertices
+ * ============================================================ */
+extern void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA1FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA1FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA1FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA2F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA2F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA2F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA3F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA3F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA3F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA4F_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA4F_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA4F_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001_close(void);
+
+/* ============================================================
  * Forward declarations — Gizem / BufferObjects
  * ============================================================ */
 extern void GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_init(void);
@@ -35,12 +252,48 @@ extern void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_draw(void);
 extern void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_close(void);
 
+extern void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_FT_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_FT_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_FT_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_close(void);
+
 /* ============================================================
- * Forward declarations — Ozan / ErrorsandStatusReset
+ * Forward declarations — Ozan / ErrorsAndStatusReset
  * ============================================================ */
 extern void GS_GL20SC_ESR_GE_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_ESR_GE_ROBUSTNESS_TP_001_draw(void);
 extern void GS_GL20SC_ESR_GE_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_EASR_GGRS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_EASR_GGRS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_EASR_GGRS_ROBUSTNESS_TP_001_close(void);
 
 /* ============================================================
  * Forward declarations — Ozan / PixelRectangles
@@ -79,8 +332,12 @@ extern void GS_GL20SC_SF_FL_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_SF_FL_ROBUSTNESS_TP_001_draw(void);
 extern void GS_GL20SC_SF_FL_ROBUSTNESS_TP_001_close(void);
 
+extern void GS_GL20SC_SF_H_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_SF_H_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_SF_H_ROBUSTNESS_TP_001_close(void);
+
 /* ============================================================
- * Forward declarations — Ozan / ViewportandClipping
+ * Forward declarations — Ozan / ViewportAndClipping
  * ============================================================ */
 extern void GS_GL20SC_VC_DR_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_VC_DR_ROBUSTNESS_TP_001_draw(void);
@@ -96,6 +353,34 @@ extern void GS_GL20SC_VC_V_ROBUSTNESS_TP_001_close(void);
 extern void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_init(void);
 extern void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_draw(void);
 extern void GS_GL20SC_PFO_S_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_BES_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_BES_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_BES_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_BF_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_BF_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_BF_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001_init(void);
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001_draw(void);
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001_close(void);
+
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002_init(void);
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002_draw(void);
+extern void GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002_close(void);
 
 /* ============================================================
  * Forward declarations — Hasan / ReadingPixels
@@ -263,7 +548,7 @@ static void runTest(void (*init_func)(), void (*draw_func)(),
 #include <stdlib.h>
 
 /* ============================================================
- * Hata kuyrugu
+ * Hata kuyruğu
  * ============================================================ */
 
 void clearGLErrors(void) {
@@ -369,7 +654,7 @@ int checkFloatArray2(const char *test_case, const char *test_procedure,
 }
 
 /* ============================================================
- * Durum sifirlama
+ * Durum sıfırlama
  * ============================================================ */
 
 void resetState_Viewport(void) {
@@ -413,7 +698,7 @@ void resetState_PixelStorei(void) {
 }
 
 /* ============================================================
- * Yardimci
+ * Rastgele değer oluşturma
  * ============================================================ */
 
 GLint randInt32(void) {
@@ -426,10 +711,6 @@ GLint randInt32(void) {
 	return (GLint)value;
 }
 
-/***************************************/
-/****** Robustness Test Functions ******/
-/***************************************/
-
 /***********************************/
 /***** Core Workflow Functions *****/
 /***********************************/
@@ -437,14 +718,17 @@ GLint randInt32(void) {
 void init() {}
 
 void draw() {
+	/* --- Arda / WholeFramebufferOperations --- */
 	runTest(GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_C_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001);
+
+	/* --- Arda / ShadersAndPrograms --- */
 	runTest(GS_GL20SC_SP_CP_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001);
@@ -454,86 +738,99 @@ void draw() {
 	runTest(GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_GVAIV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_PB_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U1I_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U1IV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U2F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U2I_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U2IV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U3F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U3I_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U3IV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U4F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_U4I_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SP_U4IV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_UM2FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_UM3FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_UP_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001);
+
+	/* --- Arda / Vertices --- */
 	runTest(GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_VA1FV_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_VA2F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA2FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_VA3F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA3FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_VA4F_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_VERT_VA4FV_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_CC_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_CD_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_CM_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_CS_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_C_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_DM_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_SM_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_DE_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_DRE_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_DVAA_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_EVAA_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VA1F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_VERT_VAP_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_CP_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_GAL_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_GVAFV_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_PB_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_U1F_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_UM4FV_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_UP_ROBUSTNESS_TP_001);
-	runTest(GS_GL20SC_SP_VAPV_ROBUSTNESS_TP_001);
+
+	/* --- Gizem / BufferObjects --- */
 	runTest(GS_GL20SC_BO_BB_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_BO_BD_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_BO_GB_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_BO_GBP_ROBUSTNESS_TP_001);
+
+	/* --- Gizem / FramebufferObjects --- */
 	runTest(GS_GL20SC_FO_BF_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_FO_GF_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_BR_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_FR_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_FT_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_GR_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_FO_RS_ROBUSTNESS_TP_001);
+
+	/* --- Ozan / ErrorsAndStatusReset --- */
 	runTest(GS_GL20SC_ESR_GE_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_EASR_GGRS_ROBUSTNESS_TP_001);
+
+	/* --- Ozan / PixelRectangles --- */
 	runTest(GS_GL20SC_PR_PS_ROBUSTNESS_TP_001);
+
+	/* --- Ozan / Rasterization --- */
 	runTest(GS_GL20SC_R_CF_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_R_FF_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_R_LW_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_R_PO_ROBUSTNESS_TP_001);
+
+	/* --- Ozan / SpecialFunctions --- */
 	runTest(GS_GL20SC_SF_FI_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_SF_FL_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_SF_H_ROBUSTNESS_TP_001);
+
+	/* --- Ozan / ViewportAndClipping --- */
 	runTest(GS_GL20SC_VC_DR_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_VC_V_ROBUSTNESS_TP_001);
+
+	/* --- Hasan / PerFragmentOperations --- */
 	runTest(GS_GL20SC_PFO_S_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_BES_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_BE_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_BFS_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_BF_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001);
+	runTest(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002);
+
+	/* --- Hasan / ReadingPixels --- */
 	runTest(GS_GL20SC_RP_RNP_ROBUSTNESS_TP_001);
+
+	/* --- Hasan / Texturing --- */
 	runTest(GS_GL20SC_TEXT_BT_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_TEXT_GM_ROBUSTNESS_TP_001);
 	runTest(GS_GL20SC_TEXT_GT_ROBUSTNESS_TP_001);

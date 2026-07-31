@@ -118,3 +118,15 @@ add_robustness_test(PFO_BlendColor
     tests/PerFragmentOperations/GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001.c
     GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001
 )
+
+# --- PerFragmentOperations - DepthFunc (State) ---
+add_robustness_test(PFO_DepthFunc
+    tests/PerFragmentOperations/GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001
+)
+
+# --- PerFragmentOperations - DepthFunc (Draw) ---
+add_robustness_test(PFO_DepthFunc_Draw
+    tests/PerFragmentOperations/GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002.c
+    GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002
+)

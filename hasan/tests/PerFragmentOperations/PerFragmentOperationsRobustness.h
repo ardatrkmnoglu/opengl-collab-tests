@@ -10,3 +10,7 @@ TEST_PROCEDURE(GS_GL20SC_PFO_BES_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
                "GL20SC_R", "PerFragmentOperations_R", "BlendEquationSeparate_R")
 TEST_PROCEDURE(GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
                "GL20SC_R", "PerFragmentOperations_R", "BlendColor_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "DepthFunc_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "DepthFunc_Draw_R")

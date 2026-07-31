@@ -112,3 +112,9 @@ add_robustness_test(TEXT_GenerateMipmap
     tests/Texturing/GS_GL20SC_TEXT_GM_ROBUSTNESS_TP_001.c
     GS_GL20SC_TEXT_GM_ROBUSTNESS_TP_001
 )
+
+# --- PerFragmentOperations - BlendColor ---
+add_robustness_test(PFO_BlendColor
+    tests/PerFragmentOperations/GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_BC_ROBUSTNESS_TP_001
+)

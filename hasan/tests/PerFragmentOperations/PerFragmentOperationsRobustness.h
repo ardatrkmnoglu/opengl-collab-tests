@@ -14,3 +14,11 @@ TEST_PROCEDURE(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
                "GL20SC_R", "PerFragmentOperations_R", "DepthFunc_R")
 TEST_PROCEDURE(GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002, DEFAULT_TEST_RUN_TIME,
                "GL20SC_R", "PerFragmentOperations_R", "DepthFunc_Draw_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_SF_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "StencilFunc_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_SO_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "StencilOp_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_SOS_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "StencilOpSeparate_R")
+TEST_PROCEDURE(GS_GL20SC_PFO_SFS_ROBUSTNESS_TP_001, DEFAULT_TEST_RUN_TIME,
+               "GL20SC_R", "PerFragmentOperations_R", "StencilFuncSeparate_R")

@@ -131,8 +131,31 @@ add_robustness_test(PFO_DepthFunc_Draw
     GS_GL20SC_PFO_DF_ROBUSTNESS_TP_002
 )
 
+# --- PerFragmentOperations - StencilFunc ---
+add_robustness_test(PFO_StencilFunc
+    tests/PerFragmentOperations/GS_GL20SC_PFO_SF_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_SF_ROBUSTNESS_TP_001
+)
 
-# --- PerFragmentOperations - DepthFunc (Draw) ---
+# --- PerFragmentOperations - StencilOp ---
+add_robustness_test(PFO_StencilOp
+    tests/PerFragmentOperations/GS_GL20SC_PFO_SO_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_SO_ROBUSTNESS_TP_001
+)
+
+# --- PerFragmentOperations - StencilOpSeparate ---
+add_robustness_test(PFO_StencilOpSeparate
+    tests/PerFragmentOperations/GS_GL20SC_PFO_SOS_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_SOS_ROBUSTNESS_TP_001
+)
+
+# --- PerFragmentOperations - StencilFuncSeparate ---
+add_robustness_test(PFO_StencilFuncSeparate
+    tests/PerFragmentOperations/GS_GL20SC_PFO_SFS_ROBUSTNESS_TP_001.c
+    GS_GL20SC_PFO_SFS_ROBUSTNESS_TP_001
+)
+
+# --- PerFragmentOperations - SampleCoverage (Draw) ---
 add_robustness_test(PFO_SampleCovarage_Draw
         tests/PerFragmentOperations/GS_GL20SC_PFO_SC_ROBUSTNESS_TP_001.c
         GS_GL20SC_PFO_SC_ROBUSTNESS_TP_001

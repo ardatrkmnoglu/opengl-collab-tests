@@ -167,3 +167,15 @@ add_robustness_test(PFO_SampleCovarage_Draw
         GS_GL20SC_PFO_SC_ROBUSTNESS_TP_001
 )
 
+# --- Texturing - GetTexParameteriv ---
+add_robustness_test(TEXT_GetTexParameteriv
+    tests/Texturing/GS_GL20SC_TEXT_GTPIV_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_GTPIV_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - GetTexParameterfv ---
+add_robustness_test(TEXT_GetTexParameterfv
+    tests/Texturing/GS_GL20SC_TEXT_GTPFV_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_GTPFV_ROBUSTNESS_TP_001
+)
+

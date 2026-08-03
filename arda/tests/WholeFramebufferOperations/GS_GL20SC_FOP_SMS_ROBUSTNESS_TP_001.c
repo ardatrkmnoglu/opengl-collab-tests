@@ -1,13 +1,11 @@
-#include "../../../include/macro.h"
-#include "../../../include/rtests.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_004";
-static const char* test_case_5 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_005";
-
+static const char *test_procedure = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_005";
 
 /* ============================================================
  * ============================================================
@@ -30,7 +28,8 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_001(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_ENUM)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "Geçersiz face parametresi (GL_TEXTURE_2D) reddedilmedi."
 		    " Actual: 0x%04X",
 		    err);
@@ -54,9 +53,9 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_002(void) {
 
 	if (!(err == GL_NO_ERROR)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
-		    "Gecerli GL_FRONT_AND_BACK degeri reddedildi."
-		    " Actual: 0x%04X",
-		    err);
+			      "Gecerli GL_FRONT_AND_BACK degeri reddedildi."
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
@@ -67,10 +66,10 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_002(void) {
 
 	if (!(front == 0x0F0F0F0F && back == 0x0F0F0F0F)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
-		    "GL_FRONT_AND_BACK her iki yüzü de ayni degere "
-		    "ayarlamadi."
-		    " Actual: 0x%04X",
-		    (unsigned int)front);
+			      "GL_FRONT_AND_BACK her iki yüzü de ayni degere "
+			      "ayarlamadi."
+			      " Actual: 0x%04X",
+			      (unsigned int)front);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
@@ -90,7 +89,8 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_003(void) {
 	GLenum err = glGetError();
 
 	if (!(err == GL_NO_ERROR)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "Ayri yüz atamalari sirasinda beklenmedik hata olustu."
 		    " Actual: 0x%04X",
 		    err);
@@ -103,7 +103,8 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_003(void) {
 	glGetIntegerv(GL_STENCIL_BACK_WRITEMASK, &back);
 
 	if (!(front == -1 && back == 0)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "GL_BACK atamasi GL_FRONT degerini ezmis olabilir "
 		    "(ya da tam tersi)."
 		    " Actual: 0x%04X",
@@ -166,11 +167,28 @@ void GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_005(void) {
 	glGetIntegerv(GL_STENCIL_BACK_WRITEMASK, &val);
 
 	if (!(val == 0x2222)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
 		    "NULL isaretçi sorgusu sonrasi sürücü state'i bozuldu."
 		    " Actual: 0x%04X",
 		    (unsigned int)val);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
+
+/* Initialization */
+void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_001();
+	GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_002();
+	GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_003();
+	GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_004();
+	GS_GL20SC_FOP_SMS_ROBUSTNESS_TC_005();
+}
+
+/* Cleanup */
+void GS_GL20SC_FOP_SMS_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

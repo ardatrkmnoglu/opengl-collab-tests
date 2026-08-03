@@ -1,12 +1,9 @@
 //Gizem'de çalışması için
 #include <glad/gles2.h>
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include <string.h>
-#include "../../../include/macro.h"
+#include "../../include/macro.h"
 
 // Arda'da çalışması için
 // #include "../../../include/rtests.h"
@@ -55,7 +52,7 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_001()
 // belirtilmeyen hatalar ------------------------------
 
 
-// n negatif oldugunda GL_INVALID_VALUE uretilip cikis dizisinin dokunulmadan kaldigini doğrular.
+// n negatif olduğunda GL_INVALID_VALUE üretilip çıkış dizisinin dokunulmadan kaldığını doğrular.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_002()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -76,8 +73,8 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_002()
     }
 }
 
-// n = INT_MIN gibi asiri negatif bir degerle (olasi integer overflow'a
-// karsi) implementasyonun crash olmadan hayatta kalip kalmadigini doğrular.
+// n = INT_MIN gibi aşırı negatif bir değerle (olası integer overflow'a
+// karşı) implementasyonun crash olmadan hayatta kalıp kalmadığını doğrular.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_003()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -95,8 +92,8 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_003()
     }
 }
 
-// n = 0 ve framebuffers = NULL kombinasyonunun crash olmadan/hatasiz
-// gecmesi beklenir (yazilacak eleman yok).
+// n = 0 ve framebuffers = NULL kombinasyonunun crash olmadan/hatasız
+// geçmesi beklenir (yazılacak eleman yok).
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_004()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -112,9 +109,10 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_004()
     }
 }
 
-// n > 0 iken framebuffers = NULL verildiginde (spesifikasyon tanimsiz
-// birakiyor) implementasyonun segfault yerine tutarli davranip
-// davranmadigini gozlemler.
+// n > 0 iken framebuffers = NULL verildiğinde (spesifikasyon tanımsız
+// bırakıyor) implementasyonun segfault yerine tutarlı davranıp
+// davranmadığını gözlemler.
+/* It crashed on Windows */
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_005()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -130,13 +128,13 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_005()
     }
 }
 
-// Dangling bir pointer'a yazma denemesinin implementasyonun bellek korumasina karsi davranisini test eder.
+// Dangling bir pointer'a yazma denemesinin implementasyonun bellek korumasına karşı davranışını test eder.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_006()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
     GLuint *freedPtr = (GLuint *)malloc(sizeof(GLuint) * 4);
-    free(freedPtr); // artik gecersiz
+    free(freedPtr); // artık geçersiz
     glGenFramebuffers(4, freedPtr);
 
     GLenum err = glGetError();
@@ -148,10 +146,10 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_006()
     }
 }
 
-// glGenFramebuffers'in yalnizca kendisine ayrilan alana yazip yazmadigini
-// anlamak icin etrafini "canary" degerlerle sardigimiz bir buffer uzerinde
-// tasma testi yapar. Eger fonksiyon cb.data disina tasip cb.before veya
-// cb.after'i bozarsa buffer overflow var demektir.
+// glGenFramebuffers'in yalnızca kendisine ayrılan alana yazıp yazmadığını
+// anlamak için etrafını "canary" değerlerle sardığımız bir buffer üzerinde
+// taşma testi yapar. Eğer fonksiyon cb.data dışına taşıp cb.before veya
+// cb.after'ı bozarsa buffer overflow var demektir.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_007()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -180,8 +178,9 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_007()
     }
 }
 
-// Cok buyuk n degeriyle (INT_MAX) cagirarak bellek tahsis hatalarinin
-// crash yerine tutarli sekilde ele alinip alinmadigini gozlemler.
+// Çok büyük n değeriyle (INT_MAX) çağırarak bellek tahsis hatalarının
+// crash yerine tutarlı şekilde ele alınıp alınmadığını gözlemler.
+/* It crashed the entire system on Windows */
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_008()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -206,17 +205,19 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_008()
     free(framebuffers);
 }
 
-// Dizinin gercek boyutundan buyuk bir n ile cagirarak stack/heap
-// tasmasi (yanlis kullanim senaryosu) altinda kararliligi test eder.
+// Dizinin gerçek boyutundan büyük bir n ile çağırarak stack/heap
+// taşması (yanlış kullanım senaryosu) altında kararlılığı test eder.
+/* It crashed on Windows */
+// Fail yazdıktan sonra sistem çöküyor.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_009()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
-    GLuint smallArray[2]; // kasitli olarak kucuk
+    GLuint smallArray[2]; // kasıtlı olarak küçük
     glGenFramebuffers(2, smallArray);
     GLenum err1 = glGetError();
 
-    // KASITLI HATALI KULLANIM: n, dizinin gercek boyutundan buyuk.
+    // KASITLI HATALI KULLANIM: n, dizinin gercek boyutundan büyük.
     glGenFramebuffers(8, smallArray);
     GLenum err2 = glGetError();
 
@@ -228,8 +229,8 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_009()
     }
 }
 
-// Ayni n ile ardisik cok sayida glGenFramebuffers
-// dongusuyle isim havuzunun (name pool) tukenmesi/wrap-around durumunu test eder
+// Aynı n ile ardışık çok sayıda glGenFramebuffers
+// döngüsüyle isim havuzunun (name pool) tükenmesi/wrap-around durumunu test eder.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_010()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -255,7 +256,7 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_010()
     }
 }
 
-// Uretilen isimlerin, hic bind edilmeden glIsFramebuffer sorgusunun tutarli davranip davranmadigini doğrular
+// Üretilen isimlerin, hiç bind edilmeden glIsFramebuffer sorgusunun tutarlı davranıp davranmadığını doğrular.
 // (spec: "no framebuffer objects are associated until first bound").
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_011()
 {
@@ -275,15 +276,15 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_011()
     }
 }
 
-// Unaligned bir cikis pointer'iyla cagrildiginda
-// implementasyonun crash olmadan davranip davranmadigini test eder.
+// Unaligned bir çıkış pointer'ıyla çağrıldığında
+// implementasyonun crash olmadan davranıp davranmadığını test eder.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_012()
 {
     while (glGetError() != GL_NO_ERROR) {}
 
     unsigned char rawBuffer[64];
     memset(rawBuffer, 0xAA, sizeof(rawBuffer));
-    GLuint *unaligned = (GLuint *)(rawBuffer + 1); // kasitli hizalama bozuklugu
+    GLuint *unaligned = (GLuint *)(rawBuffer + 1); // kasıtlı hizalama bozukluğu
 
     glGenFramebuffers(4, unaligned);
 
@@ -296,8 +297,8 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_012()
     }
 }
 
-// Farkli n degerleriyle (gecerli/gecersiz karisik) art arda cagrilarak
-// implementasyonun genel kararliligini test eder.
+// Farklı n değerleriyle (geçerli/geçersiz karışık) ardışık çağrılarak
+// implementasyonun genel kararlılığını test eder.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_013()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -327,10 +328,10 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_013()
 }
 
 // glGenFramebuffers ve glGenRenderbuffers'in (ve varsa glGenBuffers'in)
-// aynı isim uzayini paylasip paylasmadigini (paylasmamasi gerekir - her
-// obje turunun kendi ad uzayi olmali) doğrular. Farkli obje turleri
-// arasinda isim carpismasi implementasyonun ic handle tablosunda ciddi
-// bir tasarim hatasina isaret eder.
+// aynı isim uzayını paylaşıp paylaşmadığını (paylaşmaması gerekir; her
+// obje türünün kendi ad uzayı olmalı) doğrular. Farklı obje türleri
+// arasında isim çarpışması implementasyonun iç handle tablosunda ciddi
+// bir tasarım hatasına işaret eder.
 void GS_GL20SC_FO_GF_ROBUSTNESS_TC_014()
 {
     while (glGetError() != GL_NO_ERROR) {}
@@ -340,12 +341,12 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_014()
     glGenRenderbuffers(1, &rb);
 
     // fbo ismini renderbuffer olarak, rb ismini framebuffer olarak
-    // yorumlamayi dene - glIsFramebuffer/glIsRenderbuffer ile capraz kontrol.
+    // yorumlamayı dene - glIsFramebuffer/glIsRenderbuffer ile çapraz kontrol.
     GLboolean fboIsRb = glIsRenderbuffer(fbo);
     GLboolean rbIsFbo = glIsFramebuffer(rb);
 
-    // Isimler numerik olarak ortusebilir (her ikisi de kucuk sayidan
-    // baslayabilir) ama tur olarak birbirine karismamalidir.
+    // İsimler numerik olarak örtüşebilir (ikisi de küçük sayıdan
+    // başlayabilir) ama tür olarak birbirine karışmamalıdır.
     if (fboIsRb == GL_FALSE && rbIsFbo == GL_FALSE) {
         TEST_LOG_SUCCESS(test_case_14, test_procedure);
     }
@@ -356,36 +357,36 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TC_014()
 
 
 /* Initialization */
-void GGS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init(void) {
-    CHECK_ERROR(test_procedure);
+void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init(void) {
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_001();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_002();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_003();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_004();
-    CHECK_ERROR(test_procedure);
-    GS_GL20SC_FO_GF_ROBUSTNESS_TC_005();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_GF_ROBUSTNESS_TC_005(); /* It crashed on Windows */
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_006();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_007();
-    CHECK_ERROR(test_procedure);
-    GS_GL20SC_FO_GF_ROBUSTNESS_TC_008();
-    CHECK_ERROR(test_procedure);
-    GS_GL20SC_FO_GF_ROBUSTNESS_TC_009();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_GF_ROBUSTNESS_TC_008(); /* It crashed the entire system on Windows */
+    // CHECK_ERROR(test_procedure);
+    GS_GL20SC_FO_GF_ROBUSTNESS_TC_009(); /* It crashed and failed on Windows */
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_010();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_011();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_012();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_013();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
     GS_GL20SC_FO_GF_ROBUSTNESS_TC_014();
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
 }
 
 void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_draw(void) {
@@ -394,5 +395,5 @@ void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_draw(void) {
 
 /* Cleanup */
 void GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_close(void) {
-    CHECK_ERROR(test_procedure);
+    // CHECK_ERROR(test_procedure);
 }

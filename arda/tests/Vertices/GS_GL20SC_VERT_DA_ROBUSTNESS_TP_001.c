@@ -1,15 +1,12 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
-#include "../../../include/macro.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004";
-static const char* test_case_5 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005";
-static const char* test_case_6 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006";
-
+static const char *test_procedure = "GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004";
+static const char *test_case_5 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005";
+static const char *test_case_6 = "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006";
 
 /* ============================================================
  * TEST GRUBU: glDrawArrays
@@ -28,7 +25,7 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
-	GLfloat data[] = { 0.0f, 0.0f, 0.0f }; // 1 vertex (x,y,z)
+	GLfloat data[] = {0.0f, 0.0f, 0.0f}; // 1 vertex (x,y,z)
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -37,13 +34,15 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001(void) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Buffer'da 1 vertex var ama 100 tane çizmeye çalış */
 	glDrawArrays(GL_TRIANGLES, 0, 100);
 	GLenum err = glGetError();
 
-	/* Çökmediyse başarılıdır. Hata döndürebilir veya döndürmeyebilir (undefined) */
+	/* Çökmediyse başarılıdır. Hata döndürebilir veya döndürmeyebilir
+	 * (undefined) */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
 
 	glDisableVertexAttribArray(0);
@@ -66,21 +65,24 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002(void) {
 	   segfault olarak loglanır. Çökmezse geçer. */
 	long page_size = sysconf(_SC_PAGESIZE);
 	if (page_size == -1) {
-		TEST_LOG_INFO("GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: sysconf başarısız.");
+		TEST_LOG_INFO(
+		    "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: sysconf başarısız.");
 		return;
 	}
 
-	void *mem = mmap(NULL, page_size * 2, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *mem = mmap(NULL, page_size * 2, PROT_READ | PROT_WRITE,
+			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (mem == MAP_FAILED) {
-		TEST_LOG_INFO("GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: mmap başarısız.");
+		TEST_LOG_INFO(
+		    "GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002: mmap başarısız.");
 		return;
 	}
 
 	/* İkinci sayfayı korumalı yap (guard page) */
-	mprotect((char*)mem + page_size, page_size, PROT_NONE);
+	mprotect((char *)mem + page_size, page_size, PROT_NONE);
 
 	/* Veriyi ilk sayfanın tam sonuna hizala (1 vertex: 12 byte) */
-	void *data_ptr = (char*)mem + page_size - 12;
+	void *data_ptr = (char *)mem + page_size - 12;
 
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
@@ -88,7 +90,8 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002(void) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, data_ptr);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* 2 vertex çizmeye çalış -> ikinci vertex guard page'e taşar */
 	glDrawArrays(GL_POINTS, 0, 2);
@@ -112,7 +115,8 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Attribute'lar bağlanmadan çizim komutu gönderilir */
 	glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -120,7 +124,6 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003(void) {
 
 	/* Sürücü çökmemeli. GL_INVALID_OPERATION fırlatabilir veya yutabilir */
 	TEST_LOG_SUCCESS(test_case_1, test_procedure);
-
 }
 
 /* ============================================================
@@ -135,7 +138,7 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
-	GLfloat data[] = { NAN, INFINITY, -INFINITY };
+	GLfloat data[] = {NAN, INFINITY, -INFINITY};
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -144,7 +147,8 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004(void) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	glDrawArrays(GL_POINTS, 0, 1);
 	GLenum err = glGetError();
@@ -166,15 +170,18 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004(void) {
 void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005(void) {
 	glUseProgram(0);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	glDrawArrays(GL_POINTS, 0, 1);
 	GLenum err = glGetError();
 
 	if (!(err == GL_INVALID_OPERATION)) {
-		TEST_LOG_FAIL(test_case_1, test_procedure,
-			      "Programsız çizimde GL_INVALID_OPERATION bekleniyordu."
-			      " Actual: 0x%04X", err);
+		TEST_LOG_FAIL(
+		    test_case_1, test_procedure,
+		    "Programsız çizimde GL_INVALID_OPERATION bekleniyordu."
+		    " Actual: 0x%04X",
+		    err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
@@ -191,7 +198,8 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* Count negatif olamaz: GL_INVALID_VALUE */
 	glDrawArrays(GL_POINTS, 0, -1);
@@ -200,9 +208,26 @@ void GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "count=-1 GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
 
+/* Initialization */
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_001();
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_002();
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_003();
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_004();
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_005();
+	GS_GL20SC_VERT_DA_ROBUSTNESS_TC_006();
+}
+
+/* Cleanup */
+void GS_GL20SC_VERT_DA_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

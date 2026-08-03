@@ -1,13 +1,10 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
-#include "../../../include/macro.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_SP_GUL_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * TEST GRUBU: glGetUniformLocation
@@ -32,7 +29,6 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_001(void) {
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -51,11 +47,11 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_002(void) {
 
 	if (!(loc == -1)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
-			      "Yasaklı 'gl_' ön eki ifşa edildi. Actual: %d", loc);
+			      "Yasaklı 'gl_' ön eki ifşa edildi. Actual: %d",
+			      loc);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -68,7 +64,8 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_002(void) {
  * ============================================================ */
 void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	GLint loc = glGetUniformLocation(prog, "");
 	GLenum err = glGetError();
@@ -76,11 +73,11 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003(void) {
 	if (!(loc == -1 || err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Boş string için -1 ya da hata dönmedi."
-			      " loc=%d, err=0x%04X", loc, err);
+			      " loc=%d, err=0x%04X",
+			      loc, err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -92,7 +89,8 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003(void) {
  * GL_INVALID_OPERATION ile reddettiği doğrulanır.
  * ============================================================ */
 void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_004(void) {
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	/* 0 ID: hiçbir zaman geçerli program değildir */
 	GLint loc = glGetUniformLocation(0, "uFloat");
@@ -101,8 +99,24 @@ void GS_GL20SC_SP_GUL_ROBUSTNESS_TC_004(void) {
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz (0) program ID'si reddedilmedi."
-			      " loc=%d, err=0x%04X", loc, err);
+			      " loc=%d, err=0x%04X",
+			      loc, err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
+
+/* Initialization */
+void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_SP_GUL_ROBUSTNESS_TC_001();
+	GS_GL20SC_SP_GUL_ROBUSTNESS_TC_002();
+	GS_GL20SC_SP_GUL_ROBUSTNESS_TC_003();
+	GS_GL20SC_SP_GUL_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_SP_GUL_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

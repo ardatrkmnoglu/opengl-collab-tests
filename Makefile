@@ -1,11 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude -g
+CFLAGS = -Wall -Wextra -Iinclude -Igizem/external/glad/include -g -D_GNU_SOURCE
 LDFLAGS = -lglfw -lGLESv2 -lGLEW -lGL -lm
 
 BUILD_DIR = build
 INC_DIR = include
 
-TEST_SRCS = $(wildcard *.c) $(wildcard arda/tests/*/*.c) $(wildcard ozan/tests/*/*.c) $(wildcard gizem/tests/*/*.c) $(wildcard hasan/tests/*.c)
+TEST_SRCS = $(wildcard *.c) gizem/external/glad/src/gles2.c $(wildcard */tests/*/*.c)
 TEST_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(TEST_SRCS))
 
 TARGET = $(BUILD_DIR)/test_suite

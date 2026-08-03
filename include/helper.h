@@ -4,8 +4,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "macro.h"
-
 /* ------------------------------------------------------------------ *
  * createDummyProgram
  *
@@ -41,8 +39,6 @@ void destroyContext(GLFWwindow **window);
  *   - Hata kuyruğu → boşaltılır
  * ------------------------------------------------------------------ */
 void cleanOpenGLState(void);
-
-#include <GL/gl.h>
 
 /* ============================================================
  * Ortak test altyapisi
@@ -94,6 +90,18 @@ int checkFloatState2(const char *test_case, const char *test_procedure,
 int checkDoubleState2(const char *test_case, const char *test_procedure,
 		      GLenum pname, GLdouble expectedA, GLdouble expectedB,
 		      GLdouble tolerance);
+
+int checkFloatArray(const char* test_case, const char* test_procedure,
+					 GLenum pname,
+					 GLfloat expectedA, GLfloat expectedB,
+					 GLfloat tolerance);
+
+
+int checkFloatArray2(const char* test_case, const char* test_procedure,
+					 GLenum pname,
+					 GLfloat expectedA, GLfloat expectedB,
+					 GLfloat tolerance);
+
 
 /* ---------- Durum sifirlama ---------- */
 

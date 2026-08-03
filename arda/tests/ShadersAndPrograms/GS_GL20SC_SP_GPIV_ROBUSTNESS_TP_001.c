@@ -1,12 +1,10 @@
-#include "../../../include/macro.h"
-#include "../../../include/rtests.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_003
@@ -44,5 +42,17 @@ void GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_004(void) {
 	} else {
 		TEST_LOG_SUCCESS(test_case_4, test_procedure);
 	}
+}
 
+/* Initialization */
+void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_003();
+	GS_GL20SC_SP_GPIV_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_SP_GPIV_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

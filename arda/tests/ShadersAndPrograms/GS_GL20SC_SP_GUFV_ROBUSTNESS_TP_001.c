@@ -1,13 +1,10 @@
-#include "../../../include/rtests.h"
-#include "../../../include/helper.h"
-#include "../../../include/macro.h"
+#include "../../../test_utility.h"
 
-static const char* test_procedure = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001";
-static const char* test_case_1 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001";
-static const char* test_case_2 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002";
-static const char* test_case_3 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003";
-static const char* test_case_4 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004";
-
+static const char *test_procedure = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001";
+static const char *test_case_1 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001";
+static const char *test_case_2 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002";
+static const char *test_case_3 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003";
+static const char *test_case_4 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004";
 
 /* ============================================================
  * TEST GRUBU: glGetnUniformfv / glGetnUniformiv
@@ -25,7 +22,8 @@ static const char* test_case_4 = "GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004";
 void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001(void) {
 	GLuint prog = createDummyProgram();
 	GLint locFloat = glGetUniformLocation(prog, "uFloat");
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	GLfloat data[4];
 	/* BufSize negatif olamaz: KHR_robustness temel kuralı. */
@@ -35,11 +33,11 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001(void) {
 	if (!(err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Negatif bufSize GL_INVALID_VALUE üretmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -51,7 +49,8 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001(void) {
  * sorgulayıp sorgulamadığı doğrulanır.
  * ============================================================ */
 void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002(void) {
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	GLfloat data[4];
 	/* 0: hiçbir zaman geçerli bir program nesnesi değildir. */
@@ -61,7 +60,8 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002(void) {
 	if (!(err == GL_INVALID_VALUE || err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz (0) program ID'si reddedilmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
@@ -78,10 +78,12 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
 	GLint locFloat = glGetUniformLocation(prog, "uFloat");
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	GLfloat data[4];
-	/* BufSize = 0: tanımlı edge case — hata üretmemeli ya da GL_INVALID_VALUE */
+	/* BufSize = 0: tanımlı edge case — hata üretmemeli ya da
+	 * GL_INVALID_VALUE */
 	glGetnUniformfv(prog, locFloat, 0, data);
 	GLenum err = glGetError();
 
@@ -89,11 +91,11 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003(void) {
 	      err == GL_INVALID_OPERATION)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "BufSize=0 için beklenmeyen hata kodu."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
-
 }
 
 /* ============================================================
@@ -107,7 +109,8 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003(void) {
 void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004(void) {
 	GLuint prog = createDummyProgram();
 	glUseProgram(prog);
-	while (glGetError() != GL_NO_ERROR) { /* temizle */ }
+	while (glGetError() != GL_NO_ERROR) { /* temizle */
+	}
 
 	GLfloat data[4];
 	/* Tamamen uydurma lokasyon: sürücü reddetmeli */
@@ -117,9 +120,24 @@ void GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004(void) {
 	if (!(err == GL_INVALID_OPERATION || err == GL_INVALID_VALUE)) {
 		TEST_LOG_FAIL(test_case_1, test_procedure,
 			      "Geçersiz lokasyon (0x7FFFFFFF) reddedilmedi."
-			      " Actual: 0x%04X", err);
+			      " Actual: 0x%04X",
+			      err);
 	} else {
 		TEST_LOG_SUCCESS(test_case_1, test_procedure);
 	}
+}
 
+/* Initialization */
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_init(void) {}
+
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_draw(void) {
+	GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_001();
+	GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_002();
+	GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_003();
+	GS_GL20SC_SP_GUFV_ROBUSTNESS_TC_004();
+}
+
+/* Cleanup */
+void GS_GL20SC_SP_GUFV_ROBUSTNESS_TP_001_close(void) {
+	CHECK_ERROR(test_procedure);
 }

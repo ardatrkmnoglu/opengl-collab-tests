@@ -9,3 +9,7 @@ build/
 # Object files & Executables
 *.o
 *.out
+
+# OS generated files
+.DS_Store
+

@@ -179,3 +179,28 @@ add_robustness_test(TEXT_GetTexParameterfv
     GS_GL20SC_TEXT_GTPFV_ROBUSTNESS_TP_001
 )
 
+# --- Texturing - TexParameteri ---
+add_robustness_test(TEXT_TexParameteri
+    tests/Texturing/GS_GL20SC_TEXT_TPI_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TPI_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - TexParameterf ---
+add_robustness_test(TEXT_TexParameterf
+    tests/Texturing/GS_GL20SC_TEXT_TPF_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TPF_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - TexParameteriv ---
+add_robustness_test(TEXT_TexParameteriv
+    tests/Texturing/GS_GL20SC_TEXT_TPIV_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TPIV_ROBUSTNESS_TP_001
+)
+
+# --- Texturing - TexParameterfv ---
+add_robustness_test(TEXT_TexParameterfv
+    tests/Texturing/GS_GL20SC_TEXT_TPFV_ROBUSTNESS_TP_001.c
+    GS_GL20SC_TEXT_TPFV_ROBUSTNESS_TP_001
+)
+
+

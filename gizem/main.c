@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <glad/gles2.h>
 #include <GLFW/glfw3.h>
-#include "tests/BufferObjects/tests.h"
+#include "tests/BufferObjects/bufferObjects_tests.h"
 #include "tests/FramebufferObjects/frameBuffer_tests.h"
 
 const char* vertexShaderSource = "#version 100\n"
@@ -45,11 +45,11 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL ES 2.0 Testleri", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "OpenGL ES 2.0 Tests", NULL, NULL);
 
     if (window == NULL)
     {
-        printf("Pencere olusturulamadi!\n");
+        printf("Window could not be created!\n");
         glfwTerminate();
         return -1;
     }
@@ -59,7 +59,7 @@ int main(void)
 
     if (!gladLoadGLES2((GLADloadfunc)glfwGetProcAddress))
     {
-        printf("GLAD yuklenemedi!\n");
+        printf("GLAD could not be loaded!\n");
         glfwTerminate();
         return -1;
         }
@@ -84,122 +84,29 @@ int main(void)
 void init(void)
 {
     /* TESTLER */
+    /* Test procedure'ları toplu çalıştıran init fonksiyonları örnek olarak yazılmıştır.
+    Tek bir fonksiyonu da çağırabilirsiniz. Test isimlerini tests/../*.h veya tests/../*c dosyalarından bulabilirsiniz
+    Örneğin Buffer Objects - Bind Buffer 001 testi için:
+    GS_GL20SC_BO_BB_ROBUSTNESS_TC_001(); */
 
+    /* --------------- Framebuffer Objects Functions --------------- */
+    // GS_GL20SC_FO_FT2D_ROBUSTNESS_TP_001_init(); /* -- FramebufferTexture2D -- */
+    // GS_GL20SC_FO_GRP_ROBUSTNESS_TP_001_init();  /* -- GetRenderbufferParameteriv -- */
+    // GS_GL20SC_FO_GFAP_ROBUSTNESS_TP_001_init();  /* -- GetFramebufferAttachmentParameteriv -- */
+    // GS_GL20SC_FO_CFS_ROBUSTNESS_TP_001_init();  /* -- CheckFramebufferStatus -- */
+    // GS_GL20SC_FO_FR_ROBUSTNESS_TP_001_init();  /* -- FramebufferRenderbuffer -- */
+    // GS_GL20SC_FO_RS_ROBUSTNESS_TP_001_init();  /* -- RenderbufferStorage -- */
+    // GS_GL20SC_FO_GR_ROBUSTNESS_TP_001_init();  /* -- GenRenderbuffers -- */
+    // GS_GL20SC_FO_BR_ROBUSTNESS_TP_001_init();  /* -- BindRenderbuffer -- */
+    // GS_GL20SC_FO_GF_ROBUSTNESS_TP_001_init();  /* -- GenFramebuffer -- */
+    // GS_GL20SC_FO_BF_ROBUSTNESS_TP_001_init();  /* -- BindFramebuffer -- */
 
-
-
-
-    /* --------------- GenFramebuffer --------------- */
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_001();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_002();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_003();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_004();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_005();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_006();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_007();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_008();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_009();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_010();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_011();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_012();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_013();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_014();
-    // GS_GL20SC_FO_GF_ROBUSTNESS_TC_015();
-
-
-    /* --------------- BindFramebuffer --------------- */
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_001();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_002();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_003();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_004();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_005();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_006();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_007();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_008();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_009();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_010();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_011();
-    // GS_GL20SC_FO_BF_ROBUSTNESS_TC_012();
-
-
-
-
-
-
-
-    /* --------------- BindBuffer --------------- */
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_001();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_002();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_003();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_004();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_005();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_006();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_007();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_008();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_009();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_010();
-    // GS_GL20SC_BO_BB_ROBUSTNESS_TC_011();
-
-    /* --------------- BufferData --------------- */
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_001();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_002();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_003();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_004();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_005();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_006();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_007();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_008();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_009();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_010();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_011();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_012();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_013();
-    // GS_GL20SC_BO_BD_ROBUSTNESS_TC_014();
-
-    /* --------------- BufferSubData --------------- */
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_001();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_002();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_003();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_004();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_005();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_006();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_007();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_008();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_009();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_010();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_011();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_012();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_013();
-    // GS_GL20SC_BO_BSD_ROBUSTNESS_TC_014();
-
-    /* --------------- GenBuffers --------------- */
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_001();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_002();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_003();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_004();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_005();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_006();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_007();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_008();
-    // GS_GL20SC_BO_GB_ROBUSTNESS_TC_009();
-
-    /* --------------- glGetBufferParameteriv --------------- */
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_001();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_002();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_003();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_004();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_005();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_006();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_007();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_008();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_009();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_010();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_011();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_012();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_013();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_014();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_015();
-    // GS_GL20SC_GBP_GB_ROBUSTNESS_TC_016();
+    /* --------------- Buffer Objects Functions --------------- */
+    // GS_GL20SC_BO_BB_ROBUSTNESS_TP_001_init();  /* -- BindBuffer -- */
+    // GS_GL20SC_BO_BD_ROBUSTNESS_TP_001_init();  /* -- BufferData -- */
+    // GS_GL20SC_BO_BSD_ROBUSTNESS_TP_001_init(); /* -- BufferSubData -- */
+    // GS_GL20SC_BO_GB_ROBUSTNESS_TP_001_init();  /* -- GenBuffers -- */
+    // GS_GL20SC_BO_GBP_ROBUSTNESS_TP_001_init(); /* -- glGetBufferParameteriv -- */
 
 
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -212,7 +119,7 @@ void init(void)
     if (!success)
     {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("Vertex Shader Derleme Hatasi:\n%s\n", infoLog);
+        printf("Vertex Shader Compilation Error:\n%s\n", infoLog);
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -223,7 +130,7 @@ void init(void)
     if (!success)
     {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        printf("Fragment Shader Derleme Hatasi:\n%s\n", infoLog);
+        printf("Fragment Shader Compilation Error:\n%s\n", infoLog);
     }
 
     shaderProgram = glCreateProgram();
@@ -236,7 +143,7 @@ void init(void)
     if (!success)
     {
         glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        printf("Shader Programi Link Hatasi:\n%s\n", infoLog);
+        printf("Shader Program Link Error:\n%s\n", infoLog);
     }
 
     glDeleteShader(vertexShader);
